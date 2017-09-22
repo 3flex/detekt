@@ -2,17 +2,17 @@ package io.gitlab.arturbosch.detekt.api
 
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.com.intellij.mock.MockProject
-import org.jetbrains.kotlin.com.intellij.openapi.extensions.ExtensionPoint
-import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
-import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
-import org.jetbrains.kotlin.com.intellij.openapi.util.UserDataHolderBase
-import org.jetbrains.kotlin.com.intellij.pom.PomModel
-import org.jetbrains.kotlin.com.intellij.pom.PomModelAspect
-import org.jetbrains.kotlin.com.intellij.pom.PomTransaction
-import org.jetbrains.kotlin.com.intellij.pom.impl.PomTransactionBase
-import org.jetbrains.kotlin.com.intellij.pom.tree.TreeAspect
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.TreeCopyHandler
+import com.intellij.mock.MockProject
+import com.intellij.openapi.extensions.ExtensionPoint
+import com.intellij.openapi.extensions.Extensions
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.UserDataHolderBase
+import com.intellij.pom.PomModel
+import com.intellij.pom.PomModelAspect
+import com.intellij.pom.PomTransaction
+import com.intellij.pom.impl.PomTransactionBase
+import com.intellij.pom.tree.TreeAspect
+import com.intellij.psi.impl.source.tree.TreeCopyHandler
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import sun.reflect.ReflectionFactory
@@ -46,7 +46,7 @@ private fun makeMutable(project: MockProject) {
 		}
 
 	}
-	val extensionPoint = "org.jetbrains.kotlin.com.intellij.treeCopyHandler"
+	val extensionPoint = "com.intellij.treeCopyHandler"
 	val extensionClassName = TreeCopyHandler::class.java.name!!
 	arrayOf(Extensions.getArea(project), Extensions.getArea(null))
 			.filter { !it.hasExtensionPoint(extensionPoint) }

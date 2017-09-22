@@ -6,6 +6,9 @@ configurations {
 dependencies {
 	implementation project(':detekt-rules')
 	implementation project(':detekt-core')
+	implementation project(':detekt-api')
+
+	kotlinImplementation "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
 	
 	testRuntime "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"
 	testRuntime "org.junit.platform:junit-platform-console:$junitPlatformVersion"

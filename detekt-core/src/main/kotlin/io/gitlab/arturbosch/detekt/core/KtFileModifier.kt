@@ -1,7 +1,7 @@
 package io.gitlab.arturbosch.detekt.core
 
+import com.intellij.openapi.util.text.StringUtilRt
 import io.gitlab.arturbosch.detekt.api.Notification
-import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
 import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.psi.KtFile
 import java.nio.file.Files

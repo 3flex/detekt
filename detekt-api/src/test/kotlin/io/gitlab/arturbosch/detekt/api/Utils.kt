@@ -1,7 +1,7 @@
 package io.gitlab.arturbosch.detekt.api
 
-import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
-import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
+import com.intellij.openapi.util.text.StringUtilRt
+import com.intellij.psi.PsiFileFactory
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File

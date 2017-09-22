@@ -1,7 +1,7 @@
 package io.gitlab.arturbosch.detekt.test
 
 import io.gitlab.arturbosch.detekt.core.KtCompiler
-import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
+import com.intellij.openapi.util.text.StringUtilRt
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.psi.KtFile
 import java.nio.file.Paths

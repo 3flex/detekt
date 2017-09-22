@@ -4,8 +4,8 @@ import io.gitlab.arturbosch.detekt.api.Detektion
 import io.gitlab.arturbosch.detekt.api.Finding
 import io.gitlab.arturbosch.detekt.api.Notification
 import io.gitlab.arturbosch.detekt.api.ProjectMetric
-import org.jetbrains.kotlin.com.intellij.openapi.util.Key
-import org.jetbrains.kotlin.com.intellij.util.keyFMap.KeyFMap
+import com.intellij.openapi.util.Key
+import com.intellij.util.keyFMap.KeyFMap
 
 /**
  * @author Artur Bosch

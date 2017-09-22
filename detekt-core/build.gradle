@@ -1,14 +1,49 @@
+import javax.tools.ToolProvider
+
 configurations {
 	implementation.extendsFrom kotlinImplementation
 	testImplementation.extendsFrom kotlinTest
 }
 
+configurations {
+	provided
+}
+
+tasks.withType(AbstractCompile) {
+	classpath += configurations.provided
+//	classpath.forEach{println(it.path)}
+}
+
+tasks.withType(Test) {
+	classpath += configurations.provided
+}
+
+//tasks.withType(AbstractCompile) {
+//	options.encoding = 'UTF-8'
+//}
+
 dependencies {
+	compile files("../lib/intellij-core-analysis.jar")
+//	compile files("../lib/intellij-core.jar")
+//	kotlinImplementation "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
+	compile files("../lib/kotlin-ide-common.jar")
+
 	compile project(':detekt-api')
-	
-	testImplementation project(':detekt-rules')
-	testImplementation project(':detekt-test')
-	testRuntime "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"
-	testRuntime "org.junit.platform:junit-platform-console:$junitPlatformVersion"
-	testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
+
+	testCompile project(':detekt-rules')
+	testCompile project(':detekt-test')
+	testRuntime "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
+	testRuntime files("../lib/intellij-core-analysis.jar")
+	testRuntime files("../lib/intellij-core.jar")
+	testRuntime files("../lib/trove4j.jar")
+//	kotlinImplementation "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
+	testRuntime files("../lib/kotlin-ide-common.jar")
+
+	provided files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs().findAll { it.path.endsWith("jar") })
+
+//	ToolProvider.getSystemToolClassLoader().getURLs().findAll{ it.path.endsWith("jar") }.forEach {println(it)}
+
+	testCompile "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"
+	testCompile "org.junit.platform:junit-platform-console:$junitPlatformVersion"
+	testCompile "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
 }

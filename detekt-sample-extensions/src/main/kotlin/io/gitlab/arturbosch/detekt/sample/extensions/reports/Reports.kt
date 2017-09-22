@@ -1,7 +1,7 @@
 package io.gitlab.arturbosch.detekt.sample.extensions.reports
 
 import io.gitlab.arturbosch.detekt.api.Detektion
-import org.jetbrains.kotlin.com.intellij.openapi.util.Key
+import com.intellij.openapi.util.Key
 
 @Suppress("UNCHECKED_CAST", "DEPRECATION")
 fun qualifiedNamesReport(detektion: Detektion): String? {

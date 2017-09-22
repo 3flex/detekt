@@ -6,8 +6,8 @@ import io.gitlab.arturbosch.detekt.api.Notification
 import io.gitlab.arturbosch.detekt.api.ProjectMetric
 import io.gitlab.arturbosch.detekt.test.compileContentForTest
 import org.assertj.core.api.Assertions
-import org.jetbrains.kotlin.com.intellij.openapi.util.Key
-import org.jetbrains.kotlin.com.intellij.util.keyFMap.KeyFMap
+import com.intellij.openapi.util.Key
+import com.intellij.util.keyFMap.KeyFMap
 import org.junit.jupiter.api.Test
 
 /**
