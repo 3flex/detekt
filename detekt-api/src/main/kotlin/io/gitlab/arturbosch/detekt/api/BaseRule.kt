@@ -1,15 +1,19 @@
 package io.gitlab.arturbosch.detekt.api
 
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.TopDownAnalysisContext
 
 @Suppress("EmptyFunctionBlock")
 abstract class BaseRule(protected val context: Context = DefaultContext()) : DetektVisitor(), Context by context {
+
+	var analysisContext: TopDownAnalysisContext? = null
 
 	/**
 	 * Before starting visiting kotlin elements, a check is performed if this rule should be triggered.
 	 * Pre- and post-visit-hooks are executed before/after the visiting process.
 	 */
-	fun visitFile(root: KtFile) {
+	fun visitFile(root: KtFile, analysisContext: TopDownAnalysisContext) {
+		this.analysisContext = analysisContext
 		if (visitCondition(root)) {
 			clearFindings()
 			preVisit(root)

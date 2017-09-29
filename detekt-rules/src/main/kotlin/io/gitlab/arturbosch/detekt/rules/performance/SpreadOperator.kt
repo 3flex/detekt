@@ -7,6 +7,7 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtValueArgumentList
+import org.jetbrains.kotlin.resolve.calls.callUtil.getParentResolvedCall
 
 /**
  * @author Ivan Balaksha
@@ -23,5 +24,6 @@ class SpreadOperator(config: Config = Config.empty) : Rule(config) {
 				.forEach {
 					report(CodeSmell(issue, Entity.from(list)))
 				}
+		list.getParentResolvedCall(analysisContext.)
 	}
 }

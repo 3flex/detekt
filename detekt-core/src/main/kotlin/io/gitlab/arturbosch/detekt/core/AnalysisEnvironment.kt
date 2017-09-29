@@ -38,6 +38,8 @@ import org.jetbrains.kotlin.container.getService
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.analyze
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.load.java.structure.impl.JavaClassImpl
 import org.jetbrains.kotlin.name.Name
@@ -224,7 +226,7 @@ class DokkaResolutionFacade(override val project: Project,
 	}
 
 	override fun resolveToDescriptor(declaration: KtDeclaration, bodyResolveMode: BodyResolveMode): DeclarationDescriptor {
-		return resolveSession.resolveToDescriptor(declaration)
+		return declaration.resolveToDescriptor(bodyResolveMode)
 	}
 
 	override fun analyze(elements: Collection<KtElement>, bodyResolveMode: BodyResolveMode): BindingContext {
@@ -234,7 +236,7 @@ class DokkaResolutionFacade(override val project: Project,
 	val resolveSession: ResolveSession get() = getFrontendService(ResolveSession::class.java)
 
 	override fun analyze(element: KtElement, bodyResolveMode: BodyResolveMode): BindingContext {
-		throw UnsupportedOperationException()
+		return element.analyze(bodyResolveMode)
 	}
 
 	override fun analyzeFullyAndGetResult(elements: Collection<KtElement>): AnalysisResult {

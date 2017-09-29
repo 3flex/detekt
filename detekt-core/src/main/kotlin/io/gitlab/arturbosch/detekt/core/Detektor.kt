@@ -1,10 +1,6 @@
 package io.gitlab.arturbosch.detekt.core
 
 import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiJavaFile
-import com.intellij.psi.PsiManager
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Detektion
 import io.gitlab.arturbosch.detekt.api.FileProcessListener
@@ -17,11 +13,10 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.cli.jvm.config.JavaSourceRoot
-import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer
+import org.jetbrains.kotlin.resolve.TopDownAnalysisContext
 import org.jetbrains.kotlin.resolve.TopDownAnalysisMode
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
@@ -49,13 +44,13 @@ class Detektor(private val settings: ProcessingSettings,
 				settings.classpath,
 				paths)
 				//TODO: get sources (the actual files themselves)
-		resolver.generate()
+		val context = resolver.generate()
 
 		processors.forEach { it.onStart(ktFiles) }
 		val futures = ktFiles.map { file ->
 			runAsync {
 				processors.forEach { it.onProcess(file) }
-				file.analyze().apply {
+				file.analyze(context).apply {
 					processors.forEach { it.onProcessComplete(file, FindingsForFile(this)) }
 				}
 			}
@@ -73,18 +68,21 @@ class Detektor(private val settings: ProcessingSettings,
 		}
 	}
 
-	private fun KtFile.analyze(): List<Pair<String, List<Finding>>> = providers
+	private fun KtFile.analyze(context: TopDownAnalysisContext): List<Pair<String, List<Finding>>> = providers
 			.mapNotNull { it.buildRuleset(config) }
 			.sortedBy { it.id }
 			.distinctBy { it.id }
-			.map { rule -> rule.id to rule.accept(this) }
+			.map { rule -> rule.id to rule.accept(this, context) }
 }
 
 class DokkaGenerator(val classpath: List<String>,
 					 val sources: List<SourceRoot>) {
 
-	fun generate() {
+	var analysisContext: TopDownAnalysisContext? = null
+
+	fun generate(): TopDownAnalysisContext {
 		appendSourceModule(sources)
+		return analysisContext!!
 	}
 
 	private fun appendSourceModule(sourceRoots: List<SourceRoot>) {
@@ -98,7 +96,8 @@ class DokkaGenerator(val classpath: List<String>,
 
 		val coreEnvironment: KotlinCoreEnvironment = environment.createCoreEnvironment()
 		val dokkaResolutionFacade = environment.createResolutionFacade(coreEnvironment)
-		buildDocumentationModule(coreEnvironment = coreEnvironment, resolutionFacade = dokkaResolutionFacade)
+		analysisContext = buildDocumentationModule(coreEnvironment = coreEnvironment, resolutionFacade =
+		dokkaResolutionFacade)
 
 		Disposer.dispose(environment)
 	}
@@ -108,7 +107,6 @@ class DokkaGenerator(val classpath: List<String>,
 
 		environment.apply {
 			addClasspath(PathUtil.getJdkClassesRootsFromCurrentJre())
-//			addClasspath(PathUtil.getKotlinPathsForCompiler().stdlibPath)
 			for (element in this@DokkaGenerator.classpath) {
 				addClasspath(File(element))
 			}
@@ -136,86 +134,18 @@ class DokkaMessageCollector : MessageCollector {
 	override fun hasErrors() = seenErrors
 }
 
-fun buildDocumentationModule(filesToDocumentFilter: (PsiFile) -> Boolean = { file -> true },
-							 coreEnvironment: KotlinCoreEnvironment,
-							 resolutionFacade: ResolutionFacade) {
+fun buildDocumentationModule(coreEnvironment: KotlinCoreEnvironment,
+							 resolutionFacade: ResolutionFacade): TopDownAnalysisContext {
 
-	val fragmentFiles = coreEnvironment.getSourceFiles().filter(filesToDocumentFilter)
+	val fragmentFiles = coreEnvironment.getSourceFiles()
 	val analyzer = resolutionFacade.getFrontendService(LazyTopDownAnalyzer::class.java)
-//	analyzer.analyzeDeclarations()
-//	val declarations1 = analyzer.analyze
-	analyzer.analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, fragmentFiles)
-//	println("declared classes: " + declarations.declaredClasses)
 
-//	val fragments = fragmentFiles
-//			.map { resolutionFacade.resolveSession.getPackageFragment(it.packageFqName) }
-//			.filterNotNull()
-//			.distinct()
+	return analyzer.analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, fragmentFiles)
+//	declarations.secondaryConstructors
 
-//	val packageDocs = injector.getInstance(PackageDocs::class.java)
-//	for (include in includes) {
-//		packageDocs.parse(include, fragments)
-//	}
-//	if (documentationModule.content.isEmpty()) {
-//		documentationModule.updateContent {
-//			for (node in packageDocs.moduleContent.children) {
-//				append(node)
-//			}
-//		}
-//	}
-
-//	with(injector.getInstance(DocumentationBuilder::class.java)) {
-//		documentationModule.appendFragments(fragments, packageDocs.packageContent,
-//				injector.getInstance(PackageDocumentationBuilder::class.java))
-//	}
-
-//	val javaFiles = coreEnvironment.getJavaSourceFiles().filter(filesToDocumentFilter)
-//	with(injector.getInstance(JavaDocumentationBuilder::class.java)) {
-//		javaFiles.map { appendFile(it, documentationModule, packageDocs.packageContent) }
-//	}
-}
-
-//fun buildDocumentationModule(filesToDocumentFilter: (PsiFile) -> Boolean = { file -> true }) {
-//
-//	val fragmentFiles = coreEnvironment.getSourceFiles().filter(filesToDocumentFilter)
-//
-//	val resolutionFacade = injector.getInstance(DokkaResolutionFacade::class.java)
-//	val analyzer = resolutionFacade.getFrontendService(LazyTopDownAnalyzer::class.java)
-//	analyzer.analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, fragmentFiles)
-//
-//	val javaFiles = coreEnvironment.getJavaSourceFiles().filter(filesToDocumentFilter)
-//}
-
-
-fun KotlinCoreEnvironment.getJavaSourceFiles(): List<PsiJavaFile> {
-	val sourceRoots = configuration.get(JVMConfigurationKeys.CONTENT_ROOTS)
-			?.filterIsInstance<JavaSourceRoot>()
-			?.map { it.file }
-			?: listOf()
-
-	val result = arrayListOf<PsiJavaFile>()
-	val localFileSystem = VirtualFileManager.getInstance().getFileSystem("file")
-	sourceRoots.forEach { sourceRoot ->
-		sourceRoot.absoluteFile.walkTopDown().forEach {
-			val vFile = localFileSystem.findFileByPath(it.path)
-			if (vFile != null) {
-				val psiFile = PsiManager.getInstance(project).findFile(vFile)
-				if (psiFile is PsiJavaFile) {
-					result.add(psiFile)
-				}
-			}
-		}
-	}
-	return result
+//	return declarations
 }
 
 class SourceRoot(path: String) {
 	val path: String = File(path).absolutePath
-
-	companion object {
-		fun parseSourceRoot(sourceRoot: String): SourceRoot {
-			val components = sourceRoot.split("::", limit = 2)
-			return SourceRoot(components.last())
-		}
-	}
 }
