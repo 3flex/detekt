@@ -6,6 +6,7 @@ import io.gitlab.arturbosch.detekt.api.Finding
 import io.gitlab.arturbosch.detekt.api.RuleSetId
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingContext
 import java.util.concurrent.ExecutorService
 
 /**
@@ -20,13 +21,17 @@ class Detektor(
     private val testPattern: TestPattern = settings.loadTestPattern()
     private val executor: ExecutorService = settings.executorService
     private val logger = settings.errorPrinter
+    private val classpath = settings.classpath
 
     fun run(ktFiles: List<KtFile>): Map<RuleSetId, List<Finding>> = withExecutor(executor) {
+        val paths = ktFiles.map { SourceRoot(it.getUserData(KtCompiler.RELATIVE_PATH)!!) }
+        val resolver = DetektResolver(classpath, paths, providers, config)
+        val bindingContext = resolver.generate(ktFiles)
 
         val futures = ktFiles.map { file ->
             runAsync {
                 processors.forEach { it.onProcess(file) }
-                file.analyze().apply {
+                file.analyze(bindingContext).apply {
                     processors.forEach { it.onProcessComplete(file, this) }
                 }
             }.exceptionally { error ->
@@ -48,7 +53,7 @@ class Detektor(
         result
     }
 
-    private fun KtFile.analyze(): Map<RuleSetId, List<Finding>> {
+    private fun KtFile.analyze(bindingContext: BindingContext): Map<RuleSetId, List<Finding>> {
         var ruleSets = providers.asSequence()
                 .mapNotNull { it.buildRuleset(config) }
                 .sortedBy { it.id }
@@ -57,9 +62,9 @@ class Detektor(
 
         return if (testPattern.isTestSource(this)) {
             ruleSets = ruleSets.filterNot { testPattern.matchesRuleSet(it.id) }
-            ruleSets.map { ruleSet -> ruleSet.id to ruleSet.accept(this, testPattern.excludingRules) }
+            ruleSets.map { ruleSet -> ruleSet.id to ruleSet.accept(this, testPattern.excludingRules, bindingContext) }
         } else {
-            ruleSets.map { ruleSet -> ruleSet.id to ruleSet.accept(this) }
+            ruleSets.map { ruleSet -> ruleSet.id to ruleSet.accept(this, bindingContext) }
         }.toMergedMap()
     }
 }

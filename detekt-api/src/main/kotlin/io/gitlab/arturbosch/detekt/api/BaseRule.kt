@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.detekt.api
 
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingContext
 
 /**
  * The type to use when referring to rule ids giving it more context then a String would.
@@ -24,12 +25,14 @@ abstract class BaseRule(
 ) : DetektVisitor(), Context by context {
 
     open val ruleId: RuleId = javaClass.simpleName
+    var bindingContext: BindingContext = BindingContext.EMPTY
 
     /**
      * Before starting visiting kotlin elements, a check is performed if this rule should be triggered.
      * Pre- and post-visit-hooks are executed before/after the visiting process.
      */
-    fun visitFile(root: KtFile) {
+    fun visitFile(root: KtFile, bindingContext: BindingContext = BindingContext.EMPTY) {
+        this.bindingContext = bindingContext
         if (visitCondition(root)) {
             clearFindings()
             preVisit(root)
