@@ -348,6 +348,8 @@ style:
     active: false
   UnnecessaryAbstractClass:
     active: false
+  UselessCallOnNotNull:
+    active: false
   OptionalUnit:
     active: false
   OptionalReturnKeyword:
