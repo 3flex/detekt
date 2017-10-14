@@ -9,6 +9,7 @@ import io.gitlab.arturbosch.detekt.api.Notification
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
 import io.gitlab.arturbosch.detekt.api.toMergedMap
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingContext
 
 /**
  * @author Artur Bosch
@@ -25,11 +26,19 @@ class Detektor(private val settings: ProcessingSettings,
 
 	fun run(ktFiles: List<KtFile>): Detektion = withExecutor {
 
+		val paths = ktFiles.map { SourceRoot(it.getUserData(KtCompiler.RELATIVE_PATH)!!) }
+
+		val resolver = DetektResolver(
+				settings.classpath,
+				paths, providers, settings.config)
+
+		val bindingContext = resolver.generate(ktFiles)
+
 		processors.forEach { it.onStart(ktFiles) }
 		val futures = ktFiles.map { file ->
 			runAsync {
 				processors.forEach { it.onProcess(file) }
-				file.analyze().apply {
+				file.analyze(bindingContext).apply {
 					processors.forEach { it.onProcessComplete(file, FindingsForFile(this)) }
 				}
 			}
@@ -47,9 +56,9 @@ class Detektor(private val settings: ProcessingSettings,
 		}
 	}
 
-	private fun KtFile.analyze(): List<Pair<String, List<Finding>>> = providers
+	private fun KtFile.analyze(bindingContext: BindingContext): List<Pair<String, List<Finding>>> = providers
 			.mapNotNull { it.buildRuleset(config) }
 			.sortedBy { it.id }
 			.distinctBy { it.id }
-			.map { rule -> rule.id to rule.accept(this) }
+			.map { rule -> rule.id to rule.accept(this, bindingContext) }
 }
