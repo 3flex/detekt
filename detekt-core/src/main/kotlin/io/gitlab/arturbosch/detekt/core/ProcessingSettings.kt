@@ -13,7 +13,8 @@ data class ProcessingSettings(val project: List<Path>,
 							  val pathFilters: List<PathFilter> = listOf(),
 							  val parallelCompilation: Boolean = false,
 							  val excludeDefaultRuleSets: Boolean = false,
-							  val pluginPaths: List<Path> = emptyList()) {
+							  val pluginPaths: List<Path> = emptyList(),
+							  val classpath: List<String> = emptyList()) {
 
 	constructor(project: Path,
 				config: Config = Config.empty,

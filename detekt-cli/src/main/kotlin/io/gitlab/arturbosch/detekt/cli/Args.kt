@@ -13,6 +13,9 @@ class Args {
 			description = "Input paths to analyze.")
 	private var input: String? = null
 
+	@Parameter(names = ["--classpath", "-cp"])
+	var classpath: String? = null
+
 	@Parameter(names = ["--filters", "-f"],
 			description = "Path filters defined through regex with separator ';' (\".*test.*\").")
 	var filters: String? = null // Using a converter for List<PathFilter> resulted in a ClassCastException
