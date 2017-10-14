@@ -7,6 +7,7 @@ import io.gitlab.arturbosch.detekt.api.RuleSetId
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingContext
+import java.io.File
 import java.util.concurrent.ExecutorService
 
 /**
@@ -24,7 +25,7 @@ class Detektor(
     private val classpath = settings.classpath
 
     fun run(ktFiles: List<KtFile>): Map<RuleSetId, List<Finding>> = withExecutor(executor) {
-        val paths = ktFiles.map { SourceRoot(it.getUserData(KtCompiler.RELATIVE_PATH)!!) }
+        val paths = ktFiles.map { File(it.getUserData(KtCompiler.RELATIVE_PATH)!!).absolutePath }
         val resolver = DetektResolver(classpath, paths, providers, config)
         val bindingContext = resolver.generate(ktFiles)
 
