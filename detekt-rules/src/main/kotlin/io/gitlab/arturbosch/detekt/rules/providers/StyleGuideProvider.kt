@@ -39,6 +39,7 @@ import io.gitlab.arturbosch.detekt.rules.style.UnusedImports
 import io.gitlab.arturbosch.detekt.rules.style.UnusedPrivateClass
 import io.gitlab.arturbosch.detekt.rules.style.UnusedPrivateMember
 import io.gitlab.arturbosch.detekt.rules.style.UseDataClass
+import io.gitlab.arturbosch.detekt.rules.style.UselessCallOnNotNull
 import io.gitlab.arturbosch.detekt.rules.style.UtilityClassWithPublicConstructor
 import io.gitlab.arturbosch.detekt.rules.style.VarCouldBeVal
 import io.gitlab.arturbosch.detekt.rules.style.WildcardImport
@@ -101,6 +102,7 @@ class StyleGuideProvider : RuleSetProvider {
 				MandatoryBracesIfStatements(config),
 				VarCouldBeVal(config),
 				ForbiddenVoid(config),
+				UselessCallOnNotNull(config),
 				ExplicitItLambdaParameter(config)
 		))
 	}
