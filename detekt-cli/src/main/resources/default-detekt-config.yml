@@ -54,6 +54,8 @@ potential-bugs:
     active: false
   IteratorNotThrowingNoSuchElementException:
     active: false
+  OverridingDeprecatedMember:
+    active: false
   UnreachableCode:
     active: true
   LateinitUsage:
