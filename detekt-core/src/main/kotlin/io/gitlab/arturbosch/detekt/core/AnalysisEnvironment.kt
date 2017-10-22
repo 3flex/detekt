@@ -18,11 +18,11 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
 import java.io.File
 
-class AnalysisEnvironment : Disposable {
+class AnalysisEnvironment(messageCollector: MessageCollector) : Disposable {
 	val configuration = CompilerConfiguration()
 
 	init {
-		configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
+		configuration.put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
 		configuration.put(CommonConfigurationKeys.MODULE_NAME, "module for detekt static analysis")
 	}
 

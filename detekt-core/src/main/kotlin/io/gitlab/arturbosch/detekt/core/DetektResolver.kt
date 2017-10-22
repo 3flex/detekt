@@ -19,6 +19,8 @@ class DetektResolver(val classpath: List<String>,
 					 val providers: List<RuleSetProvider>,
 					 val config: Config) {
 
+	private val messageCollector = DetektMessageCollector()
+
 	fun generate(files: List<KtFile>) : BindingContext {
 		val environment = createAnalysisEnvironment(sourcePaths)
 		return try {
@@ -34,7 +36,7 @@ class DetektResolver(val classpath: List<String>,
 	}
 
 	private fun createAnalysisEnvironment(sourcePaths: List<String>): AnalysisEnvironment {
-		val environment = AnalysisEnvironment()
+		val environment = AnalysisEnvironment(messageCollector)
 
 		environment.apply {
 			addClasspaths(PathUtil.getJdkClassesRootsFromCurrentJre())
