@@ -114,6 +114,12 @@ subprojects {
 		}
 	}
 
+	if (this.name == "detekt-compiler-plugin") {
+		apply {
+			plugin("com.github.johnrengelman.shadow")
+		}
+	}
+
 	tasks.withType<Test> {
 		useJUnitPlatform()
 		testLogging {

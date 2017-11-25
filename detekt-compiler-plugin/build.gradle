@@ -1,0 +1,13 @@
+dependencies {
+    implementation project(':detekt-cli')
+    implementation project(':detekt-core')
+    compileOnly "org.jetbrains.kotlin:kotlin-compiler"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+}
+
+shadowJar {
+    dependencies {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-compiler"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+    }
+}
