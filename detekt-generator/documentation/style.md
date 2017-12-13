@@ -836,3 +836,47 @@ fun stuff() = 5
 ### NestedClassesVisibility
 
 TODO: Specify description
+
+#### Noncompliant Code:
+
+```kotlin
+internal class NestedClassesVisibility {
+
+    public class NestedPublicClass // should not be public
+}
+```
+
+#### Compliant Code:
+
+```kotlin
+internal class NestedClassesVisibility {
+
+    internal class NestedPublicClass
+}
+```
+
+### UselessCallOnNotNull
+
+TODO: Specify description
+
+### RedundantVisibilityModifierRule
+
+TODO: Specify description
+
+#### Noncompliant Code:
+
+```kotlin
+public interface Foo { // public per default
+
+    public fun bar() // public per default
+}
+```
+
+#### Compliant Code:
+
+```kotlin
+interface Foo {
+
+    fun bar()
+}
+```

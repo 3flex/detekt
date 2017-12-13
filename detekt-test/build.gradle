@@ -6,6 +6,7 @@ configurations {
 dependencies {
 	implementation project(':detekt-rules')
 	implementation project(':detekt-core')
+	implementation project(':detekt-api')
 	implementation "org.assertj:assertj-core:$assertjVersion"
 
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"

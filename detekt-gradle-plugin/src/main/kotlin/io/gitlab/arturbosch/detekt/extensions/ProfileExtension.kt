@@ -15,6 +15,7 @@ open class ProfileExtension(val name: String,
 							open var baseline: String? = null,
 							open var parallel: Boolean = false,
 							open var disableDefaultRuleSets: Boolean = false,
+							open var resolve: Boolean = false,
 							open var plugins: String? = null) {
 
 	fun arguments(debug: Boolean = false) = mutableMapOf<String, String>().apply {
@@ -35,6 +36,6 @@ open class ProfileExtension(val name: String,
 	override fun toString(): String = "ProfileExtension(name='$name', input=$input, config=$config, " +
 			"configResource=$configResource, filters=$filters, ruleSets=$ruleSets, output=$output, " +
 			"outputName=$outputName, baseline=$baseline, parallel=$parallel, " +
-			"disableDefaultRuleSets=$disableDefaultRuleSets)"
+			"disableDefaultRuleSets=$disableDefaultRuleSets, resolve=$resolve)"
 
 }

@@ -1,3 +1,9 @@
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven { url 'http://dl.bintray.com/jetbrains/spek' }
+}
+
 configurations {
 	implementation.extendsFrom kotlinImplementation
 	testImplementation.extendsFrom kotlinTest

@@ -66,6 +66,7 @@ def assertDocumentationUpToDate() {
 dependencies {
     implementation project(':detekt-core')
     implementation project(':detekt-rules')
+    implementation project(':detekt-api')
     implementation "com.beust:jcommander:$jcommanderVersion"
     implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion"
 

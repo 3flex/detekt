@@ -28,12 +28,15 @@ class PathConverter : IStringConverter<Path> {
 
 interface CommaSeparatedStringConverter<T> : IStringConverter<List<T>> {
 	val converter: IStringConverter<T>
-	override fun convert(value: String): List<T>
-			= value.splitToSequence(SEPARATOR_COMMA, SEPARATOR_SEMICOLON)
-			.map { it.trim() }
-			.map { converter.convert(it) }
-			.toList().apply {
-		if (isEmpty()) throw IllegalStateException("Given input '$value' was impossible to parse!")
+	override fun convert(value: String): List<T> {
+		println(value)
+		return value.splitToSequence(SEPARATOR_COMMA, SEPARATOR_SEMICOLON)
+				.map { it.trim() }
+				.map { converter.convert(it) }
+				.toList().apply {
+			if (isEmpty()) throw IllegalStateException("Given input '$value' was impossible to parse!")
+			this.forEach { println(it) }
+		}
 	}
 }
 

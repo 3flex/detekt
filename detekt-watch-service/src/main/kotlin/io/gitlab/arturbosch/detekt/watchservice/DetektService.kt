@@ -16,7 +16,7 @@ class DetektService(parameters: Parameters) {
 
 	private val settings = with(parameters) {
 		ProcessingSettings(
-				extractWatchDirectory(),
+				listOf(extractWatchDirectory()),
 				extractConfig(),
 				listOf(PathFilter(".*/test/.*"),
 						PathFilter(".*/resources/.*"),
