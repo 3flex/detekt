@@ -355,6 +355,6 @@ style:
   NestedClassesVisibility:
     active: false
   UselessCallOnNotNull:
-    active: false
+    active: true
   RedundantVisibilityModifierRule:
     active: false

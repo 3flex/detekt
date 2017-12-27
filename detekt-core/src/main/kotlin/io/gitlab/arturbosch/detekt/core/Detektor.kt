@@ -23,7 +23,7 @@ class Detektor(private val settings: ProcessingSettings,
 
 		val paths = ktFiles.map { File(it.getUserData(KtCompiler.RELATIVE_PATH)!!).absolutePath }
 		val resolver = DetektResolver(settings.classpath, paths, providers, settings.config)
-		val bindingContext = resolver.generate(ktFiles)
+		val bindingContext = if (settings.resolve) resolver.generate(ktFiles) else BindingContext.EMPTY
 
 		val futures = ktFiles.map { file ->
 			runAsync {

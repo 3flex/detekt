@@ -67,7 +67,7 @@ subprojects {
 			filters = '.*/resources/.*, .*/build/.*'
 			config = "${rootProject.projectDir}/detekt-cli/src/main/resources/default-detekt-config.yml"
 			baseline = "${rootProject.projectDir}/reports/baseline.xml"
-//			resolve = true
+			resolve = true
 		}
 	}
 

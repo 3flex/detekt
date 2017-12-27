@@ -46,6 +46,8 @@ class ExistingPathConverter : IStringConverter<Path> {
 		val config = File(value).toPath()
 		if (Files.notExists(config))
 			throw ParameterException("Provided path '$value' does not exist!")
+
+		val nextTest = mutableListOf<String>().orEmpty()
 		return config
 	}
 }

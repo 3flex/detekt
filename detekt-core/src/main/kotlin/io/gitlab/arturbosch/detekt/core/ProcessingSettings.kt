@@ -14,7 +14,8 @@ data class ProcessingSettings(val project: List<Path>,
 							  val parallelCompilation: Boolean = false,
 							  val excludeDefaultRuleSets: Boolean = false,
 							  val pluginPaths: List<Path> = emptyList(),
-							  val classpath: List<String> = emptyList()) {
+							  val classpath: List<String> = emptyList(),
+							  val resolve: Boolean = false) {
 
 	constructor(project: Path,
 				config: Config = Config.empty,

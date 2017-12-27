@@ -31,7 +31,7 @@ class Runner(private val arguments: Args) : Executable {
 			val classpath = createClasspath()
 			val config = loadConfiguration()
 			return ProcessingSettings(inputPath, config, pathFilters, parallel, disableDefaultRuleSets, plugins,
-					classpath)
+					classpath, resolve)
 		}
 	}
 }

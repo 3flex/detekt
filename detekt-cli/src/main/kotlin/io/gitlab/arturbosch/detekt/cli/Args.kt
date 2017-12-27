@@ -72,6 +72,10 @@ class Args {
 			help = true, description = "Shows the usage.")
 	var help: Boolean = false
 
+	@Parameter(names = ["--resolve"],
+			description = "Resolves types during analysis. Supports additional checks at the cost of performance.")
+	var resolve: Boolean = false
+
 	val inputPath: List<Path> by lazy {
 		MultipleExistingPathConverter().convert(input
 				?: throw IllegalStateException("Input parameter was not initialized by jcommander!"))
