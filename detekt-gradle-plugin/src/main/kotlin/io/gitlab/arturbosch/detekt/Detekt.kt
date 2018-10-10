@@ -5,6 +5,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.extensions.DetektReport
 import io.gitlab.arturbosch.detekt.extensions.DetektReports
 import io.gitlab.arturbosch.detekt.invoke.BaselineArgument
+import io.gitlab.arturbosch.detekt.invoke.ClasspathArgument
 import io.gitlab.arturbosch.detekt.invoke.CliArgument
 import io.gitlab.arturbosch.detekt.invoke.ConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.DebugArgument
@@ -20,6 +21,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.Project
+import org.gradle.api.tasks.CompileClasspath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -57,6 +59,11 @@ open class Detekt : DefaultTask() {
 	@PathSensitive(PathSensitivity.RELATIVE)
 	@SkipWhenEmpty
 	lateinit var input: FileCollection
+
+	@CompileClasspath
+	@Internal
+	@Optional
+	lateinit var classpath: FileCollection
 
 	@Input
 	@Optional
@@ -104,6 +111,7 @@ open class Detekt : DefaultTask() {
 	fun check() {
 		val arguments = mutableListOf<CliArgument>() +
 				InputArgument(input) +
+				ClasspathArgument(classpath) +
 				FiltersArgument(filters) +
 				ConfigArgument(config) +
 				PluginsArgument(plugins) +
@@ -115,35 +123,5 @@ open class Detekt : DefaultTask() {
 				DisableDefaultRulesetArgument(disableDefaultRuleSets)
 
 		DetektInvoker.invokeCli(project, arguments.toList(), debug)
-	}
-
-	companion object {
-		fun create(project: Project, 
-					extension: DetektExtension, 
-					name: String, 
-					taskDescription: String,
-					inputSources: FileCollection): TaskProvider<Detekt> {
-			return project.tasks.register(name, Detekt::class.java) {
-				description = taskDescription
-				debug = extension.debug
-				parallel = extension.parallel
-				disableDefaultRuleSets = extension.disableDefaultRuleSets
-				filters = extension.filters
-				config = extension.config
-				baseline = extension.baseline
-				plugins = extension.plugins
-				input = inputSources
-				extension.reports.forEach { extReport ->
-					reports.withName(extReport.name) {
-						enabled = extReport.enabled
-						val fileSuffix = extReport.name
-						@Suppress("USELESS_ELVIS")
-						val reportsDir = extension.reportsDir ?: extension.defaultReportsDir
-						val customDestination = extReport.destination
-						destination = customDestination ?: File(reportsDir, "$name.$fileSuffix")
-					}
-				}
-			}
-		}
 	}
 }

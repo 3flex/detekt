@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.SourceSetContainer
@@ -31,11 +32,41 @@ class DetektPlugin : Plugin<Project> {
 		project.sourceSets?.map { sourceSet ->
 			val name = "$DETEKT${sourceSet.name.capitalize()}"
 			val description = "Runs detekt on the ${sourceSet.name} source set."
-			Detekt.create(project, extension, name, description, sourceSet.allSource)
+			createAndConfigureDetektTask(project, extension, name, description, sourceSet.allSource, sourceSet.compileClasspath)
 		}
 
-		val detektTask = Detekt.create(project, extension, DETEKT, "Runs the default detekt task.", determineInput(extension))
+		val detektTask = createAndConfigureDetektTask(project, extension, DETEKT, "Runs the default detekt task.", determineInput(extension))
 		project.tasks.findByName(LifecycleBasePlugin.CHECK_TASK_NAME)?.dependsOn(detektTask)
+	}
+
+	private fun createAndConfigureDetektTask(project: Project,
+											 extension: DetektExtension,
+											 name: String,
+											 taskDescription: String,
+											 inputSources: FileCollection,
+											 compileClasspath: FileCollection = project.files()): TaskProvider<Detekt> {
+		return project.tasks.register(name, Detekt::class.java) {
+			description = taskDescription
+			debug = extension.debug
+			parallel = extension.parallel
+			disableDefaultRuleSets = extension.disableDefaultRuleSets
+			filters = extension.filters
+			config = extension.config
+			baseline = extension.baseline
+			plugins = extension.plugins
+			input = inputSources.asFileTree
+			classpath = compileClasspath
+			extension.reports.forEach { extReport ->
+				reports.withName(extReport.name) {
+					enabled = extReport.enabled
+					val fileSuffix = extReport.name
+					@Suppress("USELESS_ELVIS")
+					val reportsDir = extension.reportsDir ?: extension.defaultReportsDir
+					val customDestination = extReport.destination
+					destination = customDestination ?: File(reportsDir, "$name.$fileSuffix")
+				}
+			}
+		}
 	}
 
 	private fun createAndConfigureCreateBaselineTask(project: Project, extension: DetektExtension) =
@@ -91,7 +122,7 @@ class DetektPlugin : Plugin<Project> {
 		}
 	}
 
-	private val Project.sourceSets: SourceSetContainer? get() = project.getProperties()["sourceSets"] as? SourceSetContainer
+	private val Project.sourceSets: SourceSetContainer? get() = project.extensions.findByType(SourceSetContainer::class.java)
 
 	companion object {
 		private const val DETEKT = "detekt"
