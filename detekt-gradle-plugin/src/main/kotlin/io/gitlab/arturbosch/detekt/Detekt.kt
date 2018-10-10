@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektReports
 import io.gitlab.arturbosch.detekt.internal.fileProperty
 import io.gitlab.arturbosch.detekt.invoke.BaselineArgument
 import io.gitlab.arturbosch.detekt.invoke.BuildUponDefaultConfigArgument
+import io.gitlab.arturbosch.detekt.invoke.ClasspathArgument
 import io.gitlab.arturbosch.detekt.invoke.ConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.DebugArgument
 import io.gitlab.arturbosch.detekt.invoke.DetektInvoker
@@ -24,6 +25,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.reporting.ReportingExtension
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.CompileClasspath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -49,6 +51,10 @@ open class Detekt : SourceTask() {
     var input: FileCollection
         get() = source
         set(value) = setSource(value)
+
+    @CompileClasspath
+    @Optional
+    var classpath: ConfigurableFileCollection = project.layout.configurableFiles()
 
     @Input
     @Optional
@@ -142,6 +148,7 @@ open class Detekt : SourceTask() {
     fun check() {
         val arguments = mutableListOf(
                 InputArgument(source) ,
+                ClasspathArgument(classpath),
                 ConfigArgument(config) ,
                 PluginsArgument(plugins.orNull) ,
                 BaselineArgument(baseline.orNull) ,
