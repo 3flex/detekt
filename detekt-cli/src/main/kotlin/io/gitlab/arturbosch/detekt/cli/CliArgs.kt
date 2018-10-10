@@ -22,6 +22,12 @@ class CliArgs : Args {
 			description = "Path filters defined through regex with separator ';' or ',' (\".*test.*\").")
 	var filters: String? = null // Using a converter for List<PathFilter> resulted in a ClassCastException
 
+	// This is currently unused and was added for experimenting with type resolution. 
+	@Parameter(names = ["--classpath", "-cp"],
+			required = false,
+			description = "Compile Classpath of the project.")
+	private var classpath: String? = null
+
 	@Parameter(names = ["--config", "-c"],
 			description = "Path to the config file (path/to/config.yml). " +
 					"Multiple configuration files can be specified with ',' or ';' as separator.")
