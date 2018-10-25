@@ -111,7 +111,7 @@ open class Detekt : DefaultTask() {
 	fun check() {
 		val arguments = mutableListOf<CliArgument>() +
 				InputArgument(input) +
-				ClasspathArgument(classpath) +
+//				ClasspathArgument(classpath) +
 				FiltersArgument(filters) +
 				ConfigArgument(config) +
 				PluginsArgument(plugins) +
