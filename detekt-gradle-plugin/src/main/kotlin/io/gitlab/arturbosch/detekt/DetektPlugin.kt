@@ -106,9 +106,11 @@ class DetektPlugin : Plugin<Project> {
             it.plugins.set(project.provider { extension.plugins })
             it.input.setFrom(project.provider { inputSources })
             it.classpath.setFrom(project.provider { compileClasspath })
+            // TODO this does not set the report name correctly
             it.reportsDir.set(project.provider { extension.customReportsDir })
             it.reports = extension.reports.apply {
-                reportName = name
+                xml.setReportName(name)
+                html.setReportName(name)
             }
         }
     }
