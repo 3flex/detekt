@@ -107,9 +107,11 @@ class DetektPlugin : Plugin<Project> {
             it.setIncludes(defaultIncludes)
             it.setExcludes(defaultExcludes)
             it.classpath.setFrom(project.provider { compileClasspath })
+            // TODO this does not set the report name correctly
             it.reportsDir.set(project.provider { extension.customReportsDir })
             it.reports = extension.reports.apply {
-                reportName = name
+                xml.setReportName(name)
+                html.setReportName(name)
             }
         }
     }
