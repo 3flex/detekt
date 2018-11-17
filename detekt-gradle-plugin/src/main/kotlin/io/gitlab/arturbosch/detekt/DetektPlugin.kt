@@ -7,6 +7,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
@@ -48,6 +50,7 @@ class DetektPlugin : Plugin<Project> {
         setOf("kotlin", "kotlin-multiplatform", "kotlin-android", "kotlin2js")
             .forEach { pluginId ->
                 project.plugins.withId(pluginId) {
+                    println("$pluginId exists")
                     project.applyKotlinSourceSetDetektTasks(extension, sourceSets)
                 }
             }
@@ -66,6 +69,7 @@ class DetektPlugin : Plugin<Project> {
         project.kotlinSourceSets
             .filter { !existingSourceSets.contains(it.name) }
             .forEach { sourceSet ->
+                println(sourceSet.name)
                 existingSourceSets += sourceSet.name
                 val name = "$DETEKT${sourceSet.name.capitalize()}"
                 val description = "Runs detekt on the kotlin ${sourceSet.name} source set."
@@ -106,7 +110,6 @@ class DetektPlugin : Plugin<Project> {
             it.plugins.set(project.provider { extension.plugins })
             it.input.setFrom(project.provider { inputSources })
             it.classpath.setFrom(project.provider { compileClasspath })
-            // TODO this does not set the report name correctly
             it.reportsDir.set(project.provider { extension.customReportsDir })
             it.reports = extension.reports.apply {
                 xml.setReportName(name)
@@ -168,6 +171,7 @@ class DetektPlugin : Plugin<Project> {
             configuration.defaultDependencies { dependencySet ->
                 @Suppress("USELESS_ELVIS")
                 val version = extension.toolVersion ?: DEFAULT_DETEKT_VERSION
+                println("Using detekt $version")
                 dependencySet.add(project.dependencies.create("io.gitlab.arturbosch.detekt:detekt-cli:$version"))
             }
         }
