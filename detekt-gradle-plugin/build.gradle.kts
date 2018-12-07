@@ -1,4 +1,3 @@
-import com.gradle.publish.PluginConfig
 import com.jfrog.bintray.gradle.BintrayExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -26,6 +25,7 @@ plugins {
 	kotlin("jvm") version "1.3.0"
 	id("org.jetbrains.dokka") version "0.9.17"
 	id("com.github.ben-manes.versions") version "0.20.0"
+	jacoco
 }
 apply {
 	plugin("maven-publish")
@@ -40,6 +40,11 @@ val spekVersion = "1.2.1"
 val junitPlatformVersion = "1.3.1"
 val assertjVersion = "3.11.1"
 
+val jacocoRuntime by configurations.creating
+jacoco.toolVersion = "0.8.2"
+configurations["testRuntimeOnly"].extendsFrom(jacocoRuntime)
+val outputDir = file("$buildDir/testkitFiles")
+
 dependencies {
 	implementation(gradleApi())
 	implementation(kotlin("stdlib"))
@@ -49,6 +54,8 @@ dependencies {
 	testImplementation("org.jetbrains.spek:spek-subject-extension:$spekVersion")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
 	testRuntimeOnly("org.jetbrains.spek:spek-junit-platform-engine:$spekVersion")
+	testRuntimeOnly(files(outputDir))
+	jacocoRuntime("org.jacoco:org.jacoco.agent:${jacoco.toolVersion}:runtime")
 }
 
 gradlePlugin {
@@ -58,6 +65,15 @@ gradlePlugin {
 			implementationClass = "io.gitlab.arturbosch.detekt.DetektPlugin"
 		}
 	}
+}
+
+val createTestkitFiles by tasks.creating {
+	val destFile = file("$buildDir/jacoco/test.exec")
+//	inputs.files(configurations["jacocoRuntime"], destFile)
+
+	mkdir(outputDir)
+	val propertiesFile = file("$outputDir/testkit-gradle.properties")
+	propertiesFile.writeText("org.gradle.jvmargs=-javaagent:${configurations["jacocoRuntime"].singleFile.invariantSeparatorsPath}=destfile=${destFile.invariantSeparatorsPath}")
 }
 
 val test by tasks.getting(Test::class) {
@@ -75,6 +91,13 @@ val test by tasks.getting(Test::class) {
 		showCauses = true
 		showStackTraces = true
 	}
+//	dependsOn(createTestkitFiles)
+}
+
+tasks.getByName<JacocoReport>("jacocoTestReport") {
+	reports.xml.isEnabled = true
+	reports.html.isEnabled = true
+	dependsOn(test)
 }
 
 pluginBundle {

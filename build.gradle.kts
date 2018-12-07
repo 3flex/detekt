@@ -28,7 +28,7 @@ tasks.withType<Wrapper> {
 		 * This allows IDEs like IntelliJ to import the detekt-gradle-plugin as a standalone project.
 		 */
 		val gradlePluginWrapperDir = File(gradle.includedBuild("detekt-gradle-plugin").projectDir, "/gradle/wrapper")
-		GFileUtils.mkdirs(gradlePluginWrapperDir)
+		mkdir(gradlePluginWrapperDir)
 		copy {
 			from(propertiesFile)
 			into(gradlePluginWrapperDir)

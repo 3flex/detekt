@@ -19,7 +19,7 @@ class DslGradleRunner(
 
 	private val settingsContent = """
     	|rootProject.name = "rootDir-project"
-		|include(${projectLayout.submodules.map { "\"${it.name}\"" }.joinToString(",")})
+		|include(${projectLayout.submodules.joinToString(",") { "\"${it.name}\"" }})
 		|
 		""".trimMargin()
 
@@ -80,6 +80,7 @@ class DslGradleRunner(
 
 
 	fun runTasksAndCheckResult(vararg tasks: String, doAssert: DslGradleRunner.(BuildResult) -> Unit) {
+		File("$rootDir/gradle.properties").writeText(this.javaClass.getResource("/testkit-gradle.properties").readText())
 
 		// Using a custom "project-cache-dir" to avoid a Gradle error on Windows
 		val cacheArgs = listOf("--project-cache-dir", cacheDir.absolutePath, "--build-cache")
