@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.detekt.compilerplugin
 
 import com.intellij.openapi.project.Project
 import io.gitlab.arturbosch.detekt.cli.Args
+import io.gitlab.arturbosch.detekt.cli.CliArgs
 import io.gitlab.arturbosch.detekt.cli.OutputFacade
 import io.gitlab.arturbosch.detekt.cli.createPathFilters
 import io.gitlab.arturbosch.detekt.cli.createPlugins
@@ -22,9 +23,9 @@ class ExtensionHandler(private val detektOptions: List<String>) : AnalysisHandle
 			bindingTrace: BindingTrace,
 			files: Collection<KtFile>
 	): AnalysisResult? {
-		val args = parseArguments(detektOptions.toTypedArray())
+		val args = parseArguments<CliArgs>(detektOptions.toTypedArray()).first
 		val settings = createSettings(args)
-		val detektion = DetektFacade.instance(settings).run(files.toList(), bindingTrace.bindingContext)
+		val detektion = DetektFacade.create(settings).run(files.toList(), bindingTrace.bindingContext)
 		OutputFacade(args, detektion, settings).run()
 		return null
 	}
