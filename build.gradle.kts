@@ -20,30 +20,32 @@ plugins {
 	`maven-publish`
 }
 
-tasks.withType<Wrapper> {
-	gradleVersion = "4.10.2"
-	distributionType = Wrapper.DistributionType.ALL
-	doLast {
-		/*
+tasks {
+	wrapper {
+		gradleVersion = "5.0"
+		distributionType = Wrapper.DistributionType.ALL
+		doLast {
+			/*
 		 * Copy the properties file into the detekt-gradle-plugin project.
 		 * This allows IDEs like IntelliJ to import the detekt-gradle-plugin as a standalone project.
 		 */
-		val gradlePluginWrapperDir = File(gradle.includedBuild("detekt-gradle-plugin").projectDir, "/gradle/wrapper")
-		GFileUtils.mkdirs(gradlePluginWrapperDir)
-		copy {
-			from(propertiesFile)
-			into(gradlePluginWrapperDir)
+			val gradlePluginWrapperDir = File(gradle.includedBuild("detekt-gradle-plugin").projectDir, "/gradle/wrapper")
+			GFileUtils.mkdirs(gradlePluginWrapperDir)
+			copy {
+				from(propertiesFile)
+				into(gradlePluginWrapperDir)
+			}
 		}
 	}
-}
 
-tasks.withType<Test> {
-	dependsOn(gradle.includedBuild("detekt-gradle-plugin").task(":test"))
-}
+	test {
+		dependsOn(gradle.includedBuild("detekt-gradle-plugin").task(":test"))
+	}
 
-tasks.withType<Detekt> {
-	dependsOn("detekt-cli:assemble")
-	dependsOn("detekt-formatting:assemble")
+	withType<Detekt> {
+		dependsOn("detekt-cli:assemble")
+		dependsOn("detekt-formatting:assemble")
+	}
 }
 
 val detektVersion: String by project
@@ -76,10 +78,10 @@ subprojects {
 	val jacocoVersion: String by project
 	jacoco.toolVersion = jacocoVersion
 
-	tasks.getByName<JacocoReport>("jacocoTestReport") {
+	tasks.jacocoTestReport {
 		reports.xml.isEnabled = true
 		reports.html.isEnabled = true
-		dependsOn("test")
+		dependsOn(tasks.test)
 	}
 
 	val userHome = System.getProperty("user.home")
@@ -115,7 +117,7 @@ subprojects {
 		}
 	}
 
-	tasks.withType<Test> {
+	tasks.test {
 		useJUnitPlatform()
 		testLogging {
 			// set options for log level LIFECYCLE
@@ -174,7 +176,7 @@ subprojects {
 		})
 	}
 
-	tasks.withType(DokkaTask::class.java) {
+	tasks.withType<DokkaTask> {
 		// suppresses undocumented classes but not dokka warnings
 		// https://github.com/Kotlin/dokka/issues/229 && https://github.com/Kotlin/dokka/issues/319
 		reportUndocumented = false
