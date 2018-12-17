@@ -17,6 +17,7 @@ plugins {
 	id("io.gitlab.arturbosch.detekt")
 	id("org.jetbrains.dokka") version "0.9.17"
 	jacoco
+	`maven-publish`
 }
 
 tasks.withType<Wrapper> {
@@ -201,7 +202,7 @@ subprojects {
 		add("archives", javadocJar)
 	}
 
-	configure<PublishingExtension> {
+	publishing {
 		publications.create<MavenPublication>("DetektPublication") {
 			from(components["java"])
 			artifact(sourcesJar)
