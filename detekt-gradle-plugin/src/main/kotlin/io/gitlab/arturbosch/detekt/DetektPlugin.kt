@@ -42,6 +42,7 @@ class DetektPlugin : Plugin<Project> {
             it.input.setFrom(existingInputDirectoriesProvider(project, extension))
             it.reportsDir.set(project.provider { extension.customReportsDir })
             it.reports = extension.reports
+            it.ignoreFailures = extension.isIgnoreFailures
         }
 
         val checkTaskProvider = try {

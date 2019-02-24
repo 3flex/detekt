@@ -35,6 +35,6 @@ open class DetektGenerateConfigTask : DefaultTask() {
                 InputArgument(input)
 		)
 
-        DetektInvoker.invokeCli(project, arguments.toList())
+        DetektInvoker.invokeCli(project, arguments.toList(), ignoreFailures = false)
     }
 }

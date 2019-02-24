@@ -97,6 +97,6 @@ open class DetektCreateBaselineTask : DefaultTask() {
 				DisableDefaultRuleSetArgument(disableDefaultRuleSets.getOrElse(false))
 		)
 
-        DetektInvoker.invokeCli(project, arguments.toList(), debug.getOrElse(false))
+        DetektInvoker.invokeCli(project, arguments.toList(), debug.getOrElse(false), false)
     }
 }

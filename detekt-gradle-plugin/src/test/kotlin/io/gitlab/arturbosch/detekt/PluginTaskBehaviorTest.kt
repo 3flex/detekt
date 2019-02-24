@@ -36,7 +36,54 @@ internal class PluginTaskBehaviorTest : Spek({
                     .withConfigFile(configFileName)
                     .build()
         }
+        it("should not ignore failures by default") {
+            val configFileWithStyleRuleEnabled = """
+                build:
+                    maxIssues: 1
 
+                style:
+                    FunctionOnlyReturningConstant:
+                        active: true
+            """.trimIndent()
+
+            gradleRunner.writeProjectFile(configFileName, configFileWithStyleRuleEnabled)
+
+            gradleRunner.writeFailingKtFile(gradleRunner.projectLayout.srcDirs.first(), "OtherKotlinClass.kt")
+
+            gradleRunner.runDetektTaskAndCheckResult { result ->
+                assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            }
+        }
+        it("should ignore failures when specified") {
+            val config = """
+					|detekt {
+					|    setIgnoreFailures(true)
+					|}
+                    """
+
+            gradleRunner = kotlin()
+                .withDetektConfig(config)
+                .withBaseline(baselineFileName)
+                .withConfigFile(configFileName)
+                .build()
+
+            val configFileWithStyleRuleEnabled = """
+                            build:
+                                maxIssues: 1
+
+                            style:
+                                FunctionOnlyReturningConstant:
+                                    active: true
+						""".trimIndent()
+
+            gradleRunner.writeProjectFile(configFileName, configFileWithStyleRuleEnabled)
+
+            gradleRunner.writeFailingKtFile(gradleRunner.projectLayout.srcDirs.first(), "OtherKotlinClass.kt")
+
+            gradleRunner.runDetektTaskAndCheckResult { result ->
+                assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+        }
         it("should be UP-TO-DATE the 2nd run without changes") {
             gradleRunner.runDetektTaskAndCheckResult { result ->
                 assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)

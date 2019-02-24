@@ -51,7 +51,7 @@ open class DetektExtension(project: Project) : CodeQualityExtension() {
         const val DEFAULT_PARALLEL_VALUE = false
         const val DEFAULT_DISABLE_RULESETS_VALUE = false
         const val DEFAULT_REPORT_ENABLED_VALUE = true
-    const val DEFAULT_FAIL_FAST_VALUE = false
+        const val DEFAULT_FAIL_FAST_VALUE = false
 		const val DEFAULT_BUILD_UPON_DEFAULT_CONFIG_VALUE = false
 	}
 }

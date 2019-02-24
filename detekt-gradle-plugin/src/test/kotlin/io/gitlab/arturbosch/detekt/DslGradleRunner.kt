@@ -42,6 +42,11 @@ class DslGradleRunner(
 	|
 	""".trimMargin()
 
+    private fun ktInvalidFileContent(className: String) = """
+        internal class $className(val randomDefaultValue: String = \"$randomString\")"
+        fun functionReturningConstantString() = "1"
+    """.trimIndent()
+
     fun setupProject() {
         writeProjectFile(buildFileName, mainBuildFileContent)
         writeProjectFile(SETTINGS_FILENAME, settingsContent)
@@ -76,6 +81,15 @@ class DslGradleRunner(
     private fun writeKtFile(dir: File, className: String) {
         dir.mkdirs()
         File(dir, className).writeText(ktFileContent(className))
+    }
+
+    fun writeFailingKtFile(srcDir: String, className: String) {
+        writeFailingKtFile(File(rootDir, srcDir), className)
+    }
+
+    private fun writeFailingKtFile(dir: File, className: String) {
+        dir.mkdirs()
+        File(dir, className).writeText(ktInvalidFileContent(className))
     }
 
     fun runTasksAndCheckResult(vararg tasks: String, doAssert: DslGradleRunner.(BuildResult) -> Unit) {

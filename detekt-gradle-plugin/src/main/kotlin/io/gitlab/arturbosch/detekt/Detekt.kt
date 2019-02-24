@@ -34,6 +34,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.VerificationTask
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import java.io.File
 
@@ -43,7 +44,7 @@ import java.io.File
  * @author Markus Schwarz
  */
 @CacheableTask
-open class Detekt : DefaultTask() {
+open class Detekt : DefaultTask(), VerificationTask {
 
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -127,6 +128,15 @@ open class Detekt : DefaultTask() {
         @Optional
         get() = reports.html.getTargetFileProvider(effectiveReportsDir)
 
+    val ignoreFailuresProp: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
+
+    @Input
+    override fun getIgnoreFailures(): Boolean = ignoreFailuresProp.getOrElse(false)
+
+    override fun setIgnoreFailures(ignoreFailures: Boolean) {
+        ignoreFailuresProp.set(ignoreFailures)
+    }
+
     private val defaultReportsDir: Directory = project.layout.buildDirectory.get()
             .dir(ReportingExtension.DEFAULT_REPORTS_DIR_NAME)
             .dir("detekt")
@@ -154,6 +164,6 @@ open class Detekt : DefaultTask() {
 				DisableDefaultRuleSetArgument(disableDefaultRuleSetsProp.getOrElse(false))
 		)
 
-        DetektInvoker.invokeCli(project, arguments.toList(), debugProp.getOrElse(false))
+        DetektInvoker.invokeCli(project, arguments.toList(), debugProp.getOrElse(false), ignoreFailuresProp.getOrElse(false))
     }
 }
