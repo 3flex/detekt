@@ -37,7 +37,7 @@ val assertjVersion = "3.11.1"
 
 dependencies {
     implementation(kotlin("stdlib"))
-	implementation("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.3.21")
+	implementation(kotlin("gradle-plugin"))
 
     testImplementation(kotlin("reflect"))
     testImplementation("org.assertj:assertj-core:$assertjVersion")
