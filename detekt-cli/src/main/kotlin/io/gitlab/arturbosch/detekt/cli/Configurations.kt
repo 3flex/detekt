@@ -23,8 +23,8 @@ fun CliArgs.createPlugins(): List<Path> = plugins.letIfNonEmpty {
     MultipleExistingPathConverter().convert(this)
 }
 
-fun Args.createClasspath(): List<String> = classpath.letIfNonEmpty {
-	this.split(";")
+fun CliArgs.createClasspath(): List<String> = classpath.letIfNonEmpty {
+    this.split(";")
 }
 
 private fun <T> String?.letIfNonEmpty(init: String.() -> List<T>): List<T> =

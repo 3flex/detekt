@@ -1150,6 +1150,14 @@ class DataClassCandidate(val i: Int) {
 data class DataClass(val i: Int, val i2: Int)
 ```
 
+### UselessCallOnNotNull
+
+TBC
+
+**Severity**: Performance
+
+**Debt**: 5min
+
 ### UtilityClassWithPublicConstructor
 
 A class which only contains utility variables and functions with no concrete implementation can be refactored

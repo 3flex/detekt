@@ -32,7 +32,11 @@ class RuleSet(val id: RuleSetId, val rules: List<BaseRule>) {
      *
      * A list of findings is returned for given [KtFile]
      */
-    fun accept(file: KtFile, ruleFilters: Set<RuleId>, bindingContext: BindingContext = BindingContext.EMPTY): List<Finding> =
+    fun accept(
+        file: KtFile,
+        ruleFilters: Set<RuleId>,
+        bindingContext: BindingContext = BindingContext.EMPTY
+    ): List<Finding> =
             rules.asSequence()
                     .filterNot { it.ruleId in ruleFilters }
                     .onEach { if (it is MultiRule) it.ruleFilters = ruleFilters }.toList()

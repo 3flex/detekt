@@ -31,7 +31,7 @@ class CliArgs : Args {
         hidden = true,
         description = "Compile Classpath of the project."
     )
-    private var classpath: String? = null
+    var classpath: String? = null
 
     @Parameter(names = ["--config", "-c"],
             description = "Path to the config file (path/to/config.yml). " +
