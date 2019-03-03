@@ -160,7 +160,7 @@ internal class ConfigurationsSpec : Spek({
         val config = CliArgs().apply { configResource = "/configs/fail-fast-only.yml" }.loadConfiguration()
 
         it("should override active to true by default") {
-            assertThat(config.subConfig("comments").subConfig("UndocumentedPublicClass").valueOrDefault("active", false)).isEqualTo(true)
+            assertThat(config.subConfig("comments").subConfig("UndocumentedPublicClass").valueOrDefault("active", false)).isTrue()
         }
 
         it("should override maxIssues to 0 by default") {
@@ -180,7 +180,7 @@ internal class ConfigurationsSpec : Spek({
         }
 
         it("should override active when specified") {
-            assertThat(config.subConfig("comments").subConfig("CommentOverPrivateMethod").valueOrDefault("active", true)).isEqualTo(false)
+            assertThat(config.subConfig("comments").subConfig("CommentOverPrivateMethod").valueOrDefault("active", true)).isFalse()
         }
 
         it("should override maxIssues when specified") {

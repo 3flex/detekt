@@ -20,17 +20,17 @@ class ForbiddenImportSpec : Spek({
 
         it("should report nothing by default") {
             val findings = ForbiddenImport().lint(code)
-            assertThat(findings).hasSize(0)
+            assertThat(findings).isEmpty()
         }
 
         it("should report nothing when imports are blank") {
             val findings = ForbiddenImport(TestConfig(mapOf(ForbiddenImport.IMPORTS to "  "))).lint(code)
-            assertThat(findings).hasSize(0)
+            assertThat(findings).isEmpty()
         }
 
         it("should report nothing when imports do not match") {
             val findings = ForbiddenImport(TestConfig(mapOf(ForbiddenImport.IMPORTS to "org.*"))).lint(code)
-            assertThat(findings).hasSize(0)
+            assertThat(findings).isEmpty()
         }
 
         it("should report kotlin.* when imports are kotlin.*") {

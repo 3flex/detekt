@@ -27,7 +27,7 @@ class UselessPostfixExpressionSpec : Spek({
 					var j = 0
 					j = i++
 				}"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("returns no incremented value") {

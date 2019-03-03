@@ -21,7 +21,7 @@ class ThrowingExceptionInMainSpec : Spek({
 				private fun main() { }
 				fun mai() { }
 				fun main(args: String) { }"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

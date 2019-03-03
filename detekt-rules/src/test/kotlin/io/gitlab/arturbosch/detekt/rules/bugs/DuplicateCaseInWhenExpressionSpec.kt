@@ -34,7 +34,7 @@ class DuplicateCaseInWhenExpressionSpec : Spek({
 						else -> println()
 					}
 				}"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

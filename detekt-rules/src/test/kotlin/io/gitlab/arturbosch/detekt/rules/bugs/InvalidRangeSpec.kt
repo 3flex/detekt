@@ -20,7 +20,7 @@ class InvalidRangeSpec : Spek({
 					for (i in 2 until 4 step 2) {}
 					for (i in (1+1)..3) { }
 				}"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("reports incorrect bounds in for loop conditions") {
@@ -54,7 +54,7 @@ class InvalidRangeSpec : Spek({
 
         it("does not report binary expressions without an invalid range") {
             val code = "val sum = 1 + 2"
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

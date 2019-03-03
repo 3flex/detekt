@@ -26,7 +26,7 @@ class UnsafeCallOnNullableTypeSpec : Spek({
 				fun test(str: String?) {
 					println(str?.length)
 				}"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("elvis") {
@@ -34,7 +34,7 @@ class UnsafeCallOnNullableTypeSpec : Spek({
 				fun test(str: String?) {
 					println(str?.length ?: 0)
 				}"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

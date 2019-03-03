@@ -29,7 +29,7 @@ class CommentOverPrivatePropertiesSpec : Spek({
 				 * asdf
 				 */
 				val v = 1"""
-            assertThat(subject.compileAndLint(code)).hasSize(0)
+            assertThat(subject.compileAndLint(code)).isEmpty()
         }
 
         it("reports private property in class with a comment") {
@@ -51,7 +51,7 @@ class CommentOverPrivatePropertiesSpec : Spek({
 					 */
 					val v = 1
 				}"""
-            assertThat(subject.compileAndLint(code)).hasSize(0)
+            assertThat(subject.compileAndLint(code)).isEmpty()
         }
     }
 })

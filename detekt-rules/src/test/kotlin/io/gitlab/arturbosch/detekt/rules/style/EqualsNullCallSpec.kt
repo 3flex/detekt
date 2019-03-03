@@ -16,7 +16,7 @@ class EqualsNullCallSpec : Spek({
 				fun x(a: String) {
 					a.equals(null)
 				}"""
-            Assertions.assertThat(subject.lint(code).size).isEqualTo(1)
+            Assertions.assertThat(subject.lint(code)).hasSize(1)
         }
 
         it("with nested equals(null) call as parameter") {
@@ -24,7 +24,7 @@ class EqualsNullCallSpec : Spek({
 				fun x(a: String, b: String) {
 					a.equals(b.equals(null))
 				}"""
-            Assertions.assertThat(subject.lint(code).size).isEqualTo(1)
+            Assertions.assertThat(subject.lint(code)).hasSize(1)
         }
 
         it("with non-nullable parameter") {
@@ -32,7 +32,7 @@ class EqualsNullCallSpec : Spek({
 				fun x(a: String, b: String) {
 					a.equals(b)
 				}"""
-            Assertions.assertThat(subject.lint(code).size).isEqualTo(0)
+            Assertions.assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

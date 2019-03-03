@@ -17,7 +17,7 @@ class MethodOverloadingSpec : Spek({
             val findings = subject.lint(Case.OverloadedMethods.path())
 
             it("reports overloaded methods which exceed the threshold") {
-                assertThat(findings.size).isEqualTo(3)
+                assertThat(findings).hasSize(3)
             }
 
             it("reports the correct method name") {
@@ -31,7 +31,7 @@ class MethodOverloadingSpec : Spek({
 					fun x() { }
 					fun x(i: Int) { }
 				}""")
-                assertThat(subject.findings.size).isZero()
+                assertThat(subject.findings).isEmpty()
             }
         }
 
@@ -42,7 +42,7 @@ class MethodOverloadingSpec : Spek({
 				fun Boolean.foo() {}
 				fun Int.foo() {}
 				fun Long.foo() {}""")
-                assertThat(subject.findings.size).isZero()
+                assertThat(subject.findings).isEmpty()
             }
 
             it("reports extension methods with the same receiver") {
@@ -50,7 +50,7 @@ class MethodOverloadingSpec : Spek({
 				fun Int.foo() {}
 				fun Int.foo(i: Int) {}
 				fun Int.foo(i: String) {}""")
-                assertThat(subject.findings.size).isEqualTo(1)
+                assertThat(subject.findings).hasSize(1)
             }
         }
     }

@@ -28,7 +28,7 @@ class ReturnCountSpec : Spek({
 
             it("should not get flagged when max value is 3") {
                 val findings = ReturnCount(TestConfig(mapOf(ReturnCount.MAX to "3"))).lint(code)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should get flagged when max value is 1") {
@@ -49,12 +49,12 @@ class ReturnCountSpec : Spek({
 
             it("should not get flagged by default") {
                 val findings = ReturnCount().lint(code)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should not get flagged when max value is 2") {
                 val findings = ReturnCount(TestConfig(mapOf(ReturnCount.MAX to "2"))).lint(code)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should get flagged when max value is 1") {
@@ -139,7 +139,7 @@ class ReturnCountSpec : Spek({
 
             it("should not get flag when returns is in inner object") {
                 val findings = ReturnCount(TestConfig(mapOf(ReturnCount.MAX to "2"))).lint(code)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
         }
 
@@ -171,7 +171,7 @@ class ReturnCountSpec : Spek({
 
             it("should not get flag when returns is in inner object") {
                 val findings = ReturnCount(TestConfig(mapOf(ReturnCount.MAX to "2"))).lint(code)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
         }
 

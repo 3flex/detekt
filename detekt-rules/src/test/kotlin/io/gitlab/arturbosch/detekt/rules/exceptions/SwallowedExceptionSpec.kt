@@ -26,7 +26,7 @@ class SwallowedExceptionSpec : Spek({
         }
 
         it("does not report thrown catch blocks") {
-            assertThat(subject.lint(Case.SwallowedExceptionNegative.path())).hasSize(0)
+            assertThat(subject.lint(Case.SwallowedExceptionNegative.path())).isEmpty()
         }
     }
 })

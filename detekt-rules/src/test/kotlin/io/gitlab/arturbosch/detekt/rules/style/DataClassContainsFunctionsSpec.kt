@@ -29,7 +29,7 @@ class DataClassContainsFunctionsSpec : Spek({
         }
 
         it("does not report data class w/o conversion function") {
-            assertThat(subject.lint(Case.DataClassContainsFunctionsNegative.path())).hasSize(0)
+            assertThat(subject.lint(Case.DataClassContainsFunctionsNegative.path())).isEmpty()
         }
     }
 })

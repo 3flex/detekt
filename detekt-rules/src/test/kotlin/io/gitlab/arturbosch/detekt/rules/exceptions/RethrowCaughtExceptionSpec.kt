@@ -18,7 +18,7 @@ class RethrowCaughtExceptionSpec : Spek({
 
         it("does not report caught exceptions which are encapsulated in another exception or logged") {
             val path = Case.RethrowCaughtExceptionNegative.path()
-            assertThat(subject.lint(path)).hasSize(0)
+            assertThat(subject.lint(path)).isEmpty()
         }
     }
 })

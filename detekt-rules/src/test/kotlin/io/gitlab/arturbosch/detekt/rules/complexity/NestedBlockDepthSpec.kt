@@ -17,7 +17,7 @@ class NestedBlockDepthSpec : Spek({
     describe("nested classes are also considered") {
         it("should detect only the nested large class") {
             subject.lint(Case.NestedClasses.path())
-            assertThat(subject.findings.size).isEqualTo(1)
+            assertThat(subject.findings).hasSize(1)
             assertThat((subject.findings[0] as ThresholdedCodeSmell).value).isEqualTo(5)
         }
 

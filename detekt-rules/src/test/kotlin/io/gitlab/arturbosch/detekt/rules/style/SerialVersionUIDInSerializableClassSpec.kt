@@ -17,7 +17,7 @@ class SerialVersionUIDInSerializableClassSpec : Spek({
         }
 
         it("does not report serializable classes which implement the serialVersionUID correctly") {
-            assertThat(subject.lint(Case.SerializableNegative.path())).hasSize(0)
+            assertThat(subject.lint(Case.SerializableNegative.path())).isEmpty()
         }
     }
 })

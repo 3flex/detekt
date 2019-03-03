@@ -18,7 +18,7 @@ class WrongEqualsTypeParameterSpec : Spek({
 						return super.equals(other)
 					}
 				}"""
-            assertThat(subject.lint(code).size).isEqualTo(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("uses String as parameter") {
@@ -28,7 +28,7 @@ class WrongEqualsTypeParameterSpec : Spek({
 						return super.equals(other)
 					}
 				}"""
-            assertThat(subject.lint(code).size).isEqualTo(1)
+            assertThat(subject.lint(code)).hasSize(1)
         }
 
         it("uses an interface declaration") {
@@ -36,7 +36,7 @@ class WrongEqualsTypeParameterSpec : Spek({
 				interface EqualsInterf {
 					fun equals(other: String)
 				}"""
-            assertThat(subject.lint(code).size).isEqualTo(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

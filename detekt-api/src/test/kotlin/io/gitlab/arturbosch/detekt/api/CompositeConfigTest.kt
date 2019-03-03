@@ -16,8 +16,8 @@ class CompositeConfigTest : Spek({
 
         it("should have style sub config with active false which is overridden in `second` config regardless of default value") {
             val styleConfig = compositeConfig.subConfig("style").subConfig("WildcardImport")
-            assertThat(styleConfig.valueOrDefault("active", true)).isEqualTo(false)
-            assertThat(styleConfig.valueOrDefault("active", false)).isEqualTo(false)
+            assertThat(styleConfig.valueOrDefault("active", true)).isFalse()
+            assertThat(styleConfig.valueOrDefault("active", false)).isFalse()
         }
 
         it("should have code smell sub config with LongMethod threshold 20 from `first` config") {

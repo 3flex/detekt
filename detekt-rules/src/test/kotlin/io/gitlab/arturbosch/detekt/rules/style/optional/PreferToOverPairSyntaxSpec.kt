@@ -19,7 +19,7 @@ class PreferToOverPairSyntaxSpec : Spek({
 
         it("does not report if it is created using the to syntax ") {
             val path = Case.PreferToOverPairSyntaxNegative.path()
-            Assertions.assertThat(subject.lint(path)).hasSize(0)
+            Assertions.assertThat(subject.lint(path)).isEmpty()
         }
     }
 })

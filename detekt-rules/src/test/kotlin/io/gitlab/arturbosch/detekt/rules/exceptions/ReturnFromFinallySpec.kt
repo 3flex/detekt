@@ -37,7 +37,7 @@ class ReturnFromFinallySpec : Spek({
 
             it("should not report") {
                 val findings = subject.lint(code)
-                Assertions.assertThat(findings).hasSize(0)
+                Assertions.assertThat(findings).isEmpty()
             }
         }
 
@@ -74,7 +74,7 @@ class ReturnFromFinallySpec : Spek({
 
             it("should not report") {
                 val findings = subject.lint(code)
-                Assertions.assertThat(findings).hasSize(0)
+                Assertions.assertThat(findings).isEmpty()
             }
         }
     }

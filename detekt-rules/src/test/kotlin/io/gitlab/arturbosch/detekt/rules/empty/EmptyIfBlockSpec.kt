@@ -23,7 +23,7 @@ class EmptyIfBlockSpec : Spek({
 
         it("does not report negative cases") {
             val path = Case.EmptyIfNegative.path()
-            assertThat(subject.lint(path)).hasSize(0)
+            assertThat(subject.lint(path)).isEmpty()
         }
     }
 })

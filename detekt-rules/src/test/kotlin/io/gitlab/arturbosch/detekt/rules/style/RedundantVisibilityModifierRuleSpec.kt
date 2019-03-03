@@ -18,7 +18,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					override public fun A() {}
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("check overridden function of abstract class w/o public modifier") {
@@ -31,7 +31,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					override fun A() {}
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("check overridden function of interface") {
@@ -44,7 +44,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					override public fun A() {}
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("check public function") {
@@ -62,7 +62,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					fun A() {}
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("check public class") {
@@ -98,7 +98,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					val str : String = "test"
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("check overridden field w/o public modifier ") {
@@ -111,7 +111,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					override val test: String = "valid"
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
 
         it("check overridden field w/ public modifier ") {
@@ -124,7 +124,7 @@ class RedundantVisibilityModifierRuleSpec : Spek({
 					override public val test: String = "valid"
 				}
 			"""
-            assertThat(subject.lint(code)).hasSize(0)
+            assertThat(subject.lint(code)).isEmpty()
         }
     }
 })

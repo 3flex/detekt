@@ -35,7 +35,7 @@ class KtTreeCompilerSpec : Spek({
         }
 
         it("should also compile regular files") {
-            assertThat(KtTreeCompiler().compile(path.resolve("Default.kt")).size).isEqualTo(1)
+            assertThat(KtTreeCompiler().compile(path.resolve("Default.kt"))).hasSize(1)
         }
     }
 })

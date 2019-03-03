@@ -27,7 +27,7 @@ internal class SuppressionSpec : Spek({
             val ktFile = compilerFor("SuppressedElements.kt")
             val ruleSet = RuleSet("Test", listOf(TestLM(), TestLPL()))
             val findings = ruleSet.accept(ktFile)
-            assertThat(findings.size).isZero()
+            assertThat(findings).isEmpty()
         }
 
         it("rule should be suppressed by ALL") {

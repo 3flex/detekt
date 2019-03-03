@@ -26,7 +26,7 @@ class ComplexInterfaceSpec : Spek({
         }
 
         it("does not report interfaces which member size is under the threshold") {
-            assertThat(subject.lint(Case.ComplexInterfaceNegative.path())).hasSize(0)
+            assertThat(subject.lint(Case.ComplexInterfaceNegative.path())).isEmpty()
         }
     }
 })

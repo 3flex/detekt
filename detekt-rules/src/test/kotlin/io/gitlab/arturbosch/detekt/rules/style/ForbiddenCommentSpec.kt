@@ -28,7 +28,7 @@ class ForbiddenCommentSpec : Spek({
 
             it("should not report TODO usages") {
                 val findings = ForbiddenComment().lint(todo)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should report FIXME: usages") {
@@ -38,7 +38,7 @@ class ForbiddenCommentSpec : Spek({
 
             it("should not report FIXME usages") {
                 val findings = ForbiddenComment().lint(fixme)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should report STOPSHIP: usages") {
@@ -48,7 +48,7 @@ class ForbiddenCommentSpec : Spek({
 
             it("should not report STOPSHIP usages") {
                 val findings = ForbiddenComment().lint(stopShip)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
         }
 
@@ -57,17 +57,17 @@ class ForbiddenCommentSpec : Spek({
 
             it("should not report TODO: usages") {
                 val findings = ForbiddenComment(TestConfig(mapOf(ForbiddenComment.VALUES to "Banana"))).lint(todoColon)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should not report FIXME: usages") {
                 val findings = ForbiddenComment(TestConfig(mapOf(ForbiddenComment.VALUES to "Banana"))).lint(fixmeColon)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should not report STOPME: usages") {
                 val findings = ForbiddenComment(TestConfig(mapOf(ForbiddenComment.VALUES to "Banana"))).lint(stopShipColon)
-                assertThat(findings).hasSize(0)
+                assertThat(findings).isEmpty()
             }
 
             it("should report Banana usages") {
