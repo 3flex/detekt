@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.types.TypeUtils
  * TBC
  *
  * @author Matthew Haughton
- * @author JetBrains
  */
 class UselessCallOnNotNull(config: Config = Config.empty) : Rule(config) {
     override val issue: Issue = Issue(
@@ -31,6 +30,9 @@ class UselessCallOnNotNull(config: Config = Config.empty) : Rule(config) {
                 " it is redundant and will have no effect, so it can be removed.",
         Debt.FIVE_MINS
     )
+
+    // Rule adapted from the Kotlin plugin for IntelliJ:
+    // https://github.com/JetBrains/kotlin/blob/f5d0a38629e7d2e7017ee645dc4d4bee60614e93/idea/src/org/jetbrains/kotlin/idea/inspections/collections/UselessCallOnNotNullInspection.kt
 
     private val uselessFqNames = mapOf(
         "kotlin.collections.orEmpty" to deleteConversion,
