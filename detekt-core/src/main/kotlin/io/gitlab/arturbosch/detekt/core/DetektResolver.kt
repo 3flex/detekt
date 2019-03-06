@@ -2,15 +2,9 @@ package io.gitlab.arturbosch.detekt.core
 
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
-import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
-import org.jetbrains.kotlin.container.get
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer
-import org.jetbrains.kotlin.resolve.TopDownAnalysisMode
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
 
@@ -24,12 +18,7 @@ class DetektResolver(
     fun generate(files: List<KtFile>): BindingContext {
         val environment = createAnalysisEnvironment(sourcePaths)
         return try {
-            val trace = NoScopeRecordCliBindingTrace()
-            val container = environment.createCoreEnvironment(files)
-            val module = container.get<ModuleDescriptor>()
-            container.get<LazyTopDownAnalyzer>().analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, files)
-
-            AnalysisResult.success(trace.bindingContext, module).bindingContext
+            environment.createCoreEnvironment(files)
         } finally {
             Disposer.dispose(environment)
         }
@@ -40,7 +29,7 @@ class DetektResolver(
 
         environment.apply {
             addClasspaths(PathUtil.getJdkClassesRootsFromCurrentJre())
-            for (element in this@DetektResolver.classpath) {
+            for (element in classpath) {
                 addClasspath(File(element))
             }
 

@@ -13,9 +13,8 @@ import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.container.ComponentProvider
-import org.jetbrains.kotlin.load.kotlin.PackagePartProvider
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.FileBasedDeclarationProviderFactory
 import java.io.File
 
@@ -27,18 +26,15 @@ class AnalysisEnvironment : Disposable {
         configuration.put(CommonConfigurationKeys.MODULE_NAME, "module for detekt static analysis")
     }
 
-    fun createCoreEnvironment(files: List<KtFile>): ComponentProvider {
-        // otherwise will complain bin/idea.properties is missing
-        System.setProperty("idea.io.use.fallback", "true")
+    fun createCoreEnvironment(files: List<KtFile>): BindingContext {
         val environment = KotlinCoreEnvironment.createForProduction(
-            this, configuration,
-            EnvironmentConfigFiles.JVM_CONFIG_FILES
+            this, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
         )
 
-        return TopDownAnalyzerFacadeForJVM.createContainer(
+        return TopDownAnalyzerFacadeForJVM.analyzeFilesWithJavaIntegration(
             environment.project, files, NoScopeRecordCliBindingTrace(),
-            environment.configuration, { PackagePartProvider.Empty }, ::FileBasedDeclarationProviderFactory
-        )
+            environment.configuration, environment::createPackagePartProvider, ::FileBasedDeclarationProviderFactory
+        ).bindingContext
     }
 
     fun addClasspaths(paths: List<File>) {
