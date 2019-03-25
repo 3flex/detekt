@@ -67,16 +67,19 @@ subprojects {
         plugin("maven-publish")
         plugin("io.gitlab.arturbosch.detekt")
         plugin("org.jetbrains.dokka")
-        plugin("jacoco")
     }
 
-    val jacocoVersion: String by project
-    jacoco.toolVersion = jacocoVersion
+    if (project.name != "detekt-test") {
+        apply { plugin("jacoco") }
 
-    tasks.named<JacocoReport>("jacocoTestReport").configure {
-        reports.xml.isEnabled = true
-        reports.html.isEnabled = true
-        dependsOn(tasks.named("test"))
+        val jacocoVersion: String by project
+        jacoco.toolVersion = jacocoVersion
+
+        tasks.jacocoTestReport.configure {
+            reports.xml.isEnabled = false
+            reports.html.isEnabled = false
+            dependsOn(tasks.named("test"))
+        }
     }
 
     tasks.withType<Detekt> {
@@ -300,5 +303,25 @@ val detektAll by tasks.registering(Detekt::class) {
     reports {
         xml.enabled = false
         html.enabled = false
+    }
+}
+
+tasks.create<JacocoReport>("rootJacocoTestReport") {
+    val jacocoReportTasks =
+        subprojects
+            .filterNot { it.project.name == "detekt-test" }
+            .map { it.tasks["jacocoTestReport"] as JacocoReport } // For Junit 4 use `.flatMap { it.tasks.withType<JacocoReport>() }`
+    dependsOn(jacocoReportTasks) // For Junit 4 this becomes `dependsOn(tasks["test"])`
+
+    val executionData = jacocoReportTasks.map { it.executionData }.toTypedArray()
+    executionData(executionData)
+    reports.xml.isEnabled = true
+
+    subprojects.forEach { testedProject ->
+        val sourceSets = testedProject.sourceSets
+        this@create.additionalSourceDirs.from(files(sourceSets.main.get().allSource.srcDirs))
+        this@create.sourceDirectories.from(files(sourceSets.main.get().allSource.srcDirs))
+        this@create.classDirectories.from(files(sourceSets.main.get().output))
+        this@create.dependsOn(testedProject.tasks.named("test"))
     }
 }
