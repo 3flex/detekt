@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.detekt.api
 
 import io.gitlab.arturbosch.detekt.api.internal.ConfigAware
 import io.gitlab.arturbosch.detekt.api.internal.Context
+import io.gitlab.arturbosch.detekt.api.internal.isSuppressedBy
 import org.jetbrains.kotlin.psi.KtFile
 
 /**
