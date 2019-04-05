@@ -34,7 +34,7 @@ class McCabeVisitor(private val ignoreSimpleWhenEntries: Boolean) : DetektVisito
         }
     }
 
-    fun isInsideObjectLiteral(function: KtNamedFunction) =
+    private fun isInsideObjectLiteral(function: KtNamedFunction) =
             function.getStrictParentOfType<KtObjectLiteralExpression>() != null
 
     override fun visitIfExpression(expression: KtIfExpression) {
@@ -84,9 +84,7 @@ class McCabeVisitor(private val ignoreSimpleWhenEntries: Boolean) : DetektVisito
         }
         super.visitCallExpression(expression)
     }
-}
 
-fun KtCallExpression.isUsedForNesting(): Boolean = when (getCallNameExpression()?.text) {
-    "run", "let", "apply", "with", "use", "forEach" -> true
-    else -> false
+    private fun KtCallExpression.isUsedForNesting() =
+        getCallNameExpression()?.text in listOf("run", "let", "apply", "with", "use", "forEach")
 }

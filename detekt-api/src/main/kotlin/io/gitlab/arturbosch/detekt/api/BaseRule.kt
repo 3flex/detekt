@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.detekt.api
 
+import io.gitlab.arturbosch.detekt.api.internal.Context
 import io.gitlab.arturbosch.detekt.api.internal.DefaultContext
 import org.jetbrains.kotlin.psi.KtFile
 

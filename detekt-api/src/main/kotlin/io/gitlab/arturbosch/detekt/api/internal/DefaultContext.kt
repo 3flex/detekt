@@ -1,6 +1,5 @@
 package io.gitlab.arturbosch.detekt.api.internal
 
-import io.gitlab.arturbosch.detekt.api.Context
 import io.gitlab.arturbosch.detekt.api.Finding
 import io.gitlab.arturbosch.detekt.api.isSuppressedBy
 

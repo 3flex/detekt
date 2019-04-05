@@ -1,5 +1,7 @@
-package io.gitlab.arturbosch.detekt.api
+package io.gitlab.arturbosch.detekt.api.internal
 
+import io.gitlab.arturbosch.detekt.api.Finding
+import io.gitlab.arturbosch.detekt.api.Rule
 import org.jetbrains.kotlin.psi.KtFile
 
 /**
@@ -12,7 +14,7 @@ import org.jetbrains.kotlin.psi.KtFile
  * @author Artur Bosch
  * @author Marvin Ramin
  */
-interface Context {
+internal interface Context {
     val findings: List<Finding>
     fun report(finding: Finding, aliases: Set<String> = emptySet())
     fun report(findings: List<Finding>, aliases: Set<String> = emptySet())

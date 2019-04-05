@@ -1,4 +1,7 @@
-package io.gitlab.arturbosch.detekt.api
+package io.gitlab.arturbosch.detekt.api.internal
+
+import io.gitlab.arturbosch.detekt.api.Config
+import io.gitlab.arturbosch.detekt.api.RuleId
 
 /**
  * Interface which is implemented by each Rule class to provide
@@ -17,7 +20,7 @@ package io.gitlab.arturbosch.detekt.api
  *
  * @author Artur Bosch
  */
-interface ConfigAware : Config {
+internal interface ConfigAware : Config {
 
     /**
      * Id which is used to retrieve the sub config for the rule implementing this interface.
