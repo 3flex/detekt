@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.detekt.api
 
+import io.gitlab.arturbosch.detekt.api.internal.DefaultContext
 import org.jetbrains.kotlin.psi.KtFile
 
 /**
@@ -19,9 +20,7 @@ typealias RuleId = String
  * This base rule class abstracts over single and multi rules and allows the
  * detekt core engine to only care about a single type.
  */
-abstract class BaseRule(
-    protected val context: Context = DefaultContext()
-) : DetektVisitor(), Context by context {
+abstract class BaseRule : DetektVisitor(), Context by DefaultContext() {
 
     open val ruleId: RuleId = javaClass.simpleName
 

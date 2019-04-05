@@ -14,10 +14,7 @@ import org.jetbrains.kotlin.psi.KtFile
  * @author Artur Bosch
  * @author Marvin Ramin
  */
-abstract class Rule(
-    override val ruleSetConfig: Config = Config.empty,
-    ruleContext: Context = DefaultContext()) :
-        BaseRule(ruleContext), ConfigAware {
+abstract class Rule(override val ruleSetConfig: Config = Config.empty) : BaseRule(), ConfigAware {
 
     /**
      * A rule is motivated to point out a specific issue in the code base.
