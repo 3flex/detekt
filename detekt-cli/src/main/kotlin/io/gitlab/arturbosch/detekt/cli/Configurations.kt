@@ -1,6 +1,5 @@
 package io.gitlab.arturbosch.detekt.cli
 
-import io.gitlab.arturbosch.detekt.api.CompositeConfig
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.YamlConfig
 import io.gitlab.arturbosch.detekt.core.PathFilter

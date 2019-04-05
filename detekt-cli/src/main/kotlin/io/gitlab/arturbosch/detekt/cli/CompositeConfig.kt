@@ -1,4 +1,6 @@
-package io.gitlab.arturbosch.detekt.api
+package io.gitlab.arturbosch.detekt.cli
+
+import io.gitlab.arturbosch.detekt.api.Config
 
 /**
  * Wraps two different configuration which should be considered when retrieving properties.

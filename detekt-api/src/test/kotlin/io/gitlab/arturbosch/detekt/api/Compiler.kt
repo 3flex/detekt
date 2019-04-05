@@ -25,6 +25,4 @@ internal object Compiler {
 fun compilerFor(resource: String) = Compiler.compileFromContent(
         File(Compiler.javaClass.getResource("/$resource").path).readText())
 
-fun yamlConfig(resource: String) = YamlConfig.loadResource(Compiler.javaClass.getResource("/$resource"))
-
 fun resource(name: String): URI = Compiler::class.java.getResource(if (name.startsWith("/")) name else "/$name").toURI()
