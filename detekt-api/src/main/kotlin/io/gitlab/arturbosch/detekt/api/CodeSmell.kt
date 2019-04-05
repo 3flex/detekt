@@ -45,7 +45,7 @@ open class CodeSmell(
  * Represents a code smell for which a specific metric can be determined which is responsible
  * for the existence of this rule violation.
  */
-open class ThresholdedCodeSmell(
+class ThresholdedCodeSmell(
     issue: Issue,
     entity: Entity,
     val metric: Metric,
