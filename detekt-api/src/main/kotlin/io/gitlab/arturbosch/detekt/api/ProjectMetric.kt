@@ -5,7 +5,7 @@ package io.gitlab.arturbosch.detekt.api
  *
  * @author Artur Bosch
  */
-open class ProjectMetric(
+data class ProjectMetric(
     val type: String,
     val value: Int,
     val priority: Int = -1,
