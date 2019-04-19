@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.detekt.cli
 
 import com.beust.jcommander.Parameter
+import org.jetbrains.kotlin.config.JvmTarget
 import java.nio.file.Path
 
 /**
@@ -22,13 +23,6 @@ class CliArgs : Args {
             description = "Path filters defined through regex with separator ';' or ',' (\".*test.*\"). " +
                     "These filters apply on relative paths from the project root.")
     var filters: String? = null // Using a converter for List<PathFilter> resulted in a ClassCastException
-
-    @Parameter(
-        names = ["--classpath", "-cp"],
-        required = false,
-        description = "EXPERIMENTAL: Compile Classpath of the project."
-    )
-    var classpath: String? = null
 
     @Parameter(names = ["--config", "-c"],
             description = "Path to the config file (path/to/config.yml). " +
@@ -102,6 +96,25 @@ class CliArgs : Args {
             description = "Prints the AST for given [input] file. Must be no directory.",
             hidden = true)
     var printAst: Boolean = false
+
+    /*
+        The following @Parameters are used for type and symbol resolving. When additional parameters are required the
+        names should mirror the names found in this file (e.g. "classpath", "jvm-target"):
+        https://github.com/JetBrains/kotlin/blob/master/compiler/cli/cli-common/src/org/jetbrains/kotlin/cli/common/arguments/K2JVMCompilerArguments.kt
+    */
+    @Parameter(
+        names = ["--classpath", "-cp"],
+        description = "EXPERIMENTAL: Paths where to find user class files"
+    )
+    var classpath: String? = null
+
+    @Parameter(
+        names = ["--jvm-target"],
+        converter = JvmTargetConverter::class,
+        description = "EXPERIMENTAL: Target version of the generated JVM bytecode that was generated during " +
+                "compilation and is now being used for type resolution (1.6, 1.8, 9, 10, 11 or 12)"
+    )
+    var jvmTarget: JvmTarget = JvmTarget.DEFAULT
 
     val inputPaths: List<Path> by lazy {
         MultipleExistingPathConverter().convert(input ?: System.getProperty("user.dir"))

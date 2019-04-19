@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.detekt.core
 
 import io.gitlab.arturbosch.detekt.api.Config
+import org.jetbrains.kotlin.config.JvmTarget
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -23,6 +24,7 @@ data class ProcessingSettings @JvmOverloads constructor(
     val excludeDefaultRuleSets: Boolean = false,
     val pluginPaths: List<Path> = emptyList(),
     val classpath: List<String> = emptyList(),
+    val jvmTarget: JvmTarget = JvmTarget.DEFAULT,
     val executorService: ExecutorService = ForkJoinPool.commonPool(),
     val outPrinter: PrintStream = System.out,
     val errorPrinter: PrintStream = System.err
@@ -38,12 +40,13 @@ data class ProcessingSettings @JvmOverloads constructor(
         excludeDefaultRuleSets: Boolean = false,
         pluginPaths: List<Path> = emptyList(),
         classpath: List<String> = emptyList(),
+        jvmTarget: JvmTarget = JvmTarget.DEFAULT,
         executorService: ExecutorService = ForkJoinPool.commonPool(),
         outPrinter: PrintStream = System.out,
         errorPrinter: PrintStream = System.err
     ) : this(
         listOf(inputPath), config, pathFilters, parallelCompilation,
-        excludeDefaultRuleSets, pluginPaths, classpath, executorService, outPrinter, errorPrinter
+        excludeDefaultRuleSets, pluginPaths, classpath, jvmTarget, executorService, outPrinter, errorPrinter
     )
 
     init {
