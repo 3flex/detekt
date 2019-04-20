@@ -7,8 +7,13 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
+import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.psi.KtBinaryExpressionWithTypeRHS
-import org.jetbrains.kotlin.psi.KtPsiUtil
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
+import org.jetbrains.kotlin.resolve.calls.callUtil.getType
+import org.jetbrains.kotlin.types.CastDiagnosticsUtil
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 
 /**
  * Reports casts which are unsafe. In case the cast is not possible it will throw an exception.
@@ -38,9 +43,29 @@ class UnsafeCast(config: Config = Config.empty) : Rule(config) {
             Debt.TWENTY_MINS)
 
     override fun visitBinaryWithTypeRHSExpression(expression: KtBinaryExpressionWithTypeRHS) {
-        if (KtPsiUtil.isUnsafeCast(expression)) {
-            report(CodeSmell(issue, Entity.from(expression),
-                    "${expression.left.text} cannot be safely cast to ${expression.right?.text ?: ""}."))
+        super.visitBinaryWithTypeRHSExpression(expression)
+        if (bindingContext == BindingContext.EMPTY) return
+
+        val actualType = expression.left.getType(bindingContext) ?: return
+        val targetType = expression.right?.typeElement?.getAbbreviatedTypeOrType(bindingContext)
+
+        if (targetType != null && !CastDiagnosticsUtil.isCastPossible(actualType, targetType, JavaToKotlinClassMap)) {
+            report(
+                CodeSmell(
+                    issue, Entity.from(expression),
+                    "Cast from ${expression.left.text} to ${expression.right?.text ?: ""} will never succeed."
+                )
+            )
         }
+        if (targetType != null && CastDiagnosticsUtil.isCastErased(actualType, targetType, KotlinTypeChecker.DEFAULT)) {
+            report(
+                CodeSmell(
+                    issue, Entity.from(expression),
+//                    "Unchecked cast: `Map<String, *>` to `Map<String, Int>`"
+                    "Unchecked cast: `${actualType}` to `${targetType}`."
+                )
+            )
+        }
+
     }
 }
