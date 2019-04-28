@@ -1,5 +1,6 @@
 import com.jfrog.bintray.gradle.BintrayExtension
 import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.gradle.DokkaTask
@@ -32,11 +33,11 @@ tasks.wrapper {
     }
 }
 
-tasks.withType<Test> {
+tasks.withType<Test>().configureEach {
     dependsOn(gradle.includedBuild("detekt-gradle-plugin").task(":test"))
 }
 
-tasks.withType<Detekt> {
+tasks.withType<Detekt>().configureEach {
     dependsOn("detekt-cli:assemble")
     dependsOn("detekt-formatting:assemble")
     dependsOn(gradle.includedBuild("detekt-gradle-plugin").task(":detekt"))
@@ -82,7 +83,7 @@ subprojects {
         }
     }
 
-    tasks.withType<Detekt> {
+    tasks.withType<Detekt>().configureEach {
         exclude("resources/")
         exclude("build/")
     }
@@ -119,7 +120,7 @@ subprojects {
         }
     }
 
-    tasks.withType<Test> {
+    tasks.withType<Test>().configureEach {
         useJUnitPlatform()
         testLogging {
             // set options for log level LIFECYCLE
@@ -136,7 +137,7 @@ subprojects {
         }
     }
 
-    tasks.withType<KotlinCompile> {
+    tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions.jvmTarget = "1.8"
         // https://youtrack.jetbrains.com/issue/KT-24946
         kotlinOptions.freeCompilerArgs = listOf(
@@ -183,7 +184,7 @@ subprojects {
         })
     }
 
-    tasks.withType<DokkaTask> {
+    tasks.withType<DokkaTask>().configureEach {
         // suppresses undocumented classes but not dokka warnings https://github.com/Kotlin/dokka/issues/90
         reportUndocumented = false
         outputFormat = "javadoc"
@@ -193,30 +194,25 @@ subprojects {
         enabled = JavaVersion.current().isJava8
     }
 
-    val sourcesJar by tasks.creating(Jar::class) {
+    val sourcesJar by tasks.registering(Jar::class) {
         dependsOn("classes")
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
     }
 
-    val javadocJar by tasks.creating(Jar::class) {
+    val javadocJar by tasks.registering(Jar::class) {
         dependsOn("dokka")
         archiveClassifier.set("javadoc")
         from(buildDir.resolve("javadoc"))
     }
 
-    artifacts {
-        archives(sourcesJar)
-        archives(javadocJar)
-    }
-
     configure<PublishingExtension> {
         publications.create<MavenPublication>("DetektPublication") {
             from(components["java"])
-            artifact(sourcesJar)
-            artifact(javadocJar)
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
             if (project.name == "detekt-cli") {
-                artifact(tasks.getByName("shadowJar"))
+                artifact(tasks["shadowJar"])
             }
             groupId = this@subprojects.group as? String
             artifactId = this@subprojects.name
@@ -305,7 +301,7 @@ val detektAll by tasks.registering(Detekt::class) {
     }
 }
 
-tasks.create<JacocoReport>("rootJacocoTestReport") {
+tasks.register<JacocoReport>("rootJacocoTestReport") {
     val jacocoReportTasks =
         subprojects
             .filterNot { it.project.name == "detekt-test" }
@@ -319,9 +315,9 @@ tasks.create<JacocoReport>("rootJacocoTestReport") {
 
     subprojects.forEach { testedProject ->
         val sourceSets = testedProject.sourceSets
-        this@create.additionalSourceDirs.from(files(sourceSets.main.get().allSource.srcDirs))
-        this@create.sourceDirectories.from(files(sourceSets.main.get().allSource.srcDirs))
-        this@create.classDirectories.from(files(sourceSets.main.get().output))
-        this@create.dependsOn(testedProject.tasks.named("test"))
+        this@register.additionalSourceDirs.from(files(sourceSets.main.get().allSource.srcDirs))
+        this@register.sourceDirectories.from(files(sourceSets.main.get().allSource.srcDirs))
+        this@register.classDirectories.from(files(sourceSets.main.get().output))
+        this@register.dependsOn(testedProject.tasks.named("test"))
     }
 }

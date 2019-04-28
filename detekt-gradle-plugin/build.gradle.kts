@@ -1,3 +1,5 @@
+
+import io.gitlab.arturbosch.detekt.detekt
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
@@ -97,7 +99,7 @@ tasks.dokka {
     outputDirectory = "$buildDir/javadoc"
 }
 
-val generateDefaultDetektVersionFile: Task by tasks.creating {
+val generateDefaultDetektVersionFile by tasks.registering {
     val defaultDetektVersionFile =
             File("$buildDir/generated/src/io/gitlab/arturbosch/detekt", "PluginVersion.kt")
 
@@ -120,13 +122,13 @@ tasks.compileKotlin {
     dependsOn(generateDefaultDetektVersionFile)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     dependsOn("classes")
     archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
 }
 
-val javadocJar by tasks.creating(Jar::class) {
+val javadocJar by tasks.registering(Jar::class) {
     dependsOn("dokka")
     archiveClassifier.set("javadoc")
     from(buildDir.resolve("javadoc"))
@@ -147,8 +149,8 @@ detekt {
 publishing {
     publications.create<MavenPublication>("DetektPublication") {
         from(components["java"])
-        artifact(sourcesJar)
-        artifact(javadocJar)
+        artifact(tasks["sourcesJar"])
+        artifact(tasks["javadocJar"])
         groupId = rootProject.group as? String
         artifactId = rootProject.name
         version = rootProject.version as? String

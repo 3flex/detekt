@@ -4,7 +4,7 @@ application {
     mainClassName = "io.gitlab.arturbosch.detekt.generator.Main"
 }
 
-val jar by tasks.getting(Jar::class) {
+val jar by tasks.existing(Jar::class) {
     manifest {
         attributes.apply { put("Main-Class", "io.gitlab.arturbosch.detekt.generator.Main") }
     }
@@ -15,7 +15,7 @@ configurations.testImplementation.get().extendsFrom(configurations["kotlinTest"]
 
 val detektVersion: String by project
 
-val generateDocumentation: Task by tasks.creating {
+val generateDocumentation by tasks.registering {
     dependsOn(":detekt-generator:shadowJar")
     description = "Generates detekt documentation and the default config.yml based on Rule KDoc"
 
@@ -42,7 +42,7 @@ val generateDocumentation: Task by tasks.creating {
     }
 }
 
-val verifyGeneratorOutput: Task by tasks.creating {
+val verifyGeneratorOutput by tasks.registering {
     dependsOn(listOf(":detekt-generator:shadowJar", ":detekt-generator:generateDocumentation"))
     description = "Verifies that all documentation and the config.yml are up-to-date"
     doLast {
