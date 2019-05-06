@@ -12,6 +12,8 @@ internal class NestedClassVisibilityNegative {
 
     // should not detect companion object
     companion object C
+
+    class Something {}
 }
 
 private class PrivateClassWithNestedElements {
@@ -23,3 +25,8 @@ internal interface IgnoreNestedClassInInterface {
 
     class Nested
 }
+
+//internal sealed class MyTest { //NestedClassesVisibility violation
+//    object MyTest2: MyTest()
+//    class MyTest3: MyTest()
+//}

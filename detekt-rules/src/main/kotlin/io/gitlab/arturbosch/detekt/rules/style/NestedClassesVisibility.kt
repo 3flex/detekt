@@ -37,11 +37,11 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
  * @author schalkms
  * @author Marvin Ramin
  */
-class NestedClassesVisibility(config: Config = Config.empty) : Rule(config) {
+private class NestedClassesVisibility(config: Config = Config.empty) : Rule(config) {
 
     override val issue: Issue = Issue("NestedClassesVisibility", Severity.Style,
             "Nested types are often used for implementing private functionality " +
-                    "and therefore this should not be public.",
+                    "and therefore should not be visible externally.",
             Debt.FIVE_MINS)
 
     override fun visitClass(klass: KtClass) {
