@@ -13,6 +13,7 @@ repositories {
     gradlePluginPortal()
     mavenLocal()
     jcenter()
+    google()
 }
 
 plugins {
@@ -34,11 +35,14 @@ val jcommanderVersion: String by project
 val spekVersion = "2.0.2"
 val junitPlatformVersion = "1.4.1"
 val assertjVersion = "3.12.2"
+val androidGradleToolsVersion = "3.0.0"
 
 dependencies {
+    compileOnly(gradleApi())
     implementation(kotlin("stdlib"))
     implementation(kotlin("gradle-plugin"))
     implementation(kotlin("gradle-plugin-api"))
+    implementation("com.android.tools.build:gradle:$androidGradleToolsVersion")
 
     testImplementation(kotlin("reflect"))
     testImplementation("org.assertj:assertj-core:$assertjVersion")

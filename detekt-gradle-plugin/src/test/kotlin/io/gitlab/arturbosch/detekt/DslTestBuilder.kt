@@ -90,8 +90,14 @@ abstract class DslTestBuilder {
                 """.trimMargin()
     }
 
+    private class CustomBuilder(val buildFileName: String) : DslTestBuilder() {
+        override val gradleBuildName = buildFileName
+        override val gradleBuildConfig = ""
+    }
+
     companion object {
         fun kotlin(): DslTestBuilder = KotlinBuilder()
         fun groovy(): DslTestBuilder = GroovyBuilder()
+        fun custom(buildFileName: String): DslTestBuilder = CustomBuilder(buildFileName)
     }
 }

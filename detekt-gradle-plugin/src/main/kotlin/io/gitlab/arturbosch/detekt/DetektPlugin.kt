@@ -1,5 +1,9 @@
 package io.gitlab.arturbosch.detekt
 
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.api.SourceKind
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -13,6 +17,7 @@ import org.gradle.api.reporting.ReportingExtension
 import org.gradle.api.tasks.SourceSet
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 
 /**
@@ -43,10 +48,22 @@ class DetektPlugin : Plugin<Project> {
     private fun registerDetektTasks(project: Project, extension: DetektExtension) {
         // Kotlin JVM plugin
         project.plugins.withId("org.jetbrains.kotlin.jvm") {
-            project.afterEvaluate {
-                project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.all { sourceSet ->
-                    registerDetektTask(project, extension, sourceSet)
-                }
+            project.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.all { sourceSet ->
+                registerDetektTask(project, extension, sourceSet)
+            }
+        }
+
+        // Kotlin Android plugin
+        project.plugins.withId("org.jetbrains.kotlin.android") {
+            val appExtension = project.extensions.findByType(AppExtension::class.java)
+            val libraryExtension = project.extensions.findByType(LibraryExtension::class.java)
+
+            appExtension?.applicationVariants?.all { applicationVariant ->
+                registerAndroidDetektTask(project, extension, applicationVariant)
+            }
+
+            libraryExtension?.libraryVariants?.all { libraryVariant ->
+                registerAndroidDetektTask(project, extension, libraryVariant)
             }
         }
     }
@@ -97,6 +114,39 @@ class DetektPlugin : Plugin<Project> {
             it.reports.html.destination = File(extension.reportsDir, sourceSet.name + ".html")
             it.description =
                 "EXPERIMENTAL & SLOW: Run detekt analysis for ${sourceSet.name} classes with type resolution"
+        }
+    }
+
+    private fun registerAndroidDetektTask(
+        project: Project,
+        extension: DetektExtension,
+        variant: BaseVariant
+    ) {
+        val variantName = variant.name.capitalize()
+
+        project.tasks.register(DETEKT + variantName, Detekt::class.java) {
+            val files = variant.sourceSets.asSequence()
+                .flatMap { it.javaDirectories.asSequence() }
+                .flatMap { it.walk() }
+                .filter { it.isFile }
+                .asIterable()
+            val kotlinBuildTask =
+                project.tasks.getByName("compile${variantName}Kotlin") as? KotlinCompile
+            checkNotNull(kotlinBuildTask) { "KotlinCompile task for build variant ${variantName} not found." }
+            it.debugProp.set(project.provider { extension.debug })
+            it.parallelProp.set(project.provider { extension.parallel })
+            it.disableDefaultRuleSetsProp.set(project.provider { extension.disableDefaultRuleSets })
+            it.buildUponDefaultConfigProp.set(project.provider { extension.buildUponDefaultConfig })
+            it.failFastProp.set(project.provider { extension.failFast })
+            it.config.setFrom(project.provider { extension.config })
+            it.baseline.set(project.layout.file(project.provider { extension.baseline }))
+            it.plugins.set(project.provider { extension.plugins })
+            it.source(files, variant.getSourceFolders(SourceKind.JAVA))
+            it.classpath.setFrom(kotlinBuildTask.classpath)
+            it.reports.xml.destination = File(extension.reportsDir, variant.name + ".xml")
+            it.reports.html.destination = File(extension.reportsDir, variant.name + ".html")
+            it.description =
+                "EXPERIMENTAL & SLOW: Run detekt analysis for ${variant.name} classes with type resolution"
         }
     }
 
