@@ -37,6 +37,7 @@ import io.gitlab.arturbosch.detekt.rules.style.UnnecessaryApply
 import io.gitlab.arturbosch.detekt.rules.style.UnnecessaryInheritance
 import io.gitlab.arturbosch.detekt.rules.style.UnnecessaryLet
 import io.gitlab.arturbosch.detekt.rules.style.UnnecessaryParentheses
+import io.gitlab.arturbosch.detekt.rules.style.UnnecessaryTypeArgument
 import io.gitlab.arturbosch.detekt.rules.style.UntilInsteadOfRangeTo
 import io.gitlab.arturbosch.detekt.rules.style.UnusedImports
 import io.gitlab.arturbosch.detekt.rules.style.UnusedPrivateClass
@@ -104,6 +105,7 @@ class StyleGuideProvider : RuleSetProvider {
                 UntilInsteadOfRangeTo(config),
                 UnnecessaryApply(config),
                 UnnecessaryLet(config),
+                UnnecessaryTypeArgument(),
                 MayBeConst(config),
                 PreferToOverPairSyntax(config),
                 MandatoryBracesIfStatements(config),

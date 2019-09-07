@@ -36,7 +36,7 @@ class LargeClass(
                     "Split up large classes into smaller classes that are easier to understand.",
             Debt.TWENTY_MINS)
 
-    private val classToLinesCache = IdentityHashMap<KtClassOrObject, Int>()
+    private val classToLinesCache: IdentityHashMap<KtClassOrObject, Int> = IdentityHashMap<KtClassOrObject, Int>()
     private val nestedClassTracking = IdentityHashMap<KtClassOrObject, HashSet<KtClassOrObject>>()
 
     override fun preVisit(root: KtFile) {

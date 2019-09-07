@@ -39,7 +39,7 @@ class Runner(private val arguments: CliArgs) : Executable {
         return System.currentTimeMillis() - start to result
     }
 
-    private fun createSettings(): ProcessingSettings = with(arguments) {
+    private fun createSettings() = with(arguments) {
         ProcessingSettings(
             inputPaths = inputPaths,
             config = loadConfiguration(),
