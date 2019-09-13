@@ -7,11 +7,11 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
-import org.jetbrains.kotlin.cfg.WhenChecker
-import org.jetbrains.kotlin.codegen.kotlinType
+import org.jetbrains.kotlin.cfg.WhenMissingCase
+import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtWhenExpression
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.bindingContextUtil.isUsedAsExpression
 
 /**
  * Turn on this rule to flag `when` expressions that do not check that all cases are covered when the subject is an enum
@@ -73,37 +73,20 @@ class MissingWhenCase(config: Config = Config.empty) : Rule(config) {
     @Suppress("ReturnCount")
     override fun visitWhenExpression(expression: KtWhenExpression) {
         if (bindingContext == BindingContext.EMPTY) return
-        if (expression.entries.find { it.isElse } != null) return
-        if (expression.isUsedAsExpression(bindingContext)) return
-        val subjectExpression = expression.subjectExpression ?: return
-        val subjectType = subjectExpression.kotlinType(bindingContext)
-        val enumClassDescriptor = WhenChecker.getClassDescriptorOfTypeIfEnum(subjectType)
-        if (enumClassDescriptor != null) {
-            val enumMissingCases = WhenChecker.getEnumMissingCases(expression, bindingContext, enumClassDescriptor)
-            if (enumMissingCases.isNotEmpty()) {
-                report(
-                    CodeSmell(
-                        issue, Entity.from(expression),
-                        "When expression is missing cases: ${enumMissingCases.joinToString()}. Either add missing " +
-                                "cases or a default `else` case."
-                    )
+
+        if (bindingContext.diagnostics.forElement(expression).firstOrNull { it.factory == Errors.NON_EXHAUSTIVE_WHEN } != null) {
+            @Suppress("UNCHECKED_CAST")
+            val finding = bindingContext.diagnostics.forElement(expression).first() as DiagnosticWithParameters1<*, List<WhenMissingCase>>
+
+            report(
+                CodeSmell(
+                    issue, Entity.from(expression),
+                    "When expression is missing cases: ${finding.a.joinToString()}. Either add missing " +
+                            "cases or a default `else` case."
                 )
-            }
+            )
         }
-        val sealedClassDescriptor = WhenChecker.getClassDescriptorOfTypeIfSealed(subjectType)
-        if (sealedClassDescriptor != null) {
-            val sealedClassMissingCases =
-                WhenChecker.getSealedMissingCases(expression, bindingContext, sealedClassDescriptor)
-            if (sealedClassMissingCases.isNotEmpty()) {
-                report(
-                    CodeSmell(
-                        issue, Entity.from(expression),
-                        "When expression is missing cases: ${sealedClassMissingCases.joinToString()}. Either add " +
-                                "missing cases or a default `else` case."
-                    )
-                )
-            }
-        }
+
         super.visitWhenExpression(expression)
     }
 }
