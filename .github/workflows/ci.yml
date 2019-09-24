@@ -31,4 +31,4 @@ jobs:
         run: ./gradlew jacocoTestReport
       - name: Upload coverage to Codecov
         if: matrix.os == 'macOS-latest'
-        run: bash <(curl -s https://codecov.io/bash) -X gcov -t ${{ secrets.CODECOV_TOKEN }} -n "Java ${{ matrix.java_version }} on macOS" -c "$GITHUB_SHA" -v
+        run: bash <(curl -s https://codecov.io/bash) -v -X gcov -t ${{ secrets.CODECOV_TOKEN }} -n "Java ${{ matrix.java_version }} on macOS" -c "$GITHUB_SHA"
