@@ -1,0 +1,36 @@
+name: Run CI
+
+on: [push]
+
+jobs:
+  build:
+    name: Test with Java ${{ matrix.java_version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java_version: ['1.8', '11.0.x', '12.0.x']
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java_version }}
+      - name: Gradle Build
+        run: ./gradlew build --parallel -PwarningsAsErrors=true --scan
+      - name: Gradle Shadow Jar
+        run: ./gradlew installShadowDist
+      - name: Run Shadow Jar
+        run: ./detekt-cli/build/install/detekt-cli-shadow/bin/detekt-cli --help
+      - name: Run detekt CLI
+        run: ./detekt-cli/build/install/detekt-cli-shadow/bin/detekt-cli -i . --baseline ./config/detekt/baseline.xml -ex "**/resources/**,**/detekt*/build/**" -c ./detekt-cli/src/main/resources/default-detekt-config.yml,./config/detekt/detekt.yml
+      - name: Check documentation generated
+        run: ./gradlew verifyGeneratorOutput
+      - name: Generate JaCoCo report
+        if: matrix.os == 'macOS-latest'
+        run: ./gradlew jacocoTestReport
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'macOS-latest'
+        env:
+          CI_BUILD_URL: ${{ github.event.head_commit.url }}/checks
+        run: bash <(curl -s https://codecov.io/bash) -X gcov -t ${{ secrets.CODECOV_TOKEN }} -n "Java ${{ matrix.java_version }} on macOS" -c "$GITHUB_SHA"
