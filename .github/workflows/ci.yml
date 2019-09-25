@@ -1,6 +1,5 @@
 name: Run CI
 
-
 on:
   push:
   pull_request:
@@ -34,4 +33,7 @@ jobs:
         run: ./gradlew jacocoTestReport
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'
-        run: bash <(curl -s https://codecov.io/bash) -v -X gcov -t ${{ secrets.CODECOV_TOKEN }} -n "Java ${{ matrix.java_version }} on macOS" -C "$GITHUB_SHA" -B "${{ github.ref }}"
+        run: bash <(curl -s https://codecov.io/bash) -v -X gcov -t ${{ secrets.CODECOV_TOKEN }} -n "Java ${{ matrix.java_version }} on macOS" -C $GITHUB_SHA
+        env:
+          VCS_BRANCH_NAME: ${{ github.ref }}
+          VCS_PULL_REQUEST: ${{ github.event.push.id }}
