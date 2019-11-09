@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import java.util.Date
 
 repositories {
+    google()
     jcenter()
 }
 
@@ -25,11 +26,13 @@ val spekVersion = "2.0.9"
 val junitPlatformVersion = "1.5.2"
 val assertjVersion = "3.14.0"
 val detektFormattingVersion = "1.3.1"
+val androidGradleToolsVersion = "3.0.0"
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(kotlin("gradle-plugin"))
-    implementation(kotlin("gradle-plugin-api"))
+    compileOnly(kotlin("gradle-plugin"))
+    compileOnly(kotlin("gradle-plugin-api"))
+    compileOnly("com.android.tools.build:gradle:$androidGradleToolsVersion")
 
     testImplementation("org.assertj:assertj-core:$assertjVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
