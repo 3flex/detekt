@@ -18,7 +18,7 @@ jobs:
         id: cache-gradle-deps
         uses: actions/cache@v1
         with:
-          path: ${{ env.HOME }}/.gradle/caches/modules-2
+          path: $HOME/.gradle/caches/modules-2
           key: ${{ runner.os }}-gradle-deps
       - name: Set up Java
         uses: actions/setup-java@v1
@@ -37,7 +37,6 @@ jobs:
   coverage:
     name: Upload coverage report
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - uses: actions/checkout@v2
       - name: Set up Java
