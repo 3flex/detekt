@@ -81,7 +81,6 @@ fun assertDocumentationUpToDate() {
     }
 }
 
-val junitPlatformVersion: String by project
 val spekVersion: String by project
 val jcommanderVersion: String by project
 
@@ -94,6 +93,5 @@ dependencies {
     implementation(kotlin("reflect"))
 
     testImplementation(project(":detekt-test"))
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 }
