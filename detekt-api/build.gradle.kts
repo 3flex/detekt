@@ -7,7 +7,6 @@ plugins {
 configurations.testImplementation.get().extendsFrom(configurations.kotlinTest.get())
 
 val yamlVersion: String by project
-val junitPlatformVersion: String by project
 val spekVersion: String by project
 
 dependencies {
@@ -17,7 +16,6 @@ dependencies {
 
     testImplementation(project(":detekt-test"))
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 }
 
