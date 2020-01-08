@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java_version: ['1.8', '11.0.x', '13']
+        java_version: ['1.8', '11.0.x'] # add '13' once rebased where we have Gradle 6
     steps:
       - uses: actions/checkout@v2
       - name: Set up Java
