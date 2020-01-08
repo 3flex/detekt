@@ -32,5 +32,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: ./gradlew jacocoTestReport
       - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
         if: matrix.os == 'ubuntu-latest'
-        run: bash <(curl -s https://codecov.io/bash) -v -X gcov -t ${{ secrets.CODECOV_TOKEN }} -n "Java ${{ matrix.java_version }} on macOS" -C "$GITHUB_SHA" -B "${{ github.ref }}" -P ${{ github.event.pull_request.id }}
