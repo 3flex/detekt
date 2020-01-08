@@ -2,7 +2,6 @@ application {
     mainClassName = "io.gitlab.arturbosch.detekt.cli.Main"
 }
 
-val junitPlatformVersion: String by project
 val spekVersion: String by project
 val jcommanderVersion: String by project
 val detektVersion: String by project
@@ -19,7 +18,6 @@ dependencies {
     testImplementation(project(":detekt-test"))
     testImplementation(project(":detekt-rules"))
     testImplementation("org.reflections:reflections:$reflectionsVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 }
 
