@@ -14,6 +14,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+      - name: Cache Gradle dependency cache
+        id: cache-gradle-deps
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.HOME }}/.gradle/caches/modules-2
+          key: ${{ runner.os }}-gradle-deps
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
