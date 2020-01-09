@@ -19,9 +19,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: $HOME/.gradle/caches/modules-2
-          key: gradle-${{ hashFiles('**/*.gradle.kts', 'gradle.properties') }}
+          key: gradle-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
           restore-keys: |
-            gradle-${{ env.cache-name }}
+            gradle-${{ hashFiles('**/*.gradle.kts') }}-
             gradle-
       - name: Set up Java
         uses: actions/setup-java@v1
