@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java_version: ['1.8', '11.0.x', 13]
+        java_version: [1.8, 11.0.x, 13]
     name: Java ${{ matrix.java_version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
