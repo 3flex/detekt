@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        java_version: ['1.8', '11.0.x'] # add '13' once rebased where we have Gradle 6
+        java_version: ['1.8', '11.0.x', 13]
     name: Java ${{ matrix.java_version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -19,7 +19,10 @@ jobs:
         uses: actions/cache@v1
         with:
           path: $HOME/.gradle/caches/modules-2
-          key: ${{ runner.os }}-gradle-deps
+          key: gradle-${{ hashFiles('**/*.gradle.kts', 'gradle.properties') }}
+          restore-keys: |
+            gradle-${{ env.cache-name }}
+            gradle-
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
@@ -42,7 +45,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
-          java-version: 12
+          java-version: 13
       - name: Generate JaCoCo report
         run: ./gradlew jacocoTestReport
       - name: Upload coverage to Codecov
