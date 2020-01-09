@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [windows-latest] # consider adding ubuntu-latest & macOS-latest later
         java_version: [1.8, 11.0.x, 13]
     name: Java ${{ matrix.java_version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -18,8 +18,8 @@ jobs:
         id: cache-gradle-deps
         uses: actions/cache@v1
         with:
-          path: ~/.gradle/caches/modules-2
-          key: gradle2-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+          path: ~\.gradle\caches\modules-2
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
       - name: Set up Java
         uses: actions/setup-java@v1
         with:
@@ -34,20 +34,20 @@ jobs:
         run: ./detekt-cli/build/install/detekt-cli-shadow/bin/detekt-cli -i . --baseline ./config/detekt/baseline.xml -ex "**/resources/**,**/detekt*/build/**" -c ./detekt-cli/src/main/resources/default-detekt-config.yml,./config/detekt/detekt.yml
       - name: Check documentation generated
         run: ./gradlew verifyGeneratorOutput
-  coverage:
-    name: Upload coverage report
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 13
-      - name: Generate JaCoCo report
-        run: ./gradlew jacocoTestReport
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          name: Java ${{ matrix.java_version }}
-          yml: ./.codecov.yml
-          token: ${{ secrets.CODECOV_TOKEN }}
+#   coverage:
+#     name: Upload coverage report
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Set up Java
+#         uses: actions/setup-java@v1
+#         with:
+#           java-version: 13
+#       - name: Generate JaCoCo report
+#         run: ./gradlew jacocoTestReport
+#       - name: Upload coverage to Codecov
+#         uses: codecov/codecov-action@v1
+#         with:
+#           name: Java ${{ matrix.java_version }}
+#           yml: ./.codecov.yml
+#           token: ${{ secrets.CODECOV_TOKEN }}
