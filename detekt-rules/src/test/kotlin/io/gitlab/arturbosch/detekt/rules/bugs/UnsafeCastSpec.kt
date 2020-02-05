@@ -30,6 +30,7 @@ class UnsafeCastSpec : Spek({
                     println((s as? Int) ?: 0)
                 }"""
             assertThat(subject.compileAndLintWithContext(wrapper.env, code)).hasSize(1)
+            assertThat(subject.compileAndLintWithContext(wrapper.env, code).first().message).isEqualTo("first")
         }
 
         it("does not report cast that might succeed") {
