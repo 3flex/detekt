@@ -30,9 +30,9 @@ val androidGradleToolsVersion = "3.0.0"
 
 dependencies {
     implementation(kotlin("stdlib"))
-    compileOnly(kotlin("gradle-plugin"))
+    implementation(kotlin("gradle-plugin"))
     compileOnly(kotlin("gradle-plugin-api"))
-    compileOnly("com.android.tools.build:gradle:$androidGradleToolsVersion")
+    implementation("com.android.tools.build:gradle:$androidGradleToolsVersion")
 
     testImplementation("org.assertj:assertj-core:$assertjVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
@@ -69,9 +69,9 @@ tasks.test {
     }
 }
 
-tasks.validatePlugins {
-    enableStricterValidation.set(true)
-}
+//tasks.validatePlugins {
+//    enableStricterValidation.set(true)
+//}
 
 pluginBundle {
     website = "https://arturbosch.github.io/detekt"
