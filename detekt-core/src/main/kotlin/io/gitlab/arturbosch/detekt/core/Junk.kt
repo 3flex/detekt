@@ -1,12 +1,10 @@
 package io.gitlab.arturbosch.detekt.core
 
 import io.gitlab.arturbosch.detekt.api.Finding
-import io.gitlab.arturbosch.detekt.api.RuleSetId
 import org.jetbrains.kotlin.com.intellij.openapi.util.Key
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.HashMap
 
 fun Path.exists(): Boolean = Files.exists(this)
 fun Path.isFile(): Boolean = Files.isRegularFile(this)
@@ -34,5 +32,3 @@ fun <K, V> List<Pair<K, List<V>>>.toMergedMap(): Map<K, List<V>> {
     }
     return map
 }
-
-typealias FindingsResult = List<Map<RuleSetId, List<Finding>>>

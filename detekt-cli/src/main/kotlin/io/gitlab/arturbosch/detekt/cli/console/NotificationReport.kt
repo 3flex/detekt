@@ -9,10 +9,6 @@ class NotificationReport : ConsoleReport() {
     // This allows to compute intermediate messages based on detekt results and do not rely on 'println'.
     override val priority: Int = Int.MIN_VALUE + 1
 
-    override fun render(detektion: Detektion): String? {
-        if (detektion.notifications.isEmpty()) {
-            return null
-        }
-        return detektion.notifications.joinToString("\n") { it.message }
-    }
+    override fun render(detektion: Detektion): String? = if (detektion.notifications.isEmpty()) null else
+        detektion.notifications.joinToString("\n") { it.message }
 }

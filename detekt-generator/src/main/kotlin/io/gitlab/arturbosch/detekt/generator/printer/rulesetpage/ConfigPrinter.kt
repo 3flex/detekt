@@ -36,15 +36,14 @@ object ConfigPrinter : DocumentationPrinter<List<RuleSetPage>> {
             if (ruleSet.name in TestExclusions.ruleSets) {
                 keyValue { Config.EXCLUDES_KEY to TestExclusions.pattern }
             }
-            ruleSet.configuration
-                .forEach { configuration ->
+            for (configuration in ruleSet.configuration) {
                 if (configuration.defaultValue.isYamlList()) {
                     list(configuration.name, configuration.defaultValue.toList())
                 } else {
                     keyValue { configuration.name to configuration.defaultValue }
                 }
             }
-            rules.forEach { rule ->
+            for (rule in rules) {
                 node(rule.name) {
                     keyValue { "active" to "${rule.active}" }
                     if (rule.autoCorrect) {
@@ -53,8 +52,7 @@ object ConfigPrinter : DocumentationPrinter<List<RuleSetPage>> {
                     if (rule.isExcludedInTests()) {
                         keyValue { Config.EXCLUDES_KEY to TestExclusions.pattern }
                     }
-                    rule.configuration
-                        .forEach { configuration ->
+                    for (configuration in rule.configuration) {
                         if (configuration.defaultValue.isYamlList()) {
                             list(configuration.name, configuration.defaultValue.toList())
                         } else if (configuration.deprecated == null) {

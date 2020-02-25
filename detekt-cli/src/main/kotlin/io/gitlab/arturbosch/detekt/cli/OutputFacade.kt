@@ -21,7 +21,7 @@ class OutputFacade(
             .sortedBy { it.priority }
             .asReversed()
 
-        reports.forEach { report ->
+        for (report in reports) {
             report.init(config)
             when (report) {
                 is ConsoleReport -> handleConsoleReport(report, result)

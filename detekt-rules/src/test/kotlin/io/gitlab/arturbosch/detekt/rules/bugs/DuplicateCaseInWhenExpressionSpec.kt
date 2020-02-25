@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.detekt.rules.bugs
 
 import io.gitlab.arturbosch.detekt.api.Config
+import io.gitlab.arturbosch.detekt.api.Finding
 import io.gitlab.arturbosch.detekt.test.compileAndLint
 import org.assertj.core.api.Assertions.assertThat
 import org.spekframework.spek2.Spek
@@ -23,8 +24,7 @@ class DuplicateCaseInWhenExpressionSpec : Spek({
                     }
                 }"""
             val result = subject.compileAndLint(code)
-            assertThat(result).hasSize(1)
-            assertThat(result.first().message).isEqualTo("When expression has multiple case statements for 1; 1, 2.")
+            assertThat(result.map(Finding::message)).containsExactly("When expression has multiple case statements for 1; 1, 2.")
         }
 
         it("does not report duplicated label in when") {

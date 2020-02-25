@@ -49,7 +49,7 @@ class YamlConfig internal constructor(
         fun load(path: Path): Config {
             require(Files.exists(path)) { "File does not exist!" }
             require(path.toString().endsWith(YAML)) { "File does not end with $YAML!" }
-            return load(Files.newBufferedReader(path))
+            return load(path.toFile().bufferedReader())
         }
 
         /**
@@ -57,8 +57,8 @@ class YamlConfig internal constructor(
          */
         fun loadResource(url: URL): Config = load(url.openStream().bufferedReader())
 
-        private fun load(reader: BufferedReader): Config = reader.use {
-            val yamlInput = it.lineSequence().joinToString("\n")
+        private fun load(reader: BufferedReader): Config = reader.useLines {
+            val yamlInput = it.joinToString("\n")
             if (yamlInput.isEmpty()) {
                 Config.empty
             } else {

@@ -1,15 +1,14 @@
 package io.gitlab.arturbosch.detekt.core
 
 import io.gitlab.arturbosch.detekt.api.Detektion
-import io.gitlab.arturbosch.detekt.api.Finding
+import io.gitlab.arturbosch.detekt.api.Findings
 import io.gitlab.arturbosch.detekt.api.Notification
 import io.gitlab.arturbosch.detekt.api.ProjectMetric
-import io.gitlab.arturbosch.detekt.api.RuleSetId
 import org.jetbrains.kotlin.com.intellij.openapi.util.Key
 import org.jetbrains.kotlin.com.intellij.util.keyFMap.KeyFMap
 
 @Suppress("DataClassShouldBeImmutable")
-data class DetektResult(override val findings: Map<RuleSetId, List<Finding>>) : Detektion {
+data class DetektResult(override val findings: Findings) : Detektion {
 
     private val _notifications = ArrayList<Notification>()
     override val notifications: Collection<Notification> = _notifications

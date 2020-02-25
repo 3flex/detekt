@@ -21,9 +21,10 @@ import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
-import java.io.File
+import java.net.URI
 import java.net.URLClassLoader
 import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * Creates an environment instance which can be used to compile source code to KtFile's.
@@ -77,7 +78,7 @@ fun createCompilerConfiguration(
             .toList()
     }
 
-    val classpathFiles = classpath.map { File(it) }
+    val classpathFiles = classpath.map { Paths.get(it) }
     val retrievedLanguageVersion = languageVersion ?: classpathFiles.getKotlinLanguageVersion()
     val languageVersionSettings: LanguageVersionSettings? = retrievedLanguageVersion?.let {
         LanguageVersionSettingsImpl(
@@ -93,17 +94,14 @@ fun createCompilerConfiguration(
         put(JVMConfigurationKeys.JVM_TARGET, jvmTarget)
         addJavaSourceRoots(javaFiles)
         addKotlinSourceRoots(kotlinFiles)
-        addJvmClasspathRoots(classpathFiles)
+        addJvmClasspathRoots(classpathFiles.map(Path::toFile))
     }
 }
 
 @Suppress("TooGenericExceptionCaught")
-internal fun Iterable<File>.getKotlinLanguageVersion(): LanguageVersion? {
-    val urls = map { it.toURI().toURL() }
-    if (urls.isEmpty()) {
-        return null
-    }
-    return URLClassLoader(urls.toTypedArray()).use { classLoader ->
+internal fun Collection<Path>.getKotlinLanguageVersion(): LanguageVersion? {
+    val uris = map(Path::toUri).ifEmpty { return null }
+    return URLClassLoader(uris.map(URI::toURL).toTypedArray()).use { classLoader ->
         try {
             val clazz = classLoader.loadClass("kotlin.KotlinVersion")
             val field = clazz.getField("CURRENT")

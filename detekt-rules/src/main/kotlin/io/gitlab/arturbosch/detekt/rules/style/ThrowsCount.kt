@@ -55,7 +55,7 @@ class ThrowsCount(config: Config = Config.empty) : Rule(config) {
             val count = function
                 .collectDescendantsOfType<KtThrowExpression>()
                 .filterNot { excludeGuardClauses && it.isGuardClause() }
-                .count()
+                .size
 
             if (count > max) {
                 report(CodeSmell(issue, Entity.from(function), "Too many throw statements in the function" +

@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import java.io.File
 
-class CustomDetektReport(private val project: Project) {
+class CustomDetektReport(project: Project) {
 
     @Internal
     val reportIdProp: Property<String> = project.objects.property(String::class.java)

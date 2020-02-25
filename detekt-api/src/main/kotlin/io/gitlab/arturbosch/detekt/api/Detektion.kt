@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.util.Key
  * which needs to be transferred from the detekt engine to the user.
  */
 interface Detektion {
-    val findings: Map<RuleSetId, List<Finding>>
+    val findings: FindingTable<RuleSetId>
     val notifications: Collection<Notification>
     val metrics: Collection<ProjectMetric>
 
@@ -31,3 +31,6 @@ interface Detektion {
      */
     fun add(projectMetric: ProjectMetric)
 }
+
+typealias Findings = Map<RuleSetId, List<Finding>>
+typealias FindingTable<T> = Map<T, List<Finding>>

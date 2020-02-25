@@ -32,8 +32,9 @@ class SpreadOperatorSpec : Spek({
                     val testVal = foo(xs = *xsArray)
                 """
                 val actual = subject.compileAndLintWithContext(wrapper.env, code)
-                assertThat(actual).hasSize(1)
-                assertThat(actual.first().message).isEqualTo(typeResolutionEnabledMessage)
+                assertThat(actual)
+                    .extracting("message", String::class.java)
+                    .containsExactly(typeResolutionEnabledMessage)
             }
             it("reports when array copy required without using named parameters") {
                 val code = """
@@ -42,8 +43,9 @@ class SpreadOperatorSpec : Spek({
                     val testVal = foo(*xsArray)
                 """
                 val actual = subject.compileAndLintWithContext(wrapper.env, code)
-                assertThat(actual).hasSize(1)
-                assertThat(actual.first().message).isEqualTo(typeResolutionEnabledMessage)
+                assertThat(actual)
+                    .extracting("message", String::class.java)
+                    .containsExactly(typeResolutionEnabledMessage)
             }
             it("doesn't report when using array constructor with spread operator") {
                 val code = """
@@ -108,8 +110,9 @@ class SpreadOperatorSpec : Spek({
                     val testVal = foo(xs = *xsArray)
                 """
                 val actual = subject.compileAndLint(code)
-                assertThat(actual).hasSize(1)
-                assertThat(actual.first().message).isEqualTo(typeResolutionDisabledMessage)
+                assertThat(actual)
+                    .extracting("message", String::class.java)
+                    .containsExactly(typeResolutionDisabledMessage)
             }
             it("reports when array copy required without using named parameters") {
                 val code = """
@@ -118,8 +121,9 @@ class SpreadOperatorSpec : Spek({
                     val testVal = foo(*xsArray)
                 """
                 val actual = subject.compileAndLint(code)
-                assertThat(actual).hasSize(1)
-                assertThat(actual.first().message).isEqualTo(typeResolutionDisabledMessage)
+                assertThat(actual)
+                    .extracting("message", String::class.java)
+                    .containsExactly(typeResolutionDisabledMessage)
             }
             it("doesn't report when using array constructor with spread operator") {
                 val code = """
@@ -127,8 +131,9 @@ class SpreadOperatorSpec : Spek({
                     val testVal = foo(xs = *intArrayOf(1))
                 """
                 val actual = subject.compileAndLint(code)
-                assertThat(actual).hasSize(1)
-                assertThat(actual.first().message).isEqualTo(typeResolutionDisabledMessage)
+                assertThat(actual)
+                    .extracting("message", String::class.java)
+                    .containsExactly(typeResolutionDisabledMessage)
             }
 
             it("doesn't report when using array constructor with spread operator when varargs parameter comes first") {
@@ -137,8 +142,9 @@ class SpreadOperatorSpec : Spek({
                     val list = asList(-1, 0, *arrayOf(1, 2, 3), 4, stringValue = "5")
                 """
                 val actual = subject.compileAndLint(code)
-                assertThat(actual).hasSize(1)
-                assertThat(actual.first().message).isEqualTo(typeResolutionDisabledMessage)
+                assertThat(actual)
+                    .extracting("message", String::class.java)
+                    .containsExactly(typeResolutionDisabledMessage)
             }
 
             it("doesn't report when passing values directly") {

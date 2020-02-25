@@ -21,7 +21,6 @@
 
 package io.gitlab.arturbosch.detekt.cli.out
 
-import java.util.ArrayList
 import java.util.Arrays
 import java.util.Collections
 

@@ -21,9 +21,7 @@ class KtFileModifier {
 
     private fun KtFile.unnormalizeContent(): String {
         val lineSeparator = getUserData(LINE_SEPARATOR)
-        require(lineSeparator != null) {
-            "No line separator entry for ktFile ${javaFileFacadeFqName.asString()}"
-        }
+        requireNotNull(lineSeparator) { "No line separator entry for ktFile ${javaFileFacadeFqName.asString()}" }
         return StringUtilRt.convertLineSeparators(text, lineSeparator)
     }
 }

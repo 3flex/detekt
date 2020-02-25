@@ -40,7 +40,7 @@ class HtmlOutputReport : OutputReport() {
     override val name = "HTML report"
 
     override fun render(detektion: Detektion) =
-        ClasspathResourceConverter().convert(DEFAULT_TEMPLATE).openStream().bufferedReader().use { it.readText() }
+        ClasspathResourceConverter().convert(DEFAULT_TEMPLATE).openStream().bufferedReader().readText()
             .replace(PLACEHOLDER_METRICS, renderMetrics(detektion.metrics))
             .replace(PLACEHOLDER_COMPLEXITY_REPORT, renderComplexity(getComplexityMetrics(detektion)))
             .replace(PLACEHOLDER_FINDINGS, renderFindings(detektion.findings))

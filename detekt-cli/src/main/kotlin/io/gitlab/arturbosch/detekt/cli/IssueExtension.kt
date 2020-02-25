@@ -4,9 +4,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.CorrectableCodeSmell
 import io.gitlab.arturbosch.detekt.api.Detektion
 import io.gitlab.arturbosch.detekt.api.Finding
+import io.gitlab.arturbosch.detekt.api.Findings
 import io.gitlab.arturbosch.detekt.api.RuleSetId
 import org.jetbrains.kotlin.com.intellij.openapi.util.Key
-import java.util.HashMap
 
 private val WEIGHTED_ISSUES_COUNT_KEY = Key.create<Int>("WEIGHTED_ISSUES_COUNT")
 private const val BUILD = "build"
@@ -44,12 +44,12 @@ fun Detektion.getOrComputeWeightedAmountOfIssues(config: Config): Int {
     return amount
 }
 
-fun Detektion.filterAutoCorrectedIssues(config: Config): Map<RuleSetId, List<Finding>> {
+fun Detektion.filterAutoCorrectedIssues(config: Config): Findings {
     if (!config.excludeCorrectable()) {
         return findings
     }
     val filteredFindings = HashMap<RuleSetId, List<Finding>>()
-    findings.forEach { (ruleSetId, findingsList) ->
+    for ((ruleSetId, findingsList) in findings) {
         val newFindingsList = findingsList.filter { finding ->
             val correctableCodeSmell = finding as? CorrectableCodeSmell
             correctableCodeSmell == null || !correctableCodeSmell.autoCorrectEnabled

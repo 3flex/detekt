@@ -15,12 +15,7 @@ class DebtSumming() {
         debtList.add(debt)
     }
 
-    fun calculateDebt(): Debt? {
-        if (debtList.isEmpty()) {
-            return null
-        }
-        return calculate()
-    }
+    fun calculateDebt() = if (debtList.isEmpty()) null else calculate()
 
     private fun calculate(): Debt {
         var minutes = 0

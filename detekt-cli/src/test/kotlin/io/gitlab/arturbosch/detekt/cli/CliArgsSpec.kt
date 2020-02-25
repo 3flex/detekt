@@ -17,14 +17,12 @@ internal class CliArgsSpec : Spek({
 
         it("the current working directory is used if parameter is not set") {
             val cli = parseArguments<CliArgs>(emptyArray())
-            assertThat(cli.inputPaths).hasSize(1)
-            assertThat(cli.inputPaths.first()).isEqualTo(Paths.get(System.getProperty("user.dir")))
+            assertThat(cli.inputPaths).containsExactly(Paths.get(System.getProperty("user.dir")))
         }
 
         it("a single value is converted to a path") {
             val cli = parseArguments<CliArgs>(arrayOf("--input", "$projectPath"))
-            assertThat(cli.inputPaths).hasSize(1)
-            assertThat(cli.inputPaths.first().toAbsolutePath()).isEqualTo(projectPath)
+            assertThat(cli.inputPaths.map(Path::toAbsolutePath)).containsExactly(projectPath)
         }
 
         it("multiple input paths can be separated by comma") {
@@ -33,7 +31,6 @@ internal class CliArgsSpec : Spek({
             val cli = parseArguments<CliArgs>(arrayOf(
                 "--input", "$mainPath,$testPath")
             )
-            assertThat(cli.inputPaths).hasSize(2)
             assertThat(cli.inputPaths.map(Path::toAbsolutePath)).containsExactlyInAnyOrder(mainPath, testPath)
         }
 

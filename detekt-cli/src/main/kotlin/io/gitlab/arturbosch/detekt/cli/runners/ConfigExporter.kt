@@ -3,14 +3,15 @@ package io.gitlab.arturbosch.detekt.cli.runners
 import io.gitlab.arturbosch.detekt.cli.ClasspathResourceConverter
 import io.gitlab.arturbosch.detekt.cli.CliArgs
 import io.gitlab.arturbosch.detekt.cli.DEFAULT_CONFIG
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class ConfigExporter(private val arguments: CliArgs) : Executable {
 
     override fun execute() {
-        val configPath = arguments.config ?: DEFAULT_CONFIG
-        val defaultConfig = ClasspathResourceConverter().convert(DEFAULT_CONFIG).openStream()
-        defaultConfig.copyTo(File(configPath).outputStream())
-        println("Successfully copied default config to ${File(configPath).absolutePath}")
+        val configPath = Paths.get(arguments.config ?: DEFAULT_CONFIG)
+        val defaultConfig = Paths.get(ClasspathResourceConverter().convert(DEFAULT_CONFIG).toURI())
+        Files.copy(configPath, defaultConfig)
+        println("Successfully copied default config to ${configPath.toAbsolutePath()}")
     }
 }

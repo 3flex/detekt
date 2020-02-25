@@ -1,9 +1,11 @@
 package io.gitlab.arturbosch.detekt.api.internal
 
+import io.gitlab.arturbosch.detekt.core.exists
 import org.assertj.core.api.Assertions.assertThat
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class KotlinEnvironmentUtilsTest : Spek({
 
@@ -16,8 +18,8 @@ class KotlinEnvironmentUtilsTest : Spek({
 
             val classpathFiles = System.getProperty("testClasspath", "")
                 .splitToSequence(';')
-                .map(::File)
-                .filter(File::exists)
+                .map { Paths.get(it) }
+                .filter(Path::exists)
                 .toList()
 
             val languageVersion = classpathFiles.getKotlinLanguageVersion()

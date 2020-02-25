@@ -642,8 +642,9 @@ class UnusedPrivateMemberSpec : Spek({
             """
 
             val lint = subject.lint(code)
-
-            assertThat(lint.first().message).startsWith("Function parameter")
+            assertThat(lint)
+                .extracting("message", String::class.java)
+                .startsWith("Function parameter")
         }
 
         it("are specific for local variables") {

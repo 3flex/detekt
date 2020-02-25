@@ -4,15 +4,13 @@ import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.ParameterException
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageVersion
-import java.io.File
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 class ExistingPathConverter : IStringConverter<Path> {
     override fun convert(value: String): Path {
-        val config = File(value).toPath()
+        val config = Path.of(value)
         if (Files.notExists(config)) {
             throw ParameterException("Provided path '$value' does not exist!")
         }
@@ -21,9 +19,7 @@ class ExistingPathConverter : IStringConverter<Path> {
 }
 
 class PathConverter : IStringConverter<Path> {
-    override fun convert(value: String): Path {
-        return Paths.get(value)
-    }
+    override fun convert(value: String): Path = Path.of(value)
 }
 
 interface DetektInputPathConverter<T> : IStringConverter<List<T>> {

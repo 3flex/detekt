@@ -20,10 +20,7 @@ class FindingsReport : ConsoleReport() {
         val findings = detektion
             .filterAutoCorrectedIssues(config)
             .filter { it.value.isNotEmpty() }
-
-        if (findings.isEmpty()) {
-            return null
-        }
+            .ifEmpty { return null }
 
         return with(StringBuilder()) {
             val totalDebt = DebtSumming()

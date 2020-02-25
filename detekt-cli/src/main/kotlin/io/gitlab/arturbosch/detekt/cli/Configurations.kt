@@ -16,7 +16,7 @@ fun CliArgs.createPlugins(): List<Path> = plugins.letIfNonEmpty {
 fun CliArgs.createClasspath(): List<String> = classpath.letIfNonEmpty { split(";") }
 
 private fun <T> String?.letIfNonEmpty(init: String.() -> List<T>): List<T> =
-    if (this == null || this.isEmpty()) listOf() else this.init()
+    if (this.isNullOrEmpty()) listOf() else this.init()
 
 @Suppress("UnsafeCallOnNullableType")
 fun CliArgs.loadConfiguration(): Config {

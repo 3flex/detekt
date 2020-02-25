@@ -41,7 +41,7 @@ inline fun <reified T : Args> parseArguments(
         }
     })
     if (violations.isNotEmpty()) {
-        violations.forEach(errorPrinter::println)
+        violations.onEach(errorPrinter::println)
         errorPrinter.println()
         jCommander.usage(outPrinter)
         throw HandledArgumentViolation()

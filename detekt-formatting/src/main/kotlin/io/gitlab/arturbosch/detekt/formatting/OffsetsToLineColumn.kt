@@ -1,7 +1,5 @@
 package io.gitlab.arturbosch.detekt.formatting
 
-import java.util.ArrayList
-
 /**
  * Extracted and adapted from KtLint.
  */

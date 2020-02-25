@@ -1,7 +1,6 @@
 package io.gitlab.arturbosch.detekt.cli
 
 import io.gitlab.arturbosch.detekt.api.Finding
-import java.util.HashMap
 
 val Finding.baselineId: String
     get() = this.id + ":" + this.signature

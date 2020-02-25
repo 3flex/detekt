@@ -3,6 +3,7 @@ package io.gitlab.arturbosch.detekt.core
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.FileProcessListener
 import io.gitlab.arturbosch.detekt.api.Finding
+import io.gitlab.arturbosch.detekt.api.Findings
 import io.gitlab.arturbosch.detekt.api.RuleSetId
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
 import io.gitlab.arturbosch.detekt.api.internal.absolutePath
@@ -20,8 +21,8 @@ class Detektor(
     fun run(
         ktFiles: Collection<KtFile>,
         bindingContext: BindingContext = BindingContext.EMPTY
-    ): Map<RuleSetId, List<Finding>> {
-        val findingsPerFile: FindingsResult =
+    ): Findings {
+        val findingsPerFile: List<Findings> =
             if (settings.parallelCompilation) {
                 runAsync(ktFiles, bindingContext)
             } else {
@@ -38,7 +39,7 @@ class Detektor(
     private fun runSync(
         ktFiles: Collection<KtFile>,
         bindingContext: BindingContext
-    ): FindingsResult =
+    ): List<Findings> =
         ktFiles.map { file ->
             processors.forEach { it.onProcess(file) }
             val findings = runCatching { file.analyze(bindingContext) }
@@ -51,9 +52,9 @@ class Detektor(
     private fun runAsync(
         ktFiles: Collection<KtFile>,
         bindingContext: BindingContext
-    ): FindingsResult {
+    ): List<Findings> {
         val service = settings.taskPool
-        val tasks: TaskList<Map<RuleSetId, List<Finding>>?> = ktFiles.map { file ->
+        val tasks: TaskList<Findings?> = ktFiles.map { file ->
             service.task {
                 processors.forEach { it.onProcess(file) }
                 val findings = file.analyze(bindingContext)
@@ -67,7 +68,7 @@ class Detektor(
         return awaitAll(tasks).filterNotNull()
     }
 
-    private fun KtFile.analyze(bindingContext: BindingContext): Map<RuleSetId, List<Finding>> =
+    private fun KtFile.analyze(bindingContext: BindingContext): Findings =
         providers.asSequence()
             .mapNotNull { it.buildRuleset(config) }
             .sortedBy { it.id }
