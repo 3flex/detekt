@@ -11,6 +11,7 @@ include(
 )
 
 includeBuild("detekt-gradle-plugin")
+includeBuild("../gradle-pitest-plugin")
 
 pluginManagement {
 

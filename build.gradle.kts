@@ -23,6 +23,13 @@ plugins {
     id("org.sonarqube")
 }
 
+buildscript {
+    val pitest = configurations.maybeCreate("pitest")
+    dependencies {
+        pitest("org.pitest:pitest-junit5-plugin:0.12")
+    }
+}
+
 buildScan {
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
     termsOfServiceAgree = "yes"
