@@ -17,7 +17,7 @@ import java.io.File
 import java.nio.file.Path
 
 /**
- * Test compiler extends kt compiler and adds ability to compile from text content.
+ * Test compiler extends KtCompiler and adds ability to compile from text content.
  */
 internal object KtTestCompiler : KtCompiler() {
 

@@ -5,7 +5,6 @@ import io.gitlab.arturbosch.detekt.test.TestConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import java.nio.file.Paths
 
 class MaximumLineLengthSpec : Spek({
 
@@ -30,7 +29,7 @@ class MaximumLineLengthSpec : Spek({
             it("reports issues with the filename and package as signature") {
                 val finding = subject.lint(
                     code,
-                    Paths.get("home", "test", "Test.kt").toString()
+                    "Test.kt"
                 ).first()
 
                 assertThat(finding.entity.signature).isEqualTo("home.test.Test.kt:2")

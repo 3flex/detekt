@@ -1,6 +1,5 @@
 package io.gitlab.arturbosch.detekt.core
 
-import io.github.detekt.psi.LINE_SEPARATOR
 import io.github.detekt.psi.absolutePath
 import io.gitlab.arturbosch.detekt.api.Detektion
 import io.gitlab.arturbosch.detekt.api.FileProcessListener
@@ -23,7 +22,7 @@ class KtFileModifier : FileProcessListener {
     }
 
     private fun KtFile.unnormalizeContent(): String {
-        val lineSeparator = getUserData(LINE_SEPARATOR)
+        val lineSeparator = virtualFile.detectedLineSeparator
         require(lineSeparator != null) {
             "No line separator entry for ktFile ${javaFileFacadeFqName.asString()}"
         }

@@ -24,7 +24,7 @@ abstract class ConsoleReport : Extension {
     }
 
     /**
-     * Converts the given [detektion] into a string representation
+     * Converts the given [Detektion] into a string representation
      * to present it to the client.
      * The implementation specifies which parts of the report are important to the user.
      */

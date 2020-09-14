@@ -9,7 +9,6 @@ import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Detektion
 import io.gitlab.arturbosch.detekt.api.Finding
 import io.gitlab.arturbosch.detekt.api.RuleSetId
-import java.util.HashMap
 
 internal fun defaultReportMapping(reportId: String) = when (reportId) {
     TxtOutputReport::class.java.simpleName -> "txt"

@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.style.specification.describe
-import java.nio.file.Paths
 
 class EntitySpec : Spek({
 
@@ -25,7 +24,7 @@ class EntitySpec : Spek({
             }
 
             fun topLevelFun(number: Int) = Unit
-        """.trimIndent(), Paths.get("/full/path/to/Test.kt").toString())
+        """.trimIndent(), "Test.kt")
         }
 
         describe("functions") {

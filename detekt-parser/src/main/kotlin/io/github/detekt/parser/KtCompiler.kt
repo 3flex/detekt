@@ -4,6 +4,13 @@ import io.github.detekt.psi.LINE_SEPARATOR
 import io.github.detekt.psi.RELATIVE_PATH
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.StandardFileSystems
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFileManager
+import org.jetbrains.kotlin.com.intellij.psi.PsiManager
+import org.jetbrains.kotlin.com.intellij.psi.impl.PsiFileFactoryImpl
+import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
+import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import java.nio.file.Files
@@ -29,11 +36,23 @@ open class KtCompiler(
             else basePath.fileName.resolve(basePath.relativize(path))).normalize()
         val absolutePath = path.toAbsolutePath().normalize()
         val lineSeparator = content.determineLineSeparator()
+//        val psiFile = psiFileFactory.createPhysicalFile(
+//            absolutePath.toString(),
+//            StringUtilRt.convertLineSeparators(content)
+//        )
+        val project = environment.project
+        val localFileSystem = VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL)
 
-        val psiFile = psiFileFactory.createPhysicalFile(
-            absolutePath.toString(),
-            StringUtilRt.convertLineSeparators(content)
+        val psiManager = PsiManager.getInstance(project)
+        val file = localFileSystem.findFileByPath(path.toString())
+        val lightFile = LightVirtualFile(
+            path.fileName.toString(),
+            KotlinFileType.INSTANCE,
+            content
         )
+
+        val psiFile = psiManager.findFile(lightFile) as KtFile
+        PsiFileFactoryImpl.markGenerated(psiFile)
 
         return psiFile.apply {
             putUserData(LINE_SEPARATOR, lineSeparator)

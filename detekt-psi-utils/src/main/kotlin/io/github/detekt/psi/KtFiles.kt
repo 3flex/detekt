@@ -1,15 +1,15 @@
 package io.github.detekt.psi
 
 import org.jetbrains.kotlin.com.intellij.psi.PsiFile
-import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
 const val KOTLIN_SUFFIX = ".kt"
 const val KOTLIN_SCRIPT_SUFFIX = ".kts"
 
+@Deprecated("", ReplaceWith("name"))
 val PsiFile.fileName: String
-    get() = name.substringAfterLast(File.separatorChar)
+    get() = name
 
 fun PsiFile.fileNameWithoutSuffix(): String {
     val fileName = this.fileName
@@ -19,7 +19,7 @@ fun PsiFile.fileNameWithoutSuffix(): String {
     return fileName.removeSuffix(KOTLIN_SUFFIX)
 }
 
-fun PsiFile.absolutePath(): Path = Paths.get(name)
+fun PsiFile.absolutePath(): Path = Path.of(virtualFile.presentableUrl)
 
 fun PsiFile.relativePath(): Path {
     val value = getUserData(RELATIVE_PATH)

@@ -1,26 +1,26 @@
 package io.gitlab.arturbosch.detekt.core
 
-import io.github.detekt.tooling.api.spec.ProcessingSpec
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.FileProcessListener
-import io.gitlab.arturbosch.detekt.api.Finding
-import io.gitlab.arturbosch.detekt.api.MultiRule
-import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.api.RuleSetId
-import io.gitlab.arturbosch.detekt.api.RuleSetProvider
-import io.gitlab.arturbosch.detekt.api.internal.BaseRule
-import io.gitlab.arturbosch.detekt.api.internal.CompilerResources
-import io.gitlab.arturbosch.detekt.api.internal.DisabledAutoCorrectConfig
-import io.gitlab.arturbosch.detekt.api.internal.FailFastConfig
-import io.gitlab.arturbosch.detekt.core.config.DefaultConfig
-import io.gitlab.arturbosch.detekt.core.rules.IdMapping
-import io.gitlab.arturbosch.detekt.core.rules.associateRuleIdsToRuleSetIds
-import io.gitlab.arturbosch.detekt.core.rules.isActive
-import io.gitlab.arturbosch.detekt.core.rules.shouldAnalyzeFile
-import org.jetbrains.kotlin.config.languageVersionSettings
-import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactoryImpl
+    import io.github.detekt.tooling.api.spec.ProcessingSpec
+    import io.gitlab.arturbosch.detekt.api.Config
+    import io.gitlab.arturbosch.detekt.api.FileProcessListener
+    import io.gitlab.arturbosch.detekt.api.Finding
+    import io.gitlab.arturbosch.detekt.api.MultiRule
+    import io.gitlab.arturbosch.detekt.api.Rule
+    import io.gitlab.arturbosch.detekt.api.RuleSetId
+    import io.gitlab.arturbosch.detekt.api.RuleSetProvider
+    import io.gitlab.arturbosch.detekt.api.internal.BaseRule
+    import io.gitlab.arturbosch.detekt.api.internal.CompilerResources
+    import io.gitlab.arturbosch.detekt.api.internal.DisabledAutoCorrectConfig
+    import io.gitlab.arturbosch.detekt.api.internal.FailFastConfig
+    import io.gitlab.arturbosch.detekt.core.config.DefaultConfig
+    import io.gitlab.arturbosch.detekt.core.rules.IdMapping
+    import io.gitlab.arturbosch.detekt.core.rules.associateRuleIdsToRuleSetIds
+    import io.gitlab.arturbosch.detekt.core.rules.isActive
+    import io.gitlab.arturbosch.detekt.core.rules.shouldAnalyzeFile
+    import org.jetbrains.kotlin.config.languageVersionSettings
+    import org.jetbrains.kotlin.psi.KtFile
+    import org.jetbrains.kotlin.resolve.BindingContext
+    import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactoryImpl
 
 internal class Analyzer(
     private val settings: ProcessingSettings,
