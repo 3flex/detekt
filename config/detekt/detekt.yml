@@ -9,6 +9,8 @@ custom-checks:
   SpekTestDiscovery:
     active: true
     includes: ['**/test/**/*Spec.kt']
+  NotNullIfParsed:
+    active: true
 
 comments:
   CommentOverPrivateProperty:

@@ -10,7 +10,10 @@ class CustomChecksProvider : RuleSetProvider {
 
     override fun instance(config: Config) = RuleSet(
         ruleSetId,
-        listOf(SpekTestDiscovery(config))
+        listOf(
+            NotNullIfParsed(config),
+            SpekTestDiscovery(config)
+        )
     )
 
     companion object {
