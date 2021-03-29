@@ -465,6 +465,8 @@ performance:
   active: true
   ArrayPrimitive:
     active: true
+  ConstantBackingField:
+    active: false
   ForEachOnRange:
     active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**']

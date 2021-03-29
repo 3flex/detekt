@@ -16,6 +16,7 @@ class PerformanceProvider : DefaultRuleSetProvider {
     override fun instance(config: Config): RuleSet = RuleSet(
         ruleSetId,
         listOf(
+            ConstantBackingField(config),
             ForEachOnRange(config),
             SpreadOperator(config),
             UnnecessaryTemporaryInstantiation(config),

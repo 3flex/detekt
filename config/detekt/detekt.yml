@@ -69,6 +69,11 @@ formatting:
   ParameterListWrapping:
     active: false
 
+performance:
+  active: true
+  ConstantBackingField:
+    active: true
+
 potential-bugs:
   UnsafeCast:
     active: true
