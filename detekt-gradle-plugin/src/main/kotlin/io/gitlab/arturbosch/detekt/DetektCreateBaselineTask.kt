@@ -6,6 +6,7 @@ import io.gitlab.arturbosch.detekt.invoke.BasePathArgument
 import io.gitlab.arturbosch.detekt.invoke.BaselineArgument
 import io.gitlab.arturbosch.detekt.invoke.BuildUponDefaultConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.ClasspathArgument
+import io.gitlab.arturbosch.detekt.invoke.CliArgument
 import io.gitlab.arturbosch.detekt.invoke.ConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.CreateBaselineArgument
 import io.gitlab.arturbosch.detekt.invoke.DebugArgument
@@ -15,10 +16,10 @@ import io.gitlab.arturbosch.detekt.invoke.FailFastArgument
 import io.gitlab.arturbosch.detekt.invoke.InputArgument
 import io.gitlab.arturbosch.detekt.invoke.JvmTargetArgument
 import io.gitlab.arturbosch.detekt.invoke.ParallelArgument
-import io.gitlab.arturbosch.detekt.invoke.isDryRunEnabled
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Console
@@ -109,7 +110,7 @@ open class DetektCreateBaselineTask : SourceTask() {
         get() = jvmTargetProp.get()
         set(value) = jvmTargetProp.set(value)
 
-    private val isDryRun: Boolean = project.isDryRunEnabled()
+    private val isDryRun: Provider<String> = project.providers.gradleProperty(DRY_RUN_PROPERTY)
 
     @TaskAction
     fun baseline() {
@@ -134,11 +135,15 @@ open class DetektCreateBaselineTask : SourceTask() {
             DisableDefaultRuleSetArgument(disableDefaultRuleSets.getOrElse(false))
         )
 
-        DetektInvoker.create(task = this, isDryRun = isDryRun).invokeCli(
-            arguments = arguments.toList(),
+        DetektInvoker.create(isDryRun.orNull.toBoolean()).invokeCli(
+            arguments = arguments.flatMap(CliArgument::toArgument),
             ignoreFailures = ignoreFailures.getOrElse(false),
             classpath = detektClasspath.plus(pluginClasspath),
             taskName = name
         )
+    }
+
+    companion object {
+        private const val DRY_RUN_PROPERTY = "detekt-dry-run"
     }
 }

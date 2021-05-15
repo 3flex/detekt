@@ -3,17 +3,20 @@ package io.gitlab.arturbosch.detekt.invoke
 import io.gitlab.arturbosch.detekt.internal.ClassLoaderCache
 import io.gitlab.arturbosch.detekt.internal.GlobalClassLoaderCache
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
-import org.gradle.api.logging.Logger
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 import java.io.PrintStream
 import java.lang.reflect.InvocationTargetException
 
 internal interface DetektInvoker {
 
     fun invokeCli(
-        arguments: List<CliArgument>,
+        arguments: List<String>,
         classpath: FileCollection,
         taskName: String,
         ignoreFailures: Boolean = false
@@ -21,19 +24,43 @@ internal interface DetektInvoker {
 
     companion object {
 
-        fun create(task: Task, isDryRun: Boolean): DetektInvoker =
+        fun create(isDryRun: Boolean): DetektInvoker =
             if (isDryRun) {
-                DryRunInvoker(task.logger)
+                DryRunInvoker()
             } else {
                 DefaultCliInvoker()
             }
     }
 }
 
-private const val DRY_RUN_PROPERTY = "detekt-dry-run"
+internal interface MD5WorkParameters : WorkParameters {
+    val arguments: ListProperty<String>
+    val ignoreFailures: Property<Boolean>
+    val dryRun: Property<Boolean>
+    val taskName: Property<String>
+    val classpath: ConfigurableFileCollection
+}
 
-internal fun Project.isDryRunEnabled(): Boolean {
-    return hasProperty(DRY_RUN_PROPERTY) && property(DRY_RUN_PROPERTY) == "true"
+abstract class GenerateMD5 : WorkAction<MD5WorkParameters> {
+    override fun execute() {
+        if (parameters.dryRun.get()) {
+            DryRunInvoker().invokeCli(parameters.arguments.get(), parameters.classpath, parameters.taskName.get(), parameters.ignoreFailures.get())
+            return
+        }
+
+        try {
+            val runner = io.gitlab.arturbosch.detekt.cli.buildRunner(parameters.arguments.get().toTypedArray(), System.out, System.err)
+            runner.execute()
+        } catch (e: Exception) {
+            if (isBuildFailure(e.message) && parameters.ignoreFailures.get()) {
+                return
+            }
+            throw GradleException(e.message ?: "There was a problem running detekt.")
+        }
+    }
+
+    private fun isBuildFailure(msg: String?) =
+        msg != null && "Build failed with" in msg && "issues" in msg
 }
 
 internal class DefaultCliInvoker(
@@ -41,12 +68,11 @@ internal class DefaultCliInvoker(
 ) : DetektInvoker {
 
     override fun invokeCli(
-        arguments: List<CliArgument>,
+        arguments: List<String>,
         classpath: FileCollection,
         taskName: String,
         ignoreFailures: Boolean
     ) {
-        val cliArguments = arguments.flatMap(CliArgument::toArgument)
         try {
             val loader = classLoaderCache.getOrCreate(classpath)
             val clazz = loader.loadClass("io.gitlab.arturbosch.detekt.cli.Main")
@@ -55,7 +81,7 @@ internal class DefaultCliInvoker(
                 Array<String>::class.java,
                 PrintStream::class.java,
                 PrintStream::class.java
-            ).invoke(null, cliArguments.toTypedArray(), System.out, System.err)
+            ).invoke(null, arguments.toTypedArray(), System.out, System.err)
             runner::class.java.getMethod("execute").invoke(runner)
         } catch (reflectionWrapper: InvocationTargetException) {
             val message = reflectionWrapper.targetException.message
@@ -70,19 +96,18 @@ internal class DefaultCliInvoker(
         msg != null && "Build failed with" in msg && "issues" in msg
 }
 
-private class DryRunInvoker(private val logger: Logger) : DetektInvoker {
+private class DryRunInvoker : DetektInvoker {
 
     override fun invokeCli(
-        arguments: List<CliArgument>,
+        arguments: List<String>,
         classpath: FileCollection,
         taskName: String,
         ignoreFailures: Boolean
     ) {
-        val cliArguments = arguments.flatMap(CliArgument::toArgument)
-        logger.info("Invoking detekt with dry-run.")
-        logger.info("Task: $taskName")
-        logger.info("Arguments: ${cliArguments.joinToString(" ")}")
-        logger.info("Classpath: ${classpath.files}")
-        logger.info("Ignore failures: $ignoreFailures")
+        println("Invoking detekt with dry-run.")
+        println("Task: $taskName")
+        println("Arguments: ${arguments.joinToString(" ")}")
+        println("Classpath: ${classpath.files}")
+        println("Ignore failures: $ignoreFailures")
     }
 }

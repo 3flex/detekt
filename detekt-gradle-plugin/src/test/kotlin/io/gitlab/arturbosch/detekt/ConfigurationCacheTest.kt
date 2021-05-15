@@ -7,22 +7,17 @@ import org.spekframework.spek2.style.specification.describe
 
 object ConfigurationCacheTest : Spek({
     describe("Detekt task") {
-        listOf(
-            "regular invocation" to arrayOf("detekt"),
-            "dry-run invocation" to arrayOf("detekt", "-Pdetekt-dry-run=true"),
-        ).forEach { (context, arguments) ->
-            context("given $context") {
-                it("can be loaded from the configuration cache") {
-                    val gradleRunner = DslTestBuilder.kotlin().build()
+        context("given regular invocation") {
+            it("can be loaded from the configuration cache") {
+                val gradleRunner = DslTestBuilder.kotlin().build()
 
-                    // First run primes the cache
-                    gradleRunner.runTasks("--configuration-cache", *arguments)
+                // First run primes the cache
+                gradleRunner.runTasks("--configuration-cache", "detekt")
 
-                    // Second run reuses the cache
-                    val result = gradleRunner.runTasks("--configuration-cache", *arguments)
+                // Second run reuses the cache
+                val result = gradleRunner.runTasks("--configuration-cache", "detekt")
 
-                    assertThat(result.output).contains("Reusing configuration cache.")
-                }
+                assertThat(result.output).contains("Reusing configuration cache.")
             }
         }
     }

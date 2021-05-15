@@ -10,7 +10,7 @@ import org.spekframework.spek2.style.specification.describe
 
 object GradleVersionTest : Spek({
 
-    val gradleVersion = "6.1"
+    val gradleVersion = "6.2"
 
     describe(
         "detekt plugin running on oldest supported Gradle version",

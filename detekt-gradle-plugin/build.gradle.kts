@@ -16,6 +16,7 @@ dependencies {
     implementation("io.github.detekt.sarif4k:sarif4k")
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(projects.detektCli)
 
     testImplementation(projects.detektTestUtils)
     testImplementation(libs.kotlin.gradlePlugin)

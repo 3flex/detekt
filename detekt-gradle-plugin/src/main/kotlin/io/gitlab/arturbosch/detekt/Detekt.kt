@@ -10,18 +10,18 @@ import io.gitlab.arturbosch.detekt.invoke.BasePathArgument
 import io.gitlab.arturbosch.detekt.invoke.BaselineArgument
 import io.gitlab.arturbosch.detekt.invoke.BuildUponDefaultConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.ClasspathArgument
+import io.gitlab.arturbosch.detekt.invoke.CliArgument
 import io.gitlab.arturbosch.detekt.invoke.ConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.CustomReportArgument
 import io.gitlab.arturbosch.detekt.invoke.DebugArgument
 import io.gitlab.arturbosch.detekt.invoke.DefaultReportArgument
-import io.gitlab.arturbosch.detekt.invoke.DetektInvoker
 import io.gitlab.arturbosch.detekt.invoke.DisableDefaultRuleSetArgument
 import io.gitlab.arturbosch.detekt.invoke.FailFastArgument
+import io.gitlab.arturbosch.detekt.invoke.GenerateMD5
 import io.gitlab.arturbosch.detekt.invoke.InputArgument
 import io.gitlab.arturbosch.detekt.invoke.JvmTargetArgument
 import io.gitlab.arturbosch.detekt.invoke.LanguageVersionArgument
 import io.gitlab.arturbosch.detekt.invoke.ParallelArgument
-import io.gitlab.arturbosch.detekt.invoke.isDryRunEnabled
 import org.gradle.api.Action
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
@@ -49,12 +49,14 @@ import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
 open class Detekt @Inject constructor(
-    private val objects: ObjectFactory
+    private val objects: ObjectFactory,
+    private val workerExecutor: WorkerExecutor
 ) : SourceTask(), VerificationTask {
 
     @get:Classpath
@@ -193,11 +195,11 @@ open class Detekt @Inject constructor(
         .dir(ReportingExtension.DEFAULT_REPORTS_DIR_NAME)
         .dir("detekt")
 
-    private val isDryRun: Boolean = project.isDryRunEnabled()
-
     init {
         group = LifecycleBasePlugin.VERIFICATION_GROUP
     }
+
+    private val dryRun = project.providers.gradleProperty(DRY_RUN_PROPERTY)
 
     @InputFiles
     @SkipWhenEmpty
@@ -239,12 +241,19 @@ open class Detekt @Inject constructor(
         )
         arguments.addAll(convertCustomReportsToArguments())
 
-        DetektInvoker.create(task = this, isDryRun = isDryRun).invokeCli(
-            arguments = arguments.toList(),
-            ignoreFailures = ignoreFailures,
-            classpath = detektClasspath.plus(pluginClasspath),
-            taskName = name
-        )
+        val workQueue = workerExecutor.processIsolation { workerSpec ->
+            workerSpec.classpath.from(detektClasspath)
+            workerSpec.classpath.from(pluginClasspath)
+        }
+
+        workQueue.submit(GenerateMD5::class.java) { parameters ->
+            parameters.arguments.set(arguments.flatMap(CliArgument::toArgument))
+            parameters.ignoreFailures.set(ignoreFailures)
+            parameters.dryRun.set(dryRun.getOrElse("false").toBoolean())
+            parameters.classpath.from(detektClasspath)
+            parameters.classpath.from(pluginClasspath)
+            parameters.taskName.set(name)
+        }
     }
 
     private fun convertCustomReportsToArguments(): List<CustomReportArgument> = reports.custom.map {
@@ -272,5 +281,9 @@ open class Detekt @Inject constructor(
             provider.set(destination)
         }
         return provider
+    }
+
+    companion object {
+        private const val DRY_RUN_PROPERTY = "detekt-dry-run"
     }
 }
