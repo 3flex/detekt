@@ -198,6 +198,29 @@ open class Detekt @Inject constructor(
 
     private val invoker: DetektInvoker = DetektInvoker.create(project)
 
+    @get:Internal
+    internal val arguments
+        get() = mutableListOf(
+            InputArgument(source),
+            ClasspathArgument(classpath),
+            LanguageVersionArgument(languageVersionProp.orNull),
+            JvmTargetArgument(jvmTargetProp.orNull),
+            ConfigArgument(config),
+            BaselineArgument(baseline.orNull),
+            DefaultReportArgument(DetektReportType.XML, xmlReportFile.orNull),
+            DefaultReportArgument(DetektReportType.HTML, htmlReportFile.orNull),
+            DefaultReportArgument(DetektReportType.TXT, txtReportFile.orNull),
+            DefaultReportArgument(DetektReportType.SARIF, sarifReportFile.orNull),
+            DebugArgument(debugProp.getOrElse(false)),
+            ParallelArgument(parallelProp.getOrElse(false)),
+            BuildUponDefaultConfigArgument(buildUponDefaultConfigProp.getOrElse(false)),
+            FailFastArgument(failFastProp.getOrElse(false)),
+            AllRulesArgument(allRulesProp.getOrElse(false)),
+            AutoCorrectArgument(autoCorrectProp.getOrElse(false)),
+            BasePathArgument(basePathProp.orNull),
+            DisableDefaultRuleSetArgument(disableDefaultRuleSetsProp.getOrElse(false))
+        )
+
     @InputFiles
     @SkipWhenEmpty
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -218,30 +241,10 @@ open class Detekt @Inject constructor(
             )
         }
 
-        val arguments = mutableListOf(
-            InputArgument(source),
-            ClasspathArgument(classpath),
-            LanguageVersionArgument(languageVersionProp.orNull),
-            JvmTargetArgument(jvmTargetProp.orNull),
-            ConfigArgument(config),
-            BaselineArgument(baseline.orNull),
-            DefaultReportArgument(DetektReportType.XML, xmlReportFile.orNull),
-            DefaultReportArgument(DetektReportType.HTML, htmlReportFile.orNull),
-            DefaultReportArgument(DetektReportType.TXT, txtReportFile.orNull),
-            DefaultReportArgument(DetektReportType.SARIF, sarifReportFile.orNull),
-            DebugArgument(debugProp.getOrElse(false)),
-            ParallelArgument(parallelProp.getOrElse(false)),
-            BuildUponDefaultConfigArgument(buildUponDefaultConfigProp.getOrElse(false)),
-            FailFastArgument(failFastProp.getOrElse(false)),
-            AllRulesArgument(allRulesProp.getOrElse(false)),
-            AutoCorrectArgument(autoCorrectProp.getOrElse(false)),
-            BasePathArgument(basePathProp.orNull),
-            DisableDefaultRuleSetArgument(disableDefaultRuleSetsProp.getOrElse(false))
-        )
         arguments.addAll(convertCustomReportsToArguments())
 
         invoker.invokeCli(
-            arguments = arguments.toList(),
+            arguments = arguments,
             ignoreFailures = ignoreFailures,
             classpath = detektClasspath.plus(pluginClasspath),
             taskName = name
