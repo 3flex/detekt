@@ -34,3 +34,22 @@ tasks.withType<DokkaTask>().configureEach {
 apiValidation {
     ignoredPackages.add("io.gitlab.arturbosch.detekt.api.internal")
 }
+
+tasks.register("showConfigurations") {
+    doLast {
+
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+            logger.error(kotlinOptions.jvmTarget)
+            logger.error(inputs.files.minus(inputs.sourceFiles).asPath)
+//            logger.error(inputs.sourceFiles.asPath)
+            logger.error(inputs.properties.map { it.key }.joinToString("\n"))
+            logger.error(inputs.properties.get("sourceFilesExtensions").toString())
+        }
+//        logger.error(sourceSets.last().inputs)
+        kotlin.target.compilations.forEach {
+//            logger.error("${it.name}: ${it.compileKotlinTask.inputs.sourceFiles.asPath}")
+        }
+
+//        logger.error(kotlin.target.compilations.first().compileKotlinTask.kotlinOptions.jvmTarget)
+    }
+}

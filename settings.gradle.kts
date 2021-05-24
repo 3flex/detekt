@@ -34,6 +34,13 @@ include(
 enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
 // build scan plugin can only be applied in settings file
 plugins {
     id("com.gradle.enterprise") version "3.6.1"
