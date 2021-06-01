@@ -1,9 +1,7 @@
 package io.gitlab.arturbosch.detekt.invoke
 
 import io.gitlab.arturbosch.detekt.internal.ClassLoaderCache
-import io.gitlab.arturbosch.detekt.internal.GlobalClassLoaderCache
 import org.gradle.api.GradleException
-import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
@@ -24,11 +22,11 @@ internal interface DetektInvoker {
 
     companion object {
 
-        fun create(isDryRun: Boolean): DetektInvoker =
+        fun create(isDryRun: Boolean, classLoaderCache: ClassLoaderCache): DetektInvoker =
             if (isDryRun) {
                 DryRunInvoker()
             } else {
-                DefaultCliInvoker()
+                DefaultCliInvoker(classLoaderCache)
             }
     }
 }
@@ -54,8 +52,7 @@ abstract class GenerateMD5 : WorkAction<MD5WorkParameters> {
         } catch (e: Exception) {
             if (isBuildFailure(e.message) && parameters.ignoreFailures.get()) {
                 return
-            }
-            throw GradleException(e.message ?: "There was a problem running detekt.")
+            } else throw GradleException(e.message ?: "There was a problem running detekt.")
         }
     }
 
@@ -64,7 +61,7 @@ abstract class GenerateMD5 : WorkAction<MD5WorkParameters> {
 }
 
 internal class DefaultCliInvoker(
-    private val classLoaderCache: ClassLoaderCache = GlobalClassLoaderCache
+    private val classLoaderCache: ClassLoaderCache
 ) : DetektInvoker {
 
     override fun invokeCli(

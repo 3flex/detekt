@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.detekt
 
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import io.gitlab.arturbosch.detekt.internal.DefaultClassLoaderCache
 import io.gitlab.arturbosch.detekt.internal.DetektAndroid
 import io.gitlab.arturbosch.detekt.internal.DetektJvm
 import io.gitlab.arturbosch.detekt.internal.DetektMultiplatform
@@ -89,15 +90,18 @@ class DetektPlugin : Plugin<Project> {
         project.tasks.withType(Detekt::class.java).configureEach {
             it.detektClasspath.setFrom(project.configurations.getAt(CONFIGURATION_DETEKT))
             it.pluginClasspath.setFrom(project.configurations.getAt(CONFIGURATION_DETEKT_PLUGINS))
+            it.classLoaderCache.set(project.gradle.sharedServices.registerIfAbsent("detekt-class-loader", DefaultClassLoaderCache::class.java) {})
         }
 
         project.tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
             it.detektClasspath.setFrom(project.configurations.getAt(CONFIGURATION_DETEKT))
             it.pluginClasspath.setFrom(project.configurations.getAt(CONFIGURATION_DETEKT_PLUGINS))
+            it.classLoaderCache.set(project.gradle.sharedServices.registerIfAbsent("detekt-class-loader", DefaultClassLoaderCache::class.java) {})
         }
 
         project.tasks.withType(DetektGenerateConfigTask::class.java).configureEach {
             it.detektClasspath.setFrom(project.configurations.getAt(CONFIGURATION_DETEKT))
+            it.classLoaderCache.set(project.gradle.sharedServices.registerIfAbsent("detekt-class-loader", DefaultClassLoaderCache::class.java) {})
         }
     }
 

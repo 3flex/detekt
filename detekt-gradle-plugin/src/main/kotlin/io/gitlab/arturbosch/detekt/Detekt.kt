@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.extensions.DetektReport
 import io.gitlab.arturbosch.detekt.extensions.DetektReportType
 import io.gitlab.arturbosch.detekt.extensions.DetektReports
+import io.gitlab.arturbosch.detekt.internal.DefaultClassLoaderCache
 import io.gitlab.arturbosch.detekt.invoke.AllRulesArgument
 import io.gitlab.arturbosch.detekt.invoke.AutoCorrectArgument
 import io.gitlab.arturbosch.detekt.invoke.BasePathArgument
@@ -15,9 +16,9 @@ import io.gitlab.arturbosch.detekt.invoke.ConfigArgument
 import io.gitlab.arturbosch.detekt.invoke.CustomReportArgument
 import io.gitlab.arturbosch.detekt.invoke.DebugArgument
 import io.gitlab.arturbosch.detekt.invoke.DefaultReportArgument
+import io.gitlab.arturbosch.detekt.invoke.DetektInvoker
 import io.gitlab.arturbosch.detekt.invoke.DisableDefaultRuleSetArgument
 import io.gitlab.arturbosch.detekt.invoke.FailFastArgument
-import io.gitlab.arturbosch.detekt.invoke.GenerateMD5
 import io.gitlab.arturbosch.detekt.invoke.InputArgument
 import io.gitlab.arturbosch.detekt.invoke.JvmTargetArgument
 import io.gitlab.arturbosch.detekt.invoke.LanguageVersionArgument
@@ -54,7 +55,7 @@ import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
-open class Detekt @Inject constructor(
+abstract class Detekt @Inject constructor(
     private val objects: ObjectFactory,
     private val workerExecutor: WorkerExecutor
 ) : SourceTask(), VerificationTask {
@@ -199,7 +200,10 @@ open class Detekt @Inject constructor(
         group = LifecycleBasePlugin.VERIFICATION_GROUP
     }
 
-    private val dryRun = project.providers.gradleProperty(DRY_RUN_PROPERTY)
+    private val isDryRun = project.providers.gradleProperty(DRY_RUN_PROPERTY)
+
+    @get:Internal
+    internal abstract val classLoaderCache: Property<DefaultClassLoaderCache>
 
     @InputFiles
     @SkipWhenEmpty
@@ -241,19 +245,26 @@ open class Detekt @Inject constructor(
         )
         arguments.addAll(convertCustomReportsToArguments())
 
-        val workQueue = workerExecutor.processIsolation { workerSpec ->
-            workerSpec.classpath.from(detektClasspath)
-            workerSpec.classpath.from(pluginClasspath)
-        }
+        DetektInvoker.create(isDryRun.getOrNull().toBoolean(), classLoaderCache.get()).invokeCli(
+            arguments = arguments.flatMap(CliArgument::toArgument),
+            ignoreFailures = ignoreFailures,
+            classpath = detektClasspath.plus(pluginClasspath),
+            taskName = name
+        )
 
-        workQueue.submit(GenerateMD5::class.java) { parameters ->
-            parameters.arguments.set(arguments.flatMap(CliArgument::toArgument))
-            parameters.ignoreFailures.set(ignoreFailures)
-            parameters.dryRun.set(dryRun.getOrElse("false").toBoolean())
-            parameters.classpath.from(detektClasspath)
-            parameters.classpath.from(pluginClasspath)
-            parameters.taskName.set(name)
-        }
+//        val workQueue = workerExecutor.classLoaderIsolation() { workerSpec ->
+//            workerSpec.classpath.from(detektClasspath)
+//            workerSpec.classpath.from(pluginClasspath)
+//        }
+//
+//        workQueue.submit(GenerateMD5::class.java) { parameters ->
+//            parameters.arguments.set(arguments.flatMap(CliArgument::toArgument))
+//            parameters.ignoreFailures.set(ignoreFailures)
+//            parameters.dryRun.set(isDryRun.getOrNull().toBoolean())
+//            parameters.classpath.from(detektClasspath)
+//            parameters.classpath.from(pluginClasspath)
+//            parameters.taskName.set(name)
+//        }
     }
 
     private fun convertCustomReportsToArguments(): List<CustomReportArgument> = reports.custom.map {

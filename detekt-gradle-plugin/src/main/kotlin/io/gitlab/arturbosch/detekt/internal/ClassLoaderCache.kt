@@ -1,6 +1,8 @@
 package io.gitlab.arturbosch.detekt.internal
 
 import org.gradle.api.file.FileCollection
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
 import java.net.URLClassLoader
 import java.util.concurrent.ConcurrentHashMap
 
@@ -9,7 +11,7 @@ fun interface ClassLoaderCache {
     fun getOrCreate(classpath: FileCollection): URLClassLoader
 }
 
-internal class DefaultClassLoaderCache : ClassLoaderCache {
+internal abstract class DefaultClassLoaderCache : ClassLoaderCache, AutoCloseable, BuildService<BuildServiceParameters.None> {
 
     private val classpathFilesHashWithLoaders = ConcurrentHashMap<Int, URLClassLoader>()
 
@@ -23,6 +25,12 @@ internal class DefaultClassLoaderCache : ClassLoaderCache {
             )
         }
     }
-}
 
-object GlobalClassLoaderCache : ClassLoaderCache by DefaultClassLoaderCache()
+    override fun close() {
+        classpathFilesHashWithLoaders.forEach {
+            it.value.close()
+        }
+
+        classpathFilesHashWithLoaders.clear()
+    }
+}

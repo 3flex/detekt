@@ -1,5 +1,6 @@
 package io.gitlab.arturbosch.detekt
 
+import io.gitlab.arturbosch.detekt.internal.DefaultClassLoaderCache
 import io.gitlab.arturbosch.detekt.invoke.AllRulesArgument
 import io.gitlab.arturbosch.detekt.invoke.AutoCorrectArgument
 import io.gitlab.arturbosch.detekt.invoke.BasePathArgument
@@ -35,7 +36,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 @CacheableTask
-open class DetektCreateBaselineTask : SourceTask() {
+abstract class DetektCreateBaselineTask : SourceTask() {
 
     init {
         description = "Creates a detekt baseline on the given --baseline path."
@@ -91,6 +92,9 @@ open class DetektCreateBaselineTask : SourceTask() {
     @get:Optional
     val autoCorrect: Property<Boolean> = project.objects.property(Boolean::class.javaObjectType)
 
+    @get:Internal
+    internal abstract val classLoaderCache: Property<DefaultClassLoaderCache>
+
     /**
      * Respect only the file path for incremental build. Using @InputFile respects both file path and content.
      */
@@ -135,7 +139,7 @@ open class DetektCreateBaselineTask : SourceTask() {
             DisableDefaultRuleSetArgument(disableDefaultRuleSets.getOrElse(false))
         )
 
-        DetektInvoker.create(isDryRun.orNull.toBoolean()).invokeCli(
+        DetektInvoker.create(isDryRun.orNull.toBoolean(), classLoaderCache.get()).invokeCli(
             arguments = arguments.flatMap(CliArgument::toArgument),
             ignoreFailures = ignoreFailures.getOrElse(false),
             classpath = detektClasspath.plus(pluginClasspath),
