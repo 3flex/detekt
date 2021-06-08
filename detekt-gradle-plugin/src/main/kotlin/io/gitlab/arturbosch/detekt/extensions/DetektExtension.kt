@@ -7,7 +7,7 @@ import org.gradle.api.plugins.quality.CodeQualityExtension
 import java.io.File
 import javax.inject.Inject
 
-open class DetektExtension @Inject constructor(objects: ObjectFactory) : CodeQualityExtension() {
+abstract class DetektExtension @Inject constructor(objects: ObjectFactory) : CodeQualityExtension() {
 
     var ignoreFailures: Boolean
         @JvmName("ignoreFailures_")
@@ -37,7 +37,7 @@ open class DetektExtension @Inject constructor(objects: ObjectFactory) : CodeQua
 
     var basePath: String? = null
 
-    var config: ConfigurableFileCollection = objects.fileCollection()
+    abstract var config: ConfigurableFileCollection
 
     var debug: Boolean = DEFAULT_DEBUG_VALUE
 

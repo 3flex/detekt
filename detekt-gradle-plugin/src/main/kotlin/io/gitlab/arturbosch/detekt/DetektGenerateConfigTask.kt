@@ -21,7 +21,7 @@ import java.nio.file.Files
 import javax.inject.Inject
 
 @CacheableTask
-open class DetektGenerateConfigTask @Inject constructor(
+abstract class DetektGenerateConfigTask @Inject constructor(
     private val objects: ObjectFactory
 ) : DefaultTask() {
 
@@ -31,12 +31,12 @@ open class DetektGenerateConfigTask @Inject constructor(
     }
 
     @get:Classpath
-    val detektClasspath: ConfigurableFileCollection = project.objects.fileCollection()
+    abstract val detektClasspath: ConfigurableFileCollection
 
     @get:InputFiles
     @get:Optional
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val config: ConfigurableFileCollection = project.objects.fileCollection()
+    abstract val config: ConfigurableFileCollection
 
     private val isDryRun: Boolean = project.isDryRunEnabled()
 
