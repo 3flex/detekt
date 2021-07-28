@@ -48,3 +48,7 @@ snakeyaml = "org.yaml:snakeyaml:1.29"
 jcommander = "com.beust:jcommander:1.81"
 
 [bundles]
+
+[plugins]
+gradleVersions-gradle = "com.github.ben-manes.versions:0.28.0"
+sonarqube = "org.sonarqube:2.8"

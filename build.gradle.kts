@@ -5,8 +5,8 @@ plugins {
     id("packaging")
     id("releasing")
     id("detekt")
-    id("com.github.ben-manes.versions")
-    id("org.sonarqube")
+    alias(libs.plugins.gradleVersions.gradle)
+    alias(libs.plugins.sonarqube)
 }
 
 allprojects {
