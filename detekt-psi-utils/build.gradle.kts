@@ -1,5 +1,5 @@
 plugins {
-    module
+    id("module")
     id("binary-compatibility-validator")
 }
 

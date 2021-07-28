@@ -1,5 +1,5 @@
 plugins {
-    module
+    id("module")
     `java-gradle-plugin`
     id("com.gradle.plugin-publish")
 }

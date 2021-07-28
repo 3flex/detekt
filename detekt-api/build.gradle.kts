@@ -1,7 +1,7 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
-    module
+    id("module")
     id("org.jetbrains.dokka")
     `java-test-fixtures`
     id("binary-compatibility-validator")
