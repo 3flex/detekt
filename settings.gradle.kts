@@ -4,6 +4,13 @@ pluginManagement {
     includeBuild("build-logic")
 }
 
+val isCiBuild = System.getenv("CI") != null
+
+if (isCiBuild) {
+    includeBuild("detekt-gradle-plugin")
+} else {
+    include("detekt-gradle-plugin")
+}
 include("code-coverage-report")
 include("custom-checks")
 include("detekt-api")
@@ -11,7 +18,6 @@ include("detekt-cli")
 include("detekt-core")
 include("detekt-formatting")
 include("detekt-generator")
-include("detekt-gradle-plugin")
 include("detekt-metrics")
 include("detekt-parser")
 include("detekt-psi-utils")
@@ -43,8 +49,6 @@ plugins {
 }
 
 gradleEnterprise {
-    val isCiBuild = System.getenv("CI") != null
-
     buildScan {
         termsOfServiceUrl = "https://gradle.com/terms-of-service"
         if (isCiBuild) {
