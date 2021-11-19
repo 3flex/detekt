@@ -212,6 +212,13 @@
           
           
           
+          <li><a href="/detekt/compose.html">Configuration for Compose</a></li>
+          
+          
+          
+          
+          
+          
           <li><a href="/detekt/reporting.html">Reporting</a></li>
           
           
@@ -525,7 +532,7 @@ so if you want to prevent those cases, turn on this rule.</p>
 
 <h3 id="deprecation">Deprecation</h3>
 
-<p>Deprecated elements are expected to be removed in future. Alternatives should be found if possible.</p>
+<p>Deprecated elements are expected to be removed in the future. Alternatives should be found if possible.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -598,7 +605,7 @@ declaring your variable with <code class="language-plaintext highlighter-rouge">
 
 <p>Flags duplicate case statements in when expressions.</p>
 
-<p>If a when expression contains the same case statement multiple times they should be merged. Otherwise it might be
+<p>If a when expression contains the same case statement multiple times they should be merged. Otherwise, it might be
 easy to miss one of the cases when reading the code, leading to unwanted side effects.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
@@ -686,7 +693,7 @@ clarification.</p>
 
 <h3 id="exitoutsidemain">ExitOutsideMain</h3>
 
-<p>Flags use of System.exit() and Kotlin’s exitProcess() when used outside of the <code class="language-plaintext highlighter-rouge">main</code> function. This makes code more
+<p>Flags use of System.exit() and Kotlin’s exitProcess() when used outside the <code class="language-plaintext highlighter-rouge">main</code> function. This makes code more
 difficult to test, causes unexpected behaviour on Android, and is a poor way to signal a failure in the program. In
 almost all cases it is more appropriate to throw an exception.</p>
 
@@ -785,9 +792,14 @@ fun returnsNoValue() {}</p>
     <p>if the rule should check only annotated methods</p>
   </li>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">returnValueAnnotations</code> (default: <code class="language-plaintext highlighter-rouge">['*.CheckReturnValue', '*.CheckResult']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">returnValueAnnotations</code> (default: <code class="language-plaintext highlighter-rouge">['*.CheckResult', '*.CheckReturnValue']</code>)</p>
 
     <p>List of glob patterns to be used as inspection annotation</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ignoreReturnValueAnnotations</code> (default: <code class="language-plaintext highlighter-rouge">['*.CanIgnoreReturnValue']</code>)</p>
+
+    <p>Annotations to skip this inspection</p>
   </li>
 </ul>
 
@@ -807,9 +819,9 @@ fun returnsNoValue() {}</p>
 <p>Prefer passing [java.util.Locale] explicitly than using implicit default value when formatting
 strings or performing a case conversion.</p>
 
-<p>The default locale is almost always not appropriate for machine-readable text like HTTP headers.
+<p>The default locale is almost always inappropriate for machine-readable text like HTTP headers.
 For example, if locale with tag <code class="language-plaintext highlighter-rouge">ar-SA-u-nu-arab</code> is a current default then <code class="language-plaintext highlighter-rouge">%d</code> placeholders
-will be evaluated to numbers consisting of Eastern-Arabic (non-ASCII) digits.
+will be evaluated to a number consisting of Eastern-Arabic (non-ASCII) digits.
 [java.util.Locale.US] is recommended for machine-readable output.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.16.0</p>
@@ -960,7 +972,7 @@ NoSuchElementException.</p>
 
 <p>Turn on this rule to flag usages of the lateinit modifier.</p>
 
-<p>Using lateinit for property initialization can be error prone and the actual initialization is not
+<p>Using lateinit for property initialization can be error-prone and the actual initialization is not
 guaranteed. Try using constructor injection or delegation to initialize properties.</p>
 
 <p><strong>Active by default</strong>: No</p>
@@ -971,7 +983,9 @@ guaranteed. Try using constructor injection or delegation to initialize properti
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">excludeAnnotatedProperties</code> (default: <code class="language-plaintext highlighter-rouge">[]</code>)</p>
+    <p><del><code class="language-plaintext highlighter-rouge">excludeAnnotatedProperties</code></del> (default: <code class="language-plaintext highlighter-rouge">[]</code>)</p>
+
+    <p><strong>Deprecated</strong>: Use <code class="language-plaintext highlighter-rouge">ignoreAnnotated</code> instead</p>
 
     <p>Allows you to provide a list of annotations that disable this check.</p>
   </li>
@@ -985,8 +999,8 @@ guaranteed. Try using constructor injection or delegation to initialize properti
 <h4 id="noncompliant-code-16">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Foo</span> <span class="p">{</span>
-    <span class="nd">@JvmField</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">i1</span><span class="p">:</span> <span class="nc">Int</span>
-    <span class="nd">@JvmField</span> <span class="nd">@SinceKotlin</span><span class="p">(</span><span class="s">"1.0.0"</span><span class="p">)</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">i2</span><span class="p">:</span> <span class="nc">Int</span>
+    <span class="k">private</span> <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">i1</span><span class="p">:</span> <span class="nc">Int</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">i2</span><span class="p">:</span> <span class="nc">Int</span>
 <span class="p">}</span>
 </code></pre></div></div>
 
@@ -1025,6 +1039,14 @@ Preferred access methods are <code class="language-plaintext highlighter-rouge">
 <span class="kd">val</span> <span class="py">map</span> <span class="p">=</span> <span class="n">emptyMap</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">String</span><span class="p">&gt;()</span>
 <span class="n">map</span><span class="p">.</span><span class="nf">getOrElse</span><span class="p">(</span><span class="s">"key"</span><span class="p">,</span> <span class="p">{</span> <span class="s">""</span> <span class="p">})</span>
 </code></pre></div></div>
+
+<h3 id="missingpackagedeclaration">MissingPackageDeclaration</h3>
+
+<p>Reports when the package declaration is missing.</p>
+
+<p><strong>Active by default</strong>: No</p>
+
+<p><strong>Debt</strong>: 5min</p>
 
 <h3 id="missingwhencase">MissingWhenCase</h3>
 
@@ -1391,7 +1413,7 @@ null safety. Guard the code appropriately to prevent NullPointerExceptions.</p>
 
 <p>This rule reports postfix expressions (++, –) which are unused and thus unnecessary.
 This leads to confusion as a reader of the code might think the value will be incremented/decremented.
-However the value is replaced with the original value which might lead to bugs.</p>
+However, the value is replaced with the original value which might lead to bugs.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -1472,7 +1494,7 @@ See: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/equals.html</p>
             <div class="row">
                 <div class="col-lg-12 footer">
                &copy;2021 The detekt Team. All rights reserved. <br />
- Site last generated: Jul 29, 2021 <br />
+ Site last generated: Nov 19, 2021 <br />
                 </div>
             </div>
 </footer>

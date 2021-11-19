@@ -212,6 +212,13 @@
           
           
           
+          <li><a href="/detekt/compose.html">Configuration for Compose</a></li>
+          
+          
+          
+          
+          
+          
           <li><a href="/detekt/reporting.html">Reporting</a></li>
           
           
@@ -468,8 +475,8 @@ $('#toc').on('click', 'a', function() {
 
 <h3 id="exceptionraisedinunexpectedlocation">ExceptionRaisedInUnexpectedLocation</h3>
 
-<p>This rule allows to define functions which should never throw an exception. If a function exists that does throw
-an exception it will be reported. By default this rule is checking for <code class="language-plaintext highlighter-rouge">toString</code>, <code class="language-plaintext highlighter-rouge">hashCode</code>, <code class="language-plaintext highlighter-rouge">equals</code> and
+<p>This rule reports functions which should never throw an exception. If a function exists that does throw
+an exception it will be reported. By default, this rule checks <code class="language-plaintext highlighter-rouge">toString</code>, <code class="language-plaintext highlighter-rouge">hashCode</code>, <code class="language-plaintext highlighter-rouge">equals</code> and
 <code class="language-plaintext highlighter-rouge">finalize</code>. This rule is configurable via the <code class="language-plaintext highlighter-rouge">methodNames</code> configuration to change the list of functions which
 should not throw any exceptions.</p>
 
@@ -481,7 +488,7 @@ should not throw any exceptions.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">methodNames</code> (default: <code class="language-plaintext highlighter-rouge">['toString', 'hashCode', 'equals', 'finalize']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">methodNames</code> (default: <code class="language-plaintext highlighter-rouge">['equals', 'finalize', 'hashCode', 'toString']</code>)</p>
 
     <p>methods which should not throw exceptions</p>
   </li>
@@ -499,7 +506,7 @@ should not throw any exceptions.</p>
 
 <h3 id="instanceofcheckforexception">InstanceOfCheckForException</h3>
 
-<p>This rule reports <code class="language-plaintext highlighter-rouge">catch</code> blocks which check for the type of an exception via <code class="language-plaintext highlighter-rouge">is</code> checks or casts.
+<p>This rule reports <code class="language-plaintext highlighter-rouge">catch</code> blocks which check for the type of exception via <code class="language-plaintext highlighter-rouge">is</code> checks or casts.
 Instead of catching generic exception types and then checking for specific exception types the code should
 use multiple catch blocks. These catch blocks should then catch the specific exceptions.</p>
 
@@ -558,8 +565,8 @@ serve as temporary declarations and should not be put into production environmen
 mutable information about a specific exception or error. Hence, global singleton <code class="language-plaintext highlighter-rouge">Throwables</code>
 should be avoided.</p>
 
-<p>See https://kotlinlang.org/docs/reference/object-declarations.html#object-declarations
-See https://kotlinlang.org/docs/reference/object-declarations.html#companion-objects</p>
+<p>See https://kotlinlang.org/docs/object-declarations.html#object-declarations-overview
+See https://kotlinlang.org/docs/object-declarations.html#companion-objects</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -718,7 +725,7 @@ For that reason, this rule ignores that these configured exception types are cau
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">ignoredExceptionTypes</code> (default: <code class="language-plaintext highlighter-rouge">['NumberFormatException', 'InterruptedException', 'ParseException', 'MalformedURLException']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">ignoredExceptionTypes</code> (default: <code class="language-plaintext highlighter-rouge">['InterruptedException', 'MalformedURLException', 'NumberFormatException', 'ParseException']</code>)</p>
 
     <p>exception types which should be ignored (both in the catch clause and body)</p>
   </li>
@@ -818,7 +825,7 @@ down an underlying issue in a better way.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">exceptions</code> (default: <code class="language-plaintext highlighter-rouge">['ArrayIndexOutOfBoundsException', 'Error', 'Exception', 'IllegalMonitorStateException', 'NullPointerException', 'IndexOutOfBoundsException', 'RuntimeException', 'Throwable']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">exceptions</code> (default: <code class="language-plaintext highlighter-rouge">['ArrayIndexOutOfBoundsException', 'Exception', 'IllegalArgumentException', 'IllegalMonitorStateException', 'IllegalStateException', 'IndexOutOfBoundsException', 'NullPointerException', 'RuntimeException', 'Throwable']</code>)</p>
 
     <p>exceptions which should not be thrown without message or cause</p>
   </li>
@@ -889,7 +896,7 @@ exception is too broad it can lead to unintended exceptions being caught.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">exceptionNames</code> (default: <code class="language-plaintext highlighter-rouge">['ArrayIndexOutOfBoundsException', 'Error', 'Exception', 'IllegalMonitorStateException', 'NullPointerException', 'IndexOutOfBoundsException', 'RuntimeException', 'Throwable']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">exceptionNames</code> (default: <code class="language-plaintext highlighter-rouge">['ArrayIndexOutOfBoundsException', 'Error', 'Exception', 'IllegalMonitorStateException', 'IndexOutOfBoundsException', 'NullPointerException', 'RuntimeException', 'Throwable']</code>)</p>
 
     <p>exceptions which are too generic and should not be caught</p>
   </li>
@@ -931,7 +938,7 @@ exceptions to the case that has currently occurred.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">exceptionNames</code> (default: <code class="language-plaintext highlighter-rouge">['Error', 'Exception', 'Throwable', 'RuntimeException']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">exceptionNames</code> (default: <code class="language-plaintext highlighter-rouge">['Error', 'Exception', 'RuntimeException', 'Throwable']</code>)</p>
 
     <p>exceptions which are too generic and should not be thrown</p>
   </li>
@@ -973,7 +980,7 @@ exceptions to the case that has currently occurred.</p>
             <div class="row">
                 <div class="col-lg-12 footer">
                &copy;2021 The detekt Team. All rights reserved. <br />
- Site last generated: Jul 29, 2021 <br />
+ Site last generated: Nov 19, 2021 <br />
                 </div>
             </div>
 </footer>

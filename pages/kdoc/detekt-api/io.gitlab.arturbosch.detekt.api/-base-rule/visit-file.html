@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="keywords" content=" ">
-<title>visit - | A static code analyzer for Kotlin</title>
+<title>visitFile | A static code analyzer for Kotlin</title>
 <link rel="stylesheet" href="/detekt/css/syntax.css">
 
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -148,7 +148,7 @@
                                 searchInput: document.getElementById('search-input'),
                                 resultsContainer: document.getElementById('results-container'),
                                 dataSource: '/detekt/search.json',
-                                searchResultTemplate: '<li><a href="{url}" title="visit -">{title}</a></li>',
+                                searchResultTemplate: '<li><a href="{url}" title="visitFile">{title}</a></li>',
                     noResultsText: 'No results found.',
                             limit: 10,
                             fuzzy: true,
@@ -206,6 +206,13 @@
           
           
           <li><a href="/detekt/configurations.html">Configuration File</a></li>
+          
+          
+          
+          
+          
+          
+          <li><a href="/detekt/compose.html">Configuration for Compose</a></li>
           
           
           
@@ -420,7 +427,7 @@
         <!-- Content Column -->
         <div class="col-md-9" id="tg-sb-content">
             <div class="post-header">
-   <h1 class="post-title-main">visit -</h1>
+   <h1 class="post-title-main">visitFile</h1>
 </div>
 
 
@@ -457,22 +464,21 @@ $('#toc').on('click', 'a', function() {
 
     
 
-    <a target="_blank" href="https://github.com/detekt/detekt/tree/main/docs/pages//pages/kdoc/detekt-api/io.gitlab.arturbosch.detekt.api.internal/-base-rule/visit.md" class="btn btn-default githubEditButton" role="button"><i class="fa fa-github fa-lg"></i> Edit me</a>
+    <a target="_blank" href="https://github.com/detekt/detekt/tree/main/docs/pages//pages/kdoc/detekt-api/io.gitlab.arturbosch.detekt.api/-base-rule/visit-file.md" class="btn btn-default githubEditButton" role="button"><i class="fa fa-github fa-lg"></i> Edit me</a>
 
     
 
 
     
 
-  <p>//<a href="/detekt/pages/kdoc/">detekt-api</a>/<a href="/detekt/pages/kdoc/detekt-api/io.gitlab.arturbosch.detekt.api.internal/">io.gitlab.arturbosch.detekt.api.internal</a>/<a href="/detekt/pages/kdoc/detekt-api/io.gitlab.arturbosch.detekt.api.internal/-base-rule/">BaseRule</a>/<a href="/detekt/pages/kdoc/detekt-api/io.gitlab.arturbosch.detekt.api.internal/-base-rule/visit.html">visit</a></p>
+  <p>//<a href="../../../index.html">detekt-api</a>/<a href="../index.html">io.gitlab.arturbosch.detekt.api</a>/<a href="index.html">BaseRule</a>/<a href="visit-file.html">visitFile</a></p>
 
-<h1 id="visit">visit</h1>
+<h1 id="visitfile">visitFile</h1>
+
 <p>[jvm]<br />
-Content<br />
-open fun <a href="/detekt/pages/kdoc/detekt-api/io.gitlab.arturbosch.detekt.api.internal/-base-rule/visit.html">visit</a>(root: KtFile)<br />
-More info</p>
+fun <a href="visit-file.html">visitFile</a>(root: KtFile, bindingContext: BindingContext = BindingContext.EMPTY, compilerResources: <a href="../../io.gitlab.arturbosch.detekt.api.internal/-compiler-resources/index.html">CompilerResources</a>? = null)</p>
 
-<p>Init function to start visiting the KtFile. Can be overridden to start a different visiting process.</p>
+<p>Before starting visiting kotlin elements, a check is performed if this rule should be triggered. Pre- and post-visit-hooks are executed before/after the visiting process. BindingContext holds the result of the semantic analysis of the source code by the Kotlin compiler. Rules that rely on symbols and types being resolved can use the BindingContext for this analysis. Note that detekt must receive the correct compile classpath for the code being analyzed otherwise the default value BindingContext.EMPTY will be used and it will not be possible for detekt to resolve types or symbols.</p>
 
 
 
@@ -491,7 +497,7 @@ More info</p>
             <div class="row">
                 <div class="col-lg-12 footer">
                &copy;2021 The detekt Team. All rights reserved. <br />
- Site last generated: Jul 29, 2021 <br />
+ Site last generated: Nov 19, 2021 <br />
                 </div>
             </div>
 </footer>

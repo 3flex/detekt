@@ -212,6 +212,13 @@
           
           
           
+          <li><a href="/detekt/compose.html">Configuration for Compose</a></li>
+          
+          
+          
+          
+          
+          
           <li><a href="/detekt/reporting.html">Reporting</a></li>
           
           
@@ -471,7 +478,7 @@ code style guidelines.</p>
 <h3 id="classordering">ClassOrdering</h3>
 
 <p>This rule ensures class contents are ordered as follows as recommended by the Kotlin
-<a href="https://kotlinlang.org/docs/reference/coding-conventions.html#class-layout">Coding Conventions</a>:</p>
+<a href="https://kotlinlang.org/docs/coding-conventions.html#class-layout">Coding Conventions</a>:</p>
 <ul>
   <li>Property declarations and initializer blocks</li>
   <li>Secondary constructors</li>
@@ -517,8 +524,8 @@ code style guidelines.</p>
 
 <p>This rule detects <code class="language-plaintext highlighter-rouge">if</code> statements which can be collapsed. This can reduce nesting and help improve readability.</p>
 
-<p>However it should be carefully considered if merging the if statements actually does improve readability or if it
-hides some edge-cases from the reader.</p>
+<p>However, carefully consider whether merging the if statements actually improves readability, as collapsing the
+statements may hide some edge cases from the reader.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -679,10 +686,12 @@ rest of the function signature.</p>
 <h3 id="explicitcollectionelementaccessmethod">ExplicitCollectionElementAccessMethod</h3>
 
 <p>In Kotlin functions <code class="language-plaintext highlighter-rouge">get</code> or <code class="language-plaintext highlighter-rouge">set</code> can be replaced with the shorter operator — <code class="language-plaintext highlighter-rouge">[]</code>,
-see https://kotlinlang.org/docs/reference/operator-overloading.html#indexed.
+see https://kotlinlang.org/docs/operator-overloading.html#indexed-access-operator.
 Prefer the usage of the indexed access operator <code class="language-plaintext highlighter-rouge">[]</code> for map or list element access or insert methods.</p>
 
 <p><strong>Active by default</strong>: No</p>
+
+<p><strong>Requires Type Resolution</strong></p>
 
 <p><strong>Debt</strong>: 5min</p>
 
@@ -789,7 +798,7 @@ development. Offending code comments will then be reported.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">values</code> (default: <code class="language-plaintext highlighter-rouge">['TODO:', 'FIXME:', 'STOPSHIP:']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">values</code> (default: <code class="language-plaintext highlighter-rouge">['FIXME:', 'STOPSHIP:', 'TODO:']</code>)</p>
 
     <p>forbidden comment strings</p>
   </li>
@@ -797,6 +806,11 @@ development. Offending code comments will then be reported.</p>
     <p><code class="language-plaintext highlighter-rouge">allowedPatterns</code> (default: <code class="language-plaintext highlighter-rouge">''</code>)</p>
 
     <p>ignores comments which match the specified regular expression. For example <code class="language-plaintext highlighter-rouge">Ticket|Task</code>.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">customMessage</code> (default: <code class="language-plaintext highlighter-rouge">''</code>)</p>
+
+    <p>error message which overrides the default one</p>
   </li>
 </ul>
 
@@ -844,7 +858,7 @@ or deprecated APIs. Detekt will then report all imports that are forbidden.</p>
 
 <p>This rule allows to set a list of forbidden methods. This can be used to discourage the use of unstable, experimental
 or deprecated methods, especially for methods imported from external libraries.
-Detekt will then report all methods invocation that are forbidden.</p>
+Detekt will then report all method invocations that are forbidden.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -856,9 +870,9 @@ Detekt will then report all methods invocation that are forbidden.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">methods</code> (default: <code class="language-plaintext highlighter-rouge">['kotlin.io.println', 'kotlin.io.print']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">methods</code> (default: <code class="language-plaintext highlighter-rouge">['kotlin.io.print', 'kotlin.io.println']</code>)</p>
 
-    <p>Comma separated list of fully qualified method signatures which are forbidden. Methods can be defined without full signature (i.e. <code class="language-plaintext highlighter-rouge">java.time.LocalDate.now</code>) which will report calls of all methods with this name or with full signature (i.e. <code class="language-plaintext highlighter-rouge">java.time.LocalDate(java.time.Clock)</code>) which would report only call with this concrete signature.</p>
+    <p>List of fully qualified method signatures which are forbidden. Methods can be defined without full signature (i.e. <code class="language-plaintext highlighter-rouge">java.time.LocalDate.now</code>) which will report calls of all methods with this name or with full signature (i.e. <code class="language-plaintext highlighter-rouge">java.time.LocalDate(java.time.Clock)</code>) which would report only call with this concrete signature.</p>
   </li>
 </ul>
 
@@ -872,10 +886,9 @@ Detekt will then report all methods invocation that are forbidden.</p>
 
 <h3 id="forbiddenpublicdataclass">ForbiddenPublicDataClass</h3>
 
-<p>The data classes are bad for the binary compatibility in public APIs. Avoid to use it.</p>
+<p>Data classes are bad for binary compatibility in public APIs. Avoid using them.</p>
 
-<p>This rule is aimed to library maintainers. If you are developing a final application you don’t need to care about
-this issue.</p>
+<p>This rule is aimed at library maintainers. If you are developing a final application you can ignore this issue.</p>
 
 <p>More info: https://jakewharton.com/public-api-challenges-in-kotlin/</p>
 
@@ -944,7 +957,7 @@ and has only one value - the <code class="language-plaintext highlighter-rouge">
 
 <h3 id="functiononlyreturningconstant">FunctionOnlyReturningConstant</h3>
 
-<p>A function that only returns a single constant can be misleading. Instead prefer to define the constant directly
+<p>A function that only returns a single constant can be misleading. Instead, prefer declaring the constant
 as a <code class="language-plaintext highlighter-rouge">const val</code>.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.2.0</p>
@@ -970,7 +983,9 @@ as a <code class="language-plaintext highlighter-rouge">const val</code>.</p>
     <p>excluded functions</p>
   </li>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">excludeAnnotatedFunction</code> (default: <code class="language-plaintext highlighter-rouge">['dagger.Provides']</code>)</p>
+    <p><del><code class="language-plaintext highlighter-rouge">excludeAnnotatedFunction</code></del> (default: <code class="language-plaintext highlighter-rouge">[]</code>)</p>
+
+    <p><strong>Deprecated</strong>: Use <code class="language-plaintext highlighter-rouge">ignoreAnnotated</code> instead</p>
 
     <p>allows to provide a list of annotations that disable this check</p>
   </li>
@@ -991,7 +1006,7 @@ as a <code class="language-plaintext highlighter-rouge">const val</code>.</p>
 <p>Functions/properties exposed as public APIs of a library should have an explicit return type.
 Inferred return type can easily be changed by mistake which may lead to breaking changes.</p>
 
-<p>See also: <a href="https://kotlinlang.org/docs/reference/whatsnew14.html#explicit-api-mode-for-library-authors">Kotlin 1.4 Explicit API</a></p>
+<p>See also: <a href="https://kotlinlang.org/docs/whatsnew14.html#explicit-api-mode-for-library-authors">Kotlin 1.4 Explicit API</a></p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.2.0</p>
 
@@ -1238,7 +1253,7 @@ Adding braces would improve readability and avoid possible errors.</p>
 
 <p>This rule reports lines of code which exceed a defined maximum line length.</p>
 
-<p>Long lines might be hard to read on smaller screens or printouts. Additionally having a maximum line length
+<p>Long lines might be hard to read on smaller screens or printouts. Additionally, having a maximum line length
 in the codebase will help make the code more uniform.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
@@ -1295,7 +1310,7 @@ Java.</p>
 <h3 id="modifierorder">ModifierOrder</h3>
 
 <p>This rule reports cases in the code where modifiers are not in the correct order. The default modifier order is
-taken from: http://kotlinlang.org/docs/reference/coding-conventions.html#modifiers</p>
+taken from: https://kotlinlang.org/docs/coding-conventions.html#modifiers-order</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
@@ -1313,10 +1328,10 @@ taken from: http://kotlinlang.org/docs/reference/coding-conventions.html#modifie
 
 <h3 id="multilinelambdaitparameter">MultilineLambdaItParameter</h3>
 
-<p>Lambda expressions are very useful in a lot of cases and they often include very small chunks of
+<p>Lambda expressions are very useful in a lot of cases, and they often include very small chunks of
 code using only one parameter. In this cases Kotlin can supply the implicit <code class="language-plaintext highlighter-rouge">it</code> parameter
 to make code more concise. However, when you are dealing with lambdas that contain multiple statements,
-you might end up with a code that is hard to read if you don’t specify a readable, descriptive parameter name
+you might end up with code that is hard to read if you don’t specify a readable, descriptive parameter name
 explicitly.</p>
 
 <p><strong>Active by default</strong>: No</p>
@@ -1485,7 +1500,7 @@ of a lone Unit statement.</p>
 <h4 id="noncompliant-code-28">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">foo</span><span class="p">():</span> <span class="nc">Unit</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nc">Unit</span><span class="err"> </span>
+    <span class="k">return</span> <span class="nc">Unit</span>
 <span class="p">}</span>
 <span class="k">fun</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">=</span> <span class="nc">Unit</span>
 
@@ -1496,7 +1511,7 @@ of a lone Unit statement.</p>
 
 <h4 id="compliant-code-23">Compliant Code:</h4>
 
-<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span><span class="err"> </span><span class="p">}</span>
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
 
 <span class="c1">// overridden no-op functions are allowed</span>
 <span class="k">override</span> <span class="k">fun</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">=</span> <span class="nc">Unit</span>
@@ -1653,7 +1668,7 @@ operator.</p>
 <p>This rule checks for redundant visibility modifiers.</p>
 
 <p>One exemption is the
-<a href="https://kotlinlang.org/docs/reference/whatsnew14.html#explicit-api-mode-for-library-authors">explicit API mode</a>
+<a href="https://kotlinlang.org/docs/whatsnew14.html#explicit-api-mode-for-library-authors">explicit API mode</a>
 In this mode, the visibility modifier should be defined explicitly even if it is public.
 Hence, the rule ignores the visibility modifiers in explicit API mode.</p>
 
@@ -1823,7 +1838,7 @@ declarations.</p>
 <h3 id="throwscount">ThrowsCount</h3>
 
 <p>Functions should have clear <code class="language-plaintext highlighter-rouge">throw</code> statements. Functions with many <code class="language-plaintext highlighter-rouge">throw</code> statements can be harder to read and lead
-to confusion. Instead prefer to limit the amount of <code class="language-plaintext highlighter-rouge">throw</code> statements in a function.</p>
+to confusion. Instead, prefer limiting the number of <code class="language-plaintext highlighter-rouge">throw</code> statements in a function.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
@@ -1874,10 +1889,10 @@ to confusion. Instead prefer to limit the amount of <code class="language-plaint
 
 <h3 id="underscoresinnumericliterals">UnderscoresInNumericLiterals</h3>
 
-<p>This rule detects and reports decimal base 10 numeric literals above a certain length that should be underscore
-separated for readability. Underscores that do not make groups of 3 digits are also reported even if their length is
-under the <code class="language-plaintext highlighter-rouge">acceptableDecimalLength</code>. For <code class="language-plaintext highlighter-rouge">Serializable</code> classes or objects, the field <code class="language-plaintext highlighter-rouge">serialVersionUID</code> is
-explicitly ignored. For floats and doubles, anything to the right of the decimal is ignored.</p>
+<p>This rule detects and reports long base 10 numbers which should be separated with underscores
+for readability. Underscores that do not make groups of 3 digits are also reported even if their length is
+under the configured <code class="language-plaintext highlighter-rouge">acceptableLength</code>. For <code class="language-plaintext highlighter-rouge">Serializable</code> classes or objects, the field <code class="language-plaintext highlighter-rouge">serialVersionUID</code> is
+explicitly ignored. For floats and doubles, anything to the right of the decimal point is ignored.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -1887,24 +1902,27 @@ explicitly ignored. For floats and doubles, anything to the right of the decimal
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">acceptableDecimalLength</code> (default: <code class="language-plaintext highlighter-rouge">5</code>)</p>
+    <p><del><code class="language-plaintext highlighter-rouge">acceptableDecimalLength</code></del> (default: <code class="language-plaintext highlighter-rouge">5</code>)</p>
 
-    <p>Length under which decimal base 10 literals are not required to have underscores</p>
+    <p><strong>Deprecated</strong>: Use <code class="language-plaintext highlighter-rouge">acceptableLength</code> instead</p>
+
+    <p>Length under which base 10 numbers are not required to have underscores</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">acceptableLength</code> (default: <code class="language-plaintext highlighter-rouge">4</code>)</p>
+
+    <p>Maximum number of digits that a number can have and not use underscores</p>
   </li>
 </ul>
 
 <h4 id="noncompliant-code-40">Noncompliant Code:</h4>
 
-<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">object</span> <span class="nc">Money</span> <span class="p">{</span>
-    <span class="k">const</span> <span class="kd">val</span> <span class="py">DEFAULT_AMOUNT</span> <span class="p">=</span> <span class="mi">1000000</span>
-<span class="p">}</span>
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kd">val</span> <span class="py">DEFAULT_AMOUNT</span> <span class="p">=</span> <span class="mi">1000000</span>
 </code></pre></div></div>
 
 <h4 id="compliant-code-35">Compliant Code:</h4>
 
-<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">object</span> <span class="nc">Money</span> <span class="p">{</span>
-    <span class="k">const</span> <span class="kd">val</span> <span class="py">DEFAULT_AMOUNT</span> <span class="p">=</span> <span class="mi">1_000_000</span>
-<span class="p">}</span>
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kd">val</span> <span class="py">DEFAULT_AMOUNT</span> <span class="p">=</span> <span class="mi">1_000_000</span>
 </code></pre></div></div>
 
 <h3 id="unnecessaryabstractclass">UnnecessaryAbstractClass</h3>
@@ -1921,7 +1939,9 @@ refactored into concrete classes.</p>
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">excludeAnnotatedClasses</code> (default: <code class="language-plaintext highlighter-rouge">['dagger.Module']</code>)</p>
+    <p><del><code class="language-plaintext highlighter-rouge">excludeAnnotatedClasses</code></del> (default: <code class="language-plaintext highlighter-rouge">[]</code>)</p>
+
+    <p><strong>Deprecated</strong>: Use <code class="language-plaintext highlighter-rouge">ignoreAnnotated</code> instead</p>
 
     <p>Allows you to provide a list of annotations that disable this check.</p>
   </li>
@@ -1946,7 +1966,7 @@ refactored into concrete classes.</p>
 
 <p>This rule inspects the use of the Annotation use-site Target. In case that the use-site Target is not needed it can
 be removed. For more information check the kotlin documentation:
-https://kotlinlang.org/docs/reference/annotations.html#annotation-use-site-targets</p>
+https://kotlinlang.org/docs/annotations.html#annotation-use-site-targets</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -2039,8 +2059,8 @@ removed.</p>
 <h3 id="unnecessarylet">UnnecessaryLet</h3>
 
 <p><code class="language-plaintext highlighter-rouge">let</code> expressions are used extensively in our code for null-checking and chaining functions,
-but sometimes their usage should be replaced with a ordinary method/extension function call
-to reduce visual complexity</p>
+but sometimes their usage should be replaced with an ordinary method/extension function call
+to reduce visual complexity.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -2133,8 +2153,7 @@ from destructuring declarations (componentN imports).</p>
 
 <h3 id="unusedprivateclass">UnusedPrivateClass</h3>
 
-<p>Reports unused private classes.
-If private classes are unused they should be removed. Otherwise this dead code
+<p>Reports unused private classes. If private classes are unused they should be removed. Otherwise, this dead code
 can lead to confusion and potential bugs.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.2.0</p>
@@ -2146,7 +2165,7 @@ can lead to confusion and potential bugs.</p>
 <h3 id="unusedprivatemember">UnusedPrivateMember</h3>
 
 <p>Reports unused private properties, function parameters and functions.
-If these private elements are unused they should be removed. Otherwise this dead code
+If these private elements are unused they should be removed. Otherwise, this dead code
 can lead to confusion and potential bugs.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.16.0</p>
@@ -2165,6 +2184,28 @@ can lead to confusion and potential bugs.</p>
   </li>
 </ul>
 
+<h3 id="useanyornoneinsteadoffind">UseAnyOrNoneInsteadOfFind</h3>
+
+<p>Turn on this rule to flag <code class="language-plaintext highlighter-rouge">find</code> calls for null check that can be replaced with a <code class="language-plaintext highlighter-rouge">any</code> or <code class="language-plaintext highlighter-rouge">none</code> call.</p>
+
+<p><strong>Active by default</strong>: No</p>
+
+<p><strong>Requires Type Resolution</strong></p>
+
+<p><strong>Debt</strong>: 5min</p>
+
+<h4 id="noncompliant-code-49">Noncompliant Code:</h4>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">listOf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="nf">find</span> <span class="p">{</span> <span class="n">it</span> <span class="p">==</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">!=</span> <span class="k">null</span>
+<span class="nf">listOf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="nf">find</span> <span class="p">{</span> <span class="n">it</span> <span class="p">==</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">==</span> <span class="k">null</span>
+</code></pre></div></div>
+
+<h4 id="compliant-code-42">Compliant Code:</h4>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">listOf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="nf">any</span> <span class="p">{</span> <span class="n">it</span> <span class="p">==</span> <span class="mi">4</span> <span class="p">}</span>
+<span class="nf">listOf</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="nf">none</span> <span class="p">{</span> <span class="n">it</span> <span class="p">==</span> <span class="mi">4</span> <span class="p">}</span>
+</code></pre></div></div>
+
 <h3 id="usearrayliteralsinannotations">UseArrayLiteralsInAnnotations</h3>
 
 <p>This rule detects annotations which use the arrayOf(…) syntax instead of the array literal […] syntax.
@@ -2174,12 +2215,12 @@ The latter should be preferred as it is more readable.</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-49">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-50">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@PositiveCase</span><span class="p">(</span><span class="nf">arrayOf</span><span class="p">(</span><span class="s">"..."</span><span class="p">))</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-42">Compliant Code:</h4>
+<h4 id="compliant-code-43">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@NegativeCase</span><span class="p">([</span><span class="s">"..."</span><span class="p">])</span>
 </code></pre></div></div>
@@ -2194,26 +2235,26 @@ The latter should be preferred as it is more readable.</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-50">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-51">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">check</span><span class="p">(</span><span class="n">x</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-43">Compliant Code:</h4>
+<h4 id="compliant-code-44">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">checkNotNull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="usecheckorerror">UseCheckOrError</h3>
 
-<p>Kotlin provides a much more concise way to check invariants as well as pre- and post conditions.
+<p>Kotlin provides a concise way to check invariants as well as pre- and post-conditions.
 Prefer them instead of manually throwing an IllegalStateException.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-51">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-52">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="nc">IllegalStateException</span><span class="p">(</span><span class="s">"value should not be null"</span><span class="p">)</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="p">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="nc">IllegalStateException</span><span class="p">(</span><span class="s">"value is $value but should be at least 0"</span><span class="p">)</span>
@@ -2223,7 +2264,7 @@ Prefer them instead of manually throwing an IllegalStateException.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-44">Compliant Code:</h4>
+<h4 id="compliant-code-45">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">checkNotNull</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span> <span class="s">"value should not be null"</span> <span class="p">}</span>
 <span class="nf">check</span><span class="p">(</span><span class="n">value</span> <span class="p">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="s">"value is $value but should be at least 0"</span> <span class="p">}</span>
@@ -2238,7 +2279,7 @@ Prefer them instead of manually throwing an IllegalStateException.</p>
 <p>Classes that simply hold data should be refactored into a <code class="language-plaintext highlighter-rouge">data class</code>. Data classes are specialized to hold data
 and generate <code class="language-plaintext highlighter-rouge">hashCode</code>, <code class="language-plaintext highlighter-rouge">equals</code> and <code class="language-plaintext highlighter-rouge">toString</code> implementations as well.</p>
 
-<p>Read more about <code class="language-plaintext highlighter-rouge">data class</code>: https://kotlinlang.org/docs/reference/data-classes.html</p>
+<p>Read more about <code class="language-plaintext highlighter-rouge">data class</code>: https://kotlinlang.org/docs/data-classes.html</p>
 
 <p><strong>Active by default</strong>: No</p>
 
@@ -2248,7 +2289,9 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">excludeAnnotatedClasses</code> (default: <code class="language-plaintext highlighter-rouge">[]</code>)</p>
+    <p><del><code class="language-plaintext highlighter-rouge">excludeAnnotatedClasses</code></del> (default: <code class="language-plaintext highlighter-rouge">[]</code>)</p>
+
+    <p><strong>Deprecated</strong>: Use <code class="language-plaintext highlighter-rouge">ignoreAnnotated</code> instead</p>
 
     <p>allows to provide a list of annotations that disable this check</p>
   </li>
@@ -2259,14 +2302,14 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
   </li>
 </ul>
 
-<h4 id="noncompliant-code-52">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-53">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">DataClassCandidate</span><span class="p">(</span><span class="kd">val</span> <span class="py">i</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">i2</span><span class="p">:</span> <span class="nc">Int</span> <span class="p">=</span> <span class="mi">0</span>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-45">Compliant Code:</h4>
+<h4 id="compliant-code-46">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">data class</span> <span class="nc">DataClass</span><span class="p">(</span><span class="kd">val</span> <span class="py">i</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="kd">val</span> <span class="py">i2</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span>
 
@@ -2286,7 +2329,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-53">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-54">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">arrayOf</span><span class="p">()</span>
 <span class="nf">listOf</span><span class="p">()</span> <span class="c1">// or listOfNotNull()</span>
@@ -2295,7 +2338,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 <span class="nf">setOf</span><span class="p">()</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-46">Compliant Code:</h4>
+<h4 id="compliant-code-47">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">emptyArray</span><span class="p">()</span>
 <span class="nf">emptyList</span><span class="p">()</span>
@@ -2315,7 +2358,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-54">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-55">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">test</span><span class="p">(</span><span class="n">list</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Int</span><span class="p">&gt;,</span> <span class="n">s</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">a</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="n">list</span><span class="p">.</span><span class="nf">isEmpty</span><span class="p">())</span> <span class="nf">listOf</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="n">list</span>
@@ -2325,7 +2368,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-47">Compliant Code:</h4>
+<h4 id="compliant-code-48">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">test</span><span class="p">(</span><span class="n">list</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Int</span><span class="p">&gt;,</span> <span class="n">s</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">a</span> <span class="p">=</span> <span class="n">list</span><span class="p">.</span><span class="nf">ifEmpty</span> <span class="p">{</span> <span class="nf">listOf</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">}</span>
@@ -2339,13 +2382,13 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 
 <p>Binary expressions are better expressed using an <code class="language-plaintext highlighter-rouge">if</code> expression than a <code class="language-plaintext highlighter-rouge">when</code> expression.</p>
 
-<p>See https://kotlinlang.org/docs/reference/coding-conventions.html#if-versus-when</p>
+<p>See https://kotlinlang.org/docs/coding-conventions.html#if-versus-when</p>
 
 <p><strong>Active by default</strong>: No</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-55">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-56">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">when</span> <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">null</span> <span class="p">-&gt;</span> <span class="k">true</span>
@@ -2353,7 +2396,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-48">Compliant Code:</h4>
+<h4 id="compliant-code-49">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">true</span> <span class="k">else</span> <span class="k">false</span>
 </code></pre></div></div>
@@ -2368,7 +2411,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-56">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-57">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">foo</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Int</span><span class="p">&gt;?)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="p">==</span> <span class="k">null</span> <span class="p">||</span> <span class="n">x</span><span class="p">.</span><span class="nf">isEmpty</span><span class="p">())</span> <span class="k">return</span>
@@ -2381,7 +2424,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-49">Compliant Code:</h4>
+<h4 id="compliant-code-50">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="nf">isNullOrEmpty</span><span class="p">())</span> <span class="k">return</span>
 </code></pre></div></div>
@@ -2396,7 +2439,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-57">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-58">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">test</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Int</span><span class="p">&gt;?,</span> <span class="n">s</span><span class="p">:</span> <span class="nc">String</span><span class="p">?)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">a</span> <span class="p">=</span> <span class="n">x</span> <span class="o">?:</span> <span class="nf">emptyList</span><span class="p">()</span>
@@ -2404,7 +2447,7 @@ and generate <code class="language-plaintext highlighter-rouge">hashCode</code>,
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-50">Compliant Code:</h4>
+<h4 id="compliant-code-51">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">test</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">Int</span><span class="p">&gt;?,</span> <span class="n">s</span><span class="p">:</span> <span class="nc">String</span><span class="p">?)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">a</span> <span class="p">=</span> <span class="n">x</span><span class="p">.</span><span class="nf">orEmpty</span><span class="p">()</span>
@@ -2421,13 +2464,13 @@ IllegalArgumentException.</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-58">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-59">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">throw</span> <span class="nc">IllegalArgumentException</span><span class="p">(</span><span class="s">"value should not be null"</span><span class="p">)</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="p">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="nc">IllegalArgumentException</span><span class="p">(</span><span class="s">"value is $value but should be at least 0"</span><span class="p">)</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-51">Compliant Code:</h4>
+<h4 id="compliant-code-52">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">requireNotNull</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span> <span class="s">"value should not be null"</span> <span class="p">}</span>
 <span class="nf">require</span><span class="p">(</span><span class="n">value</span> <span class="p">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="s">"value is $value but should be at least 0"</span> <span class="p">}</span>
@@ -2443,12 +2486,12 @@ IllegalArgumentException.</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-59">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-60">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">require</span><span class="p">(</span><span class="n">x</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-52">Compliant Code:</h4>
+<h4 id="compliant-code-53">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">requireNotNull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre></div></div>
@@ -2466,7 +2509,7 @@ the value is null or not.</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-60">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-61">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">val</span> <span class="py">testList</span> <span class="p">=</span> <span class="nf">listOf</span><span class="p">(</span><span class="s">"string"</span><span class="p">).</span><span class="nf">orEmpty</span><span class="p">()</span>
 <span class="kd">val</span> <span class="py">testList2</span> <span class="p">=</span> <span class="nf">listOf</span><span class="p">(</span><span class="s">"string"</span><span class="p">).</span><span class="nf">orEmpty</span><span class="p">().</span><span class="nf">map</span> <span class="p">{</span> <span class="n">_</span> <span class="p">}</span>
@@ -2474,7 +2517,7 @@ the value is null or not.</p>
 <span class="kd">val</span> <span class="py">testString</span> <span class="p">=</span> <span class="s">""</span><span class="o">?.</span><span class="nf">isNullOrBlank</span><span class="p">()</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-53">Compliant Code:</h4>
+<h4 id="compliant-code-54">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">val</span> <span class="py">testList</span> <span class="p">=</span> <span class="nf">listOf</span><span class="p">(</span><span class="s">"string"</span><span class="p">)</span>
 <span class="kd">val</span> <span class="py">testList2</span> <span class="p">=</span> <span class="nf">listOf</span><span class="p">(</span><span class="s">"string"</span><span class="p">).</span><span class="nf">map</span> <span class="p">{</span> <span class="p">}</span>
@@ -2485,14 +2528,14 @@ the value is null or not.</p>
 <h3 id="utilityclasswithpublicconstructor">UtilityClassWithPublicConstructor</h3>
 
 <p>A class which only contains utility variables and functions with no concrete implementation can be refactored
-into an <code class="language-plaintext highlighter-rouge">object</code> or an class with a non-public constructor.
+into an <code class="language-plaintext highlighter-rouge">object</code> or a class with a non-public constructor.
 Furthermore, this rule reports utility classes which are not final.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.2.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-61">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-62">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">UtilityClassViolation</span> <span class="p">{</span>
 
@@ -2512,7 +2555,7 @@ Furthermore, this rule reports utility classes which are not final.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-54">Compliant Code:</h4>
+<h4 id="compliant-code-55">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">UtilityClass</span> <span class="p">{</span>
 
@@ -2543,7 +2586,7 @@ Val declarations are assign-once (read-only), which makes understanding the curr
 
 <p><strong>Aliases</strong>: CanBeVal</p>
 
-<h4 id="noncompliant-code-62">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-63">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">example</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="py">i</span> <span class="p">=</span> <span class="mi">1</span> <span class="c1">// violation: this variable is never re-assigned</span>
@@ -2551,7 +2594,7 @@ Val declarations are assign-once (read-only), which makes understanding the curr
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-55">Compliant Code:</h4>
+<h4 id="compliant-code-56">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">example</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">i</span> <span class="p">=</span> <span class="mi">1</span>
@@ -2577,13 +2620,13 @@ When suppressing an issue of WildcardImport in the baseline file, make sure to s
 
 <ul>
   <li>
-    <p><code class="language-plaintext highlighter-rouge">excludeImports</code> (default: <code class="language-plaintext highlighter-rouge">['java.util.*', 'kotlinx.android.synthetic.*']</code>)</p>
+    <p><code class="language-plaintext highlighter-rouge">excludeImports</code> (default: <code class="language-plaintext highlighter-rouge">['java.util.*']</code>)</p>
 
     <p>Define a list of package names that should be allowed to be imported with wildcard imports.</p>
   </li>
 </ul>
 
-<h4 id="noncompliant-code-63">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-64">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">io.gitlab.arturbosch.detekt.*</span>
 
@@ -2593,7 +2636,7 @@ When suppressing an issue of WildcardImport in the baseline file, make sure to s
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-56">Compliant Code:</h4>
+<h4 id="compliant-code-57">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">io.gitlab.arturbosch.detekt.DetektElement1</span>
 <span class="k">import</span> <span class="nn">io.gitlab.arturbosch.detekt.DetektElement2</span>
@@ -2620,7 +2663,7 @@ When suppressing an issue of WildcardImport in the baseline file, make sure to s
             <div class="row">
                 <div class="col-lg-12 footer">
                &copy;2021 The detekt Team. All rights reserved. <br />
- Site last generated: Jul 29, 2021 <br />
+ Site last generated: Nov 19, 2021 <br />
                 </div>
             </div>
 </footer>

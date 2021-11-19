@@ -212,6 +212,13 @@
           
           
           
+          <li><a href="/detekt/compose.html">Configuration for Compose</a></li>
+          
+          
+          
+          
+          
+          
           <li><a href="/detekt/reporting.html">Reporting</a></li>
           
           
@@ -466,9 +473,39 @@ $('#toc').on('click', 'a', function() {
 
   <p>The naming ruleset contains rules which assert the naming of different parts of the codebase.</p>
 
+<h3 id="booleanpropertynaming">BooleanPropertyNaming</h3>
+
+<p>Reports when a boolean property doesn’t match a pattern</p>
+
+<p><strong>Active by default</strong>: No</p>
+
+<p><strong>Requires Type Resolution</strong></p>
+
+<p><strong>Debt</strong>: 5min</p>
+
+<h4 id="configuration-options">Configuration options:</h4>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">allowedPattern</code> (default: <code class="language-plaintext highlighter-rouge">'^(is|has|are)'</code>)</p>
+
+    <p>naming pattern</p>
+  </li>
+</ul>
+
+<h4 id="noncompliant-code">Noncompliant Code:</h4>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">val</span> <span class="py">progressBar</span><span class="p">:</span> <span class="nc">Boolean</span> <span class="p">=</span> <span class="k">true</span>
+</code></pre></div></div>
+
+<h4 id="compliant-code">Compliant Code:</h4>
+
+<div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">val</span> <span class="py">hasProgressBar</span><span class="p">:</span> <span class="nc">Boolean</span> <span class="p">=</span> <span class="k">true</span>
+</code></pre></div></div>
+
 <h3 id="classnaming">ClassNaming</h3>
 
-<p>Reports when class or object names which do not follow the specified naming convention are used.</p>
+<p>Reports class or object names that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
@@ -476,7 +513,7 @@ $('#toc').on('click', 'a', function() {
 
 <p><strong>Aliases</strong>: ClassName</p>
 
-<h4 id="configuration-options">Configuration options:</h4>
+<h4 id="configuration-options-1">Configuration options:</h4>
 
 <ul>
   <li>
@@ -488,13 +525,13 @@ $('#toc').on('click', 'a', function() {
 
 <h3 id="constructorparameternaming">ConstructorParameterNaming</h3>
 
-<p>Reports constructor parameter names which do not follow the specified naming convention are used.</p>
+<p>Reports constructor parameter names that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-1">Configuration options:</h4>
+<h4 id="configuration-options-2">Configuration options:</h4>
 
 <ul>
   <li>
@@ -521,13 +558,13 @@ $('#toc').on('click', 'a', function() {
 
 <h3 id="enumnaming">EnumNaming</h3>
 
-<p>Reports when enum names which do not follow the specified naming convention are used.</p>
+<p>Reports enum names that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-2">Configuration options:</h4>
+<h4 id="configuration-options-3">Configuration options:</h4>
 
 <ul>
   <li>
@@ -539,15 +576,14 @@ $('#toc').on('click', 'a', function() {
 
 <h3 id="forbiddenclassname">ForbiddenClassName</h3>
 
-<p>Reports class names which are forbidden per configuration.
-By default this rule does not report any classes.
+<p>Reports class names which are forbidden per configuration. By default, this rule does not report any classes.
 Examples for forbidden names might be too generic class names like <code class="language-plaintext highlighter-rouge">...Manager</code>.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-3">Configuration options:</h4>
+<h4 id="configuration-options-4">Configuration options:</h4>
 
 <ul>
   <li>
@@ -565,7 +601,7 @@ Examples for forbidden names might be too generic class names like <code class="
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-4">Configuration options:</h4>
+<h4 id="configuration-options-5">Configuration options:</h4>
 
 <ul>
   <li>
@@ -583,7 +619,7 @@ Examples for forbidden names might be too generic class names like <code class="
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-5">Configuration options:</h4>
+<h4 id="configuration-options-6">Configuration options:</h4>
 
 <ul>
   <li>
@@ -595,7 +631,7 @@ Examples for forbidden names might be too generic class names like <code class="
 
 <h3 id="functionnaming">FunctionNaming</h3>
 
-<p>Reports when function names which do not follow the specified naming convention are used.
+<p>Reports function names that do not follow the specified naming convention.
 One exception are factory functions used to create instances of classes.
 These factory functions can have the same name as the class being created.</p>
 
@@ -605,7 +641,7 @@ These factory functions can have the same name as the class being created.</p>
 
 <p><strong>Aliases</strong>: FunctionName</p>
 
-<h4 id="configuration-options-6">Configuration options:</h4>
+<h4 id="configuration-options-7">Configuration options:</h4>
 
 <ul>
   <li>
@@ -623,22 +659,17 @@ These factory functions can have the same name as the class being created.</p>
 
     <p>ignores functions that have the override modifier</p>
   </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">ignoreAnnotated</code> (default: <code class="language-plaintext highlighter-rouge">['Composable']</code>)</p>
-
-    <p>ignore naming for functions in the context of these annotation class names</p>
-  </li>
 </ul>
 
 <h3 id="functionparameternaming">FunctionParameterNaming</h3>
 
-<p>Reports function parameter names which do not follow the specified naming convention are used.</p>
+<p>Reports function parameter names that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-7">Configuration options:</h4>
+<h4 id="configuration-options-8">Configuration options:</h4>
 
 <ul>
   <li>
@@ -667,19 +698,37 @@ These factory functions can have the same name as the class being created.</p>
 
 <h3 id="invalidpackagedeclaration">InvalidPackageDeclaration</h3>
 
-<p>Reports when the package declaration is missing or the file location does not match the declared package.</p>
+<p>Reports when the file location does not match the declared package.</p>
 
 <p><strong>Active by default</strong>: No</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-8">Configuration options:</h4>
+<h4 id="configuration-options-9">Configuration options:</h4>
 
 <ul>
   <li>
     <p><code class="language-plaintext highlighter-rouge">rootPackage</code> (default: <code class="language-plaintext highlighter-rouge">''</code>)</p>
 
     <p>if specified this part of the package structure is ignored</p>
+  </li>
+</ul>
+
+<h3 id="lambdaparameternaming">LambdaParameterNaming</h3>
+
+<p>Reports lambda parameter names that do not follow the specified naming convention.</p>
+
+<p><strong>Active by default</strong>: No</p>
+
+<p><strong>Debt</strong>: 5min</p>
+
+<h4 id="configuration-options-10">Configuration options:</h4>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">parameterPattern</code> (default: <code class="language-plaintext highlighter-rouge">'[a-z][A-Za-z0-9]*|_'</code>)</p>
+
+    <p>naming pattern</p>
   </li>
 </ul>
 
@@ -694,13 +743,13 @@ Use camel humps with an uppercase first letter (e.g. ProcessDeclarations.kt).</p
 <p>The name of the file should describe what the code in the file does.
 Therefore, you should avoid using meaningless words such as “Util” in file names.” - Official Kotlin Style Guide</p>
 
-<p>More information at: http://kotlinlang.org/docs/reference/coding-conventions.html</p>
+<p>More information at: https://kotlinlang.org/docs/coding-conventions.html</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-9">Configuration options:</h4>
+<h4 id="configuration-options-11">Configuration options:</h4>
 
 <ul>
   <li>
@@ -710,7 +759,7 @@ Therefore, you should avoid using meaningless words such as “Util” in file n
   </li>
 </ul>
 
-<h4 id="noncompliant-code">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-1">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Foo</span> <span class="c1">// FooUtils.kt</span>
 
@@ -718,7 +767,7 @@ Therefore, you should avoid using meaningless words such as “Util” in file n
 <span class="k">fun</span> <span class="nc">Foo</span><span class="p">.</span><span class="nf">toBar</span><span class="p">():</span> <span class="nc">Bar</span> <span class="p">=</span> <span class="o">..</span><span class="p">.</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code">Compliant Code:</h4>
+<h4 id="compliant-code-1">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Foo</span> <span class="p">{</span> <span class="c1">// Foo.kt</span>
     <span class="k">fun</span> <span class="nf">stuff</span><span class="p">()</span> <span class="p">=</span> <span class="mi">42</span>
@@ -738,7 +787,7 @@ Factory functions that create an instance of the class are exempt from this rule
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-10">Configuration options:</h4>
+<h4 id="configuration-options-12">Configuration options:</h4>
 
 <ul>
   <li>
@@ -755,7 +804,7 @@ Factory functions that create an instance of the class are exempt from this rule
   </li>
 </ul>
 
-<h4 id="noncompliant-code-1">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-2">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">MethodNameEqualsClassName</span> <span class="p">{</span>
 
@@ -768,7 +817,7 @@ Factory functions that create an instance of the class are exempt from this rule
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-1">Compliant Code:</h4>
+<h4 id="compliant-code-2">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Manager</span> <span class="p">{</span>
 
@@ -792,7 +841,7 @@ Shadowing makes it impossible to access a variable with the same name in the sco
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-2">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-3">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">test</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">i</span> <span class="p">=</span> <span class="mi">1</span>
@@ -805,7 +854,7 @@ Shadowing makes it impossible to access a variable with the same name in the sco
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-2">Compliant Code:</h4>
+<h4 id="compliant-code-3">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fun</span> <span class="nf">test</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nc">Int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nc">Int</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">val</span> <span class="py">x</span> <span class="p">=</span> <span class="mi">1</span>
@@ -829,25 +878,25 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="noncompliant-code-3">Noncompliant Code:</h4>
+<h4 id="noncompliant-code-4">Noncompliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">val</span> <span class="py">isEnabled</span><span class="p">:</span> <span class="nc">Int</span> <span class="p">=</span> <span class="mi">500</span>
 </code></pre></div></div>
 
-<h4 id="compliant-code-3">Compliant Code:</h4>
+<h4 id="compliant-code-4">Compliant Code:</h4>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">val</span> <span class="py">isEnabled</span><span class="p">:</span> <span class="nc">Boolean</span> <span class="p">=</span> <span class="k">false</span>
 </code></pre></div></div>
 
 <h3 id="objectpropertynaming">ObjectPropertyNaming</h3>
 
-<p>Reports when property names inside objects which do not follow the specified naming convention are used.</p>
+<p>Reports property names inside objects that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-11">Configuration options:</h4>
+<h4 id="configuration-options-13">Configuration options:</h4>
 
 <ul>
   <li>
@@ -869,7 +918,7 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <h3 id="packagenaming">PackageNaming</h3>
 
-<p>Reports when package names which do not follow the specified naming convention are used.</p>
+<p>Reports package names that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
@@ -877,7 +926,7 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <p><strong>Aliases</strong>: PackageDirectoryMismatch</p>
 
-<h4 id="configuration-options-12">Configuration options:</h4>
+<h4 id="configuration-options-14">Configuration options:</h4>
 
 <ul>
   <li>
@@ -889,13 +938,13 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <h3 id="toplevelpropertynaming">TopLevelPropertyNaming</h3>
 
-<p>Reports when top level constant names which do not follow the specified naming convention are used.</p>
+<p>Reports top level constant that which do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-13">Configuration options:</h4>
+<h4 id="configuration-options-15">Configuration options:</h4>
 
 <ul>
   <li>
@@ -923,7 +972,7 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-14">Configuration options:</h4>
+<h4 id="configuration-options-16">Configuration options:</h4>
 
 <ul>
   <li>
@@ -941,7 +990,7 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-15">Configuration options:</h4>
+<h4 id="configuration-options-17">Configuration options:</h4>
 
 <ul>
   <li>
@@ -953,13 +1002,13 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
 
 <h3 id="variablenaming">VariableNaming</h3>
 
-<p>Reports when variable names which do not follow the specified naming convention are used.</p>
+<p>Reports variable names that do not follow the specified naming convention.</p>
 
 <p><strong>Active by default</strong>: Yes - Since v1.0.0</p>
 
 <p><strong>Debt</strong>: 5min</p>
 
-<h4 id="configuration-options-16">Configuration options:</h4>
+<h4 id="configuration-options-18">Configuration options:</h4>
 
 <ul>
   <li>
@@ -1000,7 +1049,7 @@ Please check the <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-
             <div class="row">
                 <div class="col-lg-12 footer">
                &copy;2021 The detekt Team. All rights reserved. <br />
- Site last generated: Jul 29, 2021 <br />
+ Site last generated: Nov 19, 2021 <br />
                 </div>
             </div>
 </footer>
