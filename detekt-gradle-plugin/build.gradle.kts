@@ -38,16 +38,18 @@ testing {
     }
 }
 
-val pluginCompileOnly: Configuration by configurations.creating
+val pluginRuntimeOnly: Configuration by configurations.creating
 
-configurations.compileOnly { extendsFrom(pluginCompileOnly) }
+configurations.named("functionalTestRuntimeOnly") { extendsFrom(pluginRuntimeOnly) }
 
 dependencies {
     compileOnly(libs.kotlin.gradlePluginApi)
+    compileOnly(libs.android.gradle)
+    compileOnly(libs.kotlin.gradle)
     implementation(libs.sarif4k)
 
-    pluginCompileOnly(libs.android.gradle)
-    pluginCompileOnly(libs.kotlin.gradle)
+    pluginRuntimeOnly(libs.android.gradle)
+    pluginRuntimeOnly(libs.kotlin.gradle)
 }
 
 gradlePlugin {
@@ -70,7 +72,7 @@ gradlePlugin {
 
 // Manually inject dependency to gradle-testkit since the default injected plugin classpath is from `main.runtime`.
 tasks.pluginUnderTestMetadata {
-    pluginClasspath.from(pluginCompileOnly)
+    pluginClasspath.from(pluginRuntimeOnly)
 }
 
 tasks.validatePlugins {
