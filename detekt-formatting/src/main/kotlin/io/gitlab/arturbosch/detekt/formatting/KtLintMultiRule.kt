@@ -101,6 +101,8 @@ class KtLintMultiRule(config: Config = Config.empty) :
         SpacingAroundParens(config),
         SpacingAroundRangeOperator(config),
         StringTemplate(config),
+        TrailingCommaOnCallSite(config),
+        TrailingCommaOnDeclarationSite(config),
         Wrapping(config),
 
         // Wrappers for ktlint-ruleset-experimental rules. Disabled by default.
@@ -123,8 +125,6 @@ class KtLintMultiRule(config: Config = Config.empty) :
         SpacingAroundUnaryOperator(config),
         SpacingBetweenDeclarationsWithAnnotations(config),
         SpacingBetweenDeclarationsWithComments(config),
-        TrailingCommaOnCallSite(config),
-        TrailingCommaOnDeclarationSite(config),
         TypeArgumentListSpacing(config),
         UnnecessaryParenthesesBeforeTrailingLambda(config),
     )
