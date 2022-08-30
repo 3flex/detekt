@@ -34,15 +34,4 @@ class Indentation(config: Config) : FormattingRule(config) {
         mapOf(
             DefaultEditorConfigProperties.indentSizeProperty to indentSize.toString(),
         )
-
-    /**
-     * [IndentationRule] has visitor modifier RunOnRootNodeOnly, so [node] is always the root file.
-     * Override the parent implementation to highlight the entire file.
-     */
-    override fun getTextLocationForViolation(node: ASTNode, offset: Int): TextLocation {
-        val relativeEnd = node.text
-            .drop(offset)
-            .indexOfFirst { !it.isWhitespace() }
-        return TextLocation(offset, offset + relativeEnd)
-    }
 }

@@ -133,25 +133,20 @@ class KtLintMultiRule(config: Config = Config.empty) :
         root.node.visitTokens { node ->
             sortedRules.forEach { it.apply(node) }
         }
+        sortedRules.forEach { it.afterLastNode() }
     }
 
     internal fun getSortedRules(): List<FormattingRule> {
-        val runFirstOnRoot = mutableListOf<FormattingRule>()
         val other = mutableListOf<FormattingRule>()
-        val runLastOnRoot = mutableListOf<FormattingRule>()
         val runLast = mutableListOf<FormattingRule>()
         for (rule in activeRules.filterIsInstance<FormattingRule>()) {
             when {
-                rule.runOnRootNodeOnly && rule.runAsLateAsPossible -> runLastOnRoot.add(rule)
-                rule.runOnRootNodeOnly -> runFirstOnRoot.add(rule)
                 rule.runAsLateAsPossible -> runLast.add(rule)
                 else -> other.add(rule)
             }
         }
         return LinkedList<FormattingRule>().apply {
-            addAll(runFirstOnRoot)
             addAll(other)
-            addAll(runLastOnRoot)
             addAll(runLast)
         }
     }

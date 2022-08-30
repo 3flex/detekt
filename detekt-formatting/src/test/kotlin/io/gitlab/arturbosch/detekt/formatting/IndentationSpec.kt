@@ -35,7 +35,7 @@ class IndentationSpec {
             fun `places finding location to the indentation`() {
                 subject.lint(code).assert()
                     .hasStartSourceLocation(2, 1)
-                    .hasTextLocations(13 to 14)
+                    .hasTextLocations(12 to 14)
             }
         }
 
