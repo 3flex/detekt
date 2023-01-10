@@ -57,21 +57,25 @@ testing {
     }
 }
 
-val pluginCompileOnly: Configuration by configurations.creating
+val pluginRuntimePlugin: Configuration by configurations.creating
 val functionalTestImplementation: Configuration by configurations.getting
 
-configurations.compileOnly { extendsFrom(pluginCompileOnly) }
-
-pluginCompileOnly.attributes {
+pluginRuntimePlugin.attributes {
     attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, "library"))
 }
-
+java {
+    withSourcesJar()
+    withJavadocJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 dependencies {
-    compileOnly(libs.kotlin.gradlePluginApi)
+    compileOnly(libs.kotlin.gradle)
+    compileOnly(libs.android.gradle.api)
     implementation(libs.sarif4k)
 
-    pluginCompileOnly(libs.android.gradle)
-    pluginCompileOnly(libs.kotlin.gradle)
+    pluginRuntimePlugin(libs.android.gradle)
+    pluginRuntimePlugin(libs.kotlin.gradle)
 
     // We use this published version of the detekt-formatting to self analyse this project.
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0")
@@ -114,7 +118,7 @@ kotlin.target.compilations.getByName("functionalTest") {
 
 // Manually inject dependency to gradle-testkit since the default injected plugin classpath is from `main.runtime`.
 tasks.pluginUnderTestMetadata {
-    pluginClasspath.from(pluginCompileOnly)
+    pluginClasspath.from(pluginRuntimePlugin)
 }
 
 tasks.validatePlugins {
