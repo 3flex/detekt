@@ -99,12 +99,6 @@ internal class Analyzer(
         bindingContext: BindingContext,
         compilerResources: CompilerResources
     ): Map<RuleSetId, List<Finding>> {
-        @Suppress("DEPRECATION")
-        fun isCorrectable(rule: BaseRule): Boolean = when (rule) {
-            is Rule -> rule.autoCorrect
-            else -> error("No other rule type expected.")
-        }
-
         val activeRuleSetsToRuleSetConfigs = providers.asSequence()
             .map { it to config.subConfig(it.ruleSetId) }
             .filter { (_, ruleSetConfig) -> ruleSetConfig.isActive() }
@@ -115,12 +109,12 @@ internal class Analyzer(
             activeRuleSetsToRuleSetConfigs.map { (ruleSet, _) -> ruleSet }
         )
 
-        val (correctableRules, otherRules) = activeRuleSetsToRuleSetConfigs
+        val executableRules = activeRuleSetsToRuleSetConfigs
             .flatMap { (ruleSet, _) -> ruleSet.rules.asSequence() }
             .filter { rule ->
                 bindingContext != BindingContext.EMPTY || !rule::class.hasAnnotation<RequiresTypeResolution>()
             }
-            .partition { isCorrectable(it) }
+            .toList()
 
         val result = HashMap<RuleSetId, MutableList<Finding>>()
 
@@ -137,8 +131,7 @@ internal class Analyzer(
             }
         }
 
-        executeRules(correctableRules)
-        executeRules(otherRules)
+        executeRules(executableRules)
 
         return result
     }

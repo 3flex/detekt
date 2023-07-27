@@ -40,6 +40,10 @@ abstract class FormattingRule(config: Config) : Rule(config) {
     private var positionByOffset: (offset: Int) -> Pair<Int, Int> by SingleAssign()
     private var root: KtFile by SingleAssign()
 
+    private val autoCorrect: Boolean
+        get() = valueOrDefault(Config.AUTO_CORRECT_KEY, false) &&
+            ruleSetConfig.valueOrDefault(Config.AUTO_CORRECT_KEY, true)
+
     protected fun issueFor(description: String) =
         Issue(javaClass.simpleName, Severity.Style, description, Debt.FIVE_MINS)
 
