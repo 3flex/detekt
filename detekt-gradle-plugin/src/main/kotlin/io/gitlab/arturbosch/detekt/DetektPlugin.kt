@@ -4,7 +4,6 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.internal.DetektAndroid
 import io.gitlab.arturbosch.detekt.internal.DetektJvm
 import io.gitlab.arturbosch.detekt.internal.DetektMultiplatform
-import io.gitlab.arturbosch.detekt.internal.DetektPlain
 import io.gitlab.arturbosch.detekt.internal.DetektSourceSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -34,7 +33,6 @@ class DetektPlugin : Plugin<Project> {
         configurePluginDependencies(project, extension)
         setTaskDefaults(project)
 
-        project.registerDetektPlainTask(extension)
         project.registerSourceSetTasks(extension)
         project.registerDetektJvmTasks(extension)
         if (project.findProperty(DETEKT_ANDROID_DISABLED_PROPERTY) != "true") {
@@ -68,10 +66,6 @@ class DetektPlugin : Plugin<Project> {
         plugins.withId("kotlin-android") {
             DetektAndroid(this).registerTasks(extension)
         }
-    }
-
-    private fun Project.registerDetektPlainTask(extension: DetektExtension) {
-        DetektPlain(this).registerTasks(extension)
     }
 
     private fun Project.registerGenerateConfigTask(extension: DetektExtension) {
