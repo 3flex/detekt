@@ -56,6 +56,10 @@ class DetektPlugin : Plugin<Project> {
     private fun Project.registerDetektJvmTasks(extension: DetektExtension) {
         plugins.withId("org.jetbrains.kotlin.jvm") {
             DetektJvm(this).registerTasks(extension)
+
+            tasks.named(DETEKT_TASK_NAME) {
+                it.dependsOn("detektMainSourceSet", "detektTestSourceSet")
+            }
         }
     }
 
@@ -74,6 +78,10 @@ class DetektPlugin : Plugin<Project> {
     private fun Project.registerDetektAndroidTasks(extension: DetektExtension) {
         plugins.withId("kotlin-android") {
             DetektAndroid(this).registerTasks(extension)
+
+            tasks.named(DETEKT_TASK_NAME) {
+                it.dependsOn("detektMainSourceSet", "detektTestSourceSet", "detektAndroidTestSourceSet")
+            }
         }
     }
 

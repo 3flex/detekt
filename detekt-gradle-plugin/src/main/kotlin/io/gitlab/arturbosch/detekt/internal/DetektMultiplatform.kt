@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.androidJvm
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.jvm
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 import java.io.File
 
 internal class DetektMultiplatform(private val project: Project) {
@@ -36,6 +37,15 @@ internal class DetektMultiplatform(private val project: Project) {
                         extension = extension,
                         inputSource = inputSource
                     )
+
+                    tasks.named(DetektPlugin.DETEKT_TASK_NAME) {
+                        // requires kotlin.mpp.androidSourceSetLayoutVersion=2 or Kotlin 1.9.0 where this is the default
+                        it.dependsOn(
+                            "detekt${target.name.capitalize()}MainSourceSet",
+                            "detekt${target.name.capitalize()}UnitTestSourceSet",
+                            "detekt${target.name.capitalize()}InstrumentedTestSourceSet",
+                        )
+                    }
                 } else {
                     project.registerMultiplatformTasksForNonAndroidTarget(
                         compilation = compilation,
@@ -43,8 +53,21 @@ internal class DetektMultiplatform(private val project: Project) {
                         extension = extension,
                         inputSource = inputSource
                     )
+
+                    if (target.name != KotlinMultiplatformPlugin.METADATA_TARGET_NAME) {
+                        tasks.named(DetektPlugin.DETEKT_TASK_NAME) {
+                            it.dependsOn(
+                                "detekt${target.name.capitalize()}MainSourceSet",
+                                "detekt${target.name.capitalize()}TestSourceSet",
+                            )
+                        }
+                    }
                 }
             }
+        }
+
+        tasks.named(DetektPlugin.DETEKT_TASK_NAME) {
+            it.dependsOn("detektCommonMainSourceSet", "detektCommonTestSourceSet")
         }
     }
 
