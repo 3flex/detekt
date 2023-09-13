@@ -25,14 +25,6 @@ open class DetektExtension @Inject constructor(objects: ObjectFactory) : CodeQua
             isIgnoreFailures = value
         }
 
-    val source: ConfigurableFileCollection = objects.fileCollection()
-        .from(
-            DEFAULT_SRC_DIR_JAVA,
-            DEFAULT_TEST_SRC_DIR_JAVA,
-            DEFAULT_SRC_DIR_KOTLIN,
-            DEFAULT_TEST_SRC_DIR_KOTLIN,
-        )
-
     var baseline: File? = objects
         .fileProperty()
         .fileValue(File("detekt-baseline.xml"))
