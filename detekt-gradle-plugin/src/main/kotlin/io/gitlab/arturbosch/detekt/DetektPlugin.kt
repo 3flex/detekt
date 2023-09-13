@@ -33,6 +33,10 @@ class DetektPlugin : Plugin<Project> {
         configurePluginDependencies(project, extension)
         setTaskDefaults(project)
 
+        val detektTask = project.tasks.register(DETEKT_TASK_NAME) {
+            it.group = LifecycleBasePlugin.VERIFICATION_GROUP
+        }
+
         project.registerSourceSetTasks(extension)
         project.registerDetektJvmTasks(extension)
         if (project.findProperty(DETEKT_ANDROID_DISABLED_PROPERTY) != "true") {
