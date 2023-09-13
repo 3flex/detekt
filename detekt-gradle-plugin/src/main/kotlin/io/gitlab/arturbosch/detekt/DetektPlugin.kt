@@ -9,6 +9,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ReportingBasePlugin
 import org.gradle.api.reporting.ReportingExtension
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 class DetektPlugin : Plugin<Project> {
@@ -35,6 +36,10 @@ class DetektPlugin : Plugin<Project> {
 
         val detektTask = project.tasks.register(DETEKT_TASK_NAME) {
             it.group = LifecycleBasePlugin.VERIFICATION_GROUP
+        }
+
+        project.tasks.matching { it.name == LifecycleBasePlugin.CHECK_TASK_NAME }.configureEach {
+            it.dependsOn(detektTask)
         }
 
         project.registerSourceSetTasks(extension)
