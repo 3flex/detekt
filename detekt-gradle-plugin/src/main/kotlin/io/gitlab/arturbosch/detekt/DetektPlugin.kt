@@ -38,8 +38,10 @@ class DetektPlugin : Plugin<Project> {
             it.group = LifecycleBasePlugin.VERIFICATION_GROUP
         }
 
-        project.tasks.matching { it.name == LifecycleBasePlugin.CHECK_TASK_NAME }.configureEach {
-            it.dependsOn(detektTask)
+        project.plugins.withType(LifecycleBasePlugin::class.java) {
+            project.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME) {
+                it.dependsOn(detektTask)
+            }
         }
 
         project.registerSourceSetTasks(extension)
