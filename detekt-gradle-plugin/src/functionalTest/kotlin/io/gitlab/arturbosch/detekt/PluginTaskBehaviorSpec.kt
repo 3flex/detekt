@@ -38,35 +38,35 @@ class PluginTaskBehaviorSpec {
     @Test
     fun `should be UP-TO-DATE the 2nd run without changes`() {
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
     @Test
     fun `should pick up build artifacts from the build cache on a 2nd run after deleting the build dir`() {
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         gradleRunner.projectFile("build").deleteRecursively()
 
         // Running detekt again should pick up artifacts from Build Cache
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
         }
     }
 
     @Test
     fun `should pick up build artifacts from the build cache on a 2nd run after running 'clean'`() {
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
-        gradleRunner.runTasksAndCheckResult("clean", "detekt") { result ->
+        gradleRunner.runTasksAndCheckResult("clean", "detektMainSourceSet") { result ->
             assertThat(result.task(":clean")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.FROM_CACHE)
         }
     }
 
@@ -79,14 +79,14 @@ class PluginTaskBehaviorSpec {
         """.trimIndent()
 
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         // update config file
         gradleRunner.writeProjectFile(configFileName, configFileWithCommentsDisabled)
 
-        gradleRunner.runTasksAndCheckResult("detekt") { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        gradleRunner.runTasksAndCheckResult("detektMainSourceSet") { result ->
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -101,28 +101,28 @@ class PluginTaskBehaviorSpec {
         """.trimIndent()
 
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         // update baseline file
         gradleRunner.writeProjectFile(baselineFileName, changedBaselineContent)
 
-        gradleRunner.runTasksAndCheckResult("detekt") { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        gradleRunner.runTasksAndCheckResult("detektMainSourceSet") { result ->
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
     fun `should run again after changing inputs`() {
         gradleRunner.runDetektTaskAndCheckResult { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
 
         // add a new File
         gradleRunner.writeKtFile(gradleRunner.projectLayout.srcDirs.first(), "OtherKotlinClass")
 
-        gradleRunner.runTasksAndCheckResult("detekt") { result ->
-            assertThat(result.task(":detekt")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        gradleRunner.runTasksAndCheckResult("detektMainSourceSet") { result ->
+            assertThat(result.task(":detektMainSourceSet")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 }
