@@ -1,6 +1,7 @@
 package io.gitlab.arturbosch.detekt.internal
 
 import io.gitlab.arturbosch.detekt.DetektPlugin
+import io.gitlab.arturbosch.detekt.DetektPlugin.Companion.BASELINE_TASK_NAME
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -34,7 +35,7 @@ internal class DetektSourceSet(private val project: Project) {
         sourceSet: KotlinSourceSet,
         extension: DetektExtension,
     ) {
-        registerCreateBaselineTask(DetektPlugin.BASELINE_TASK_NAME + sourceSet.name.capitalize() + "SourceSet", extension) {
+        registerCreateBaselineTask("$BASELINE_TASK_NAME${sourceSet.name.capitalize()}SourceSet", extension) {
             source = sourceSet.kotlin
             val variantBaselineFile = extension.baseline?.addVariantName("${sourceSet.name}SourceSet")
             baseline.convention(layout.file(provider { variantBaselineFile }))
