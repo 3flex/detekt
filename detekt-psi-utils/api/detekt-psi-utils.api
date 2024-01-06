@@ -53,15 +53,6 @@ public final class io/gitlab/arturbosch/detekt/rules/IsPartOfUtilsKt {
 	public static final fun isPartOfString (Lorg/jetbrains/kotlin/com/intellij/psi/PsiElement;)Z
 }
 
-public final class io/gitlab/arturbosch/detekt/rules/JunkKt {
-	public static final fun companionObject (Lorg/jetbrains/kotlin/psi/KtClass;)Lorg/jetbrains/kotlin/psi/KtObjectDeclaration;
-	public static final fun getIntValueForPsiElement (Lorg/jetbrains/kotlin/com/intellij/psi/PsiElement;)Ljava/lang/Integer;
-	public static final fun hasCommentInside (Lorg/jetbrains/kotlin/com/intellij/psi/PsiElement;)Z
-	public static final fun hasCommentInside (Lorg/jetbrains/kotlin/psi/KtClassOrObject;)Z
-	public static final fun isUsedForNesting (Lorg/jetbrains/kotlin/psi/KtCallExpression;)Z
-	public static final fun receiverIsUsed (Lorg/jetbrains/kotlin/psi/KtCallExpression;Lorg/jetbrains/kotlin/resolve/BindingContext;)Z
-}
-
 public final class io/gitlab/arturbosch/detekt/rules/KeywordsKt {
 	public static final field IT_LITERAL Ljava/lang/String;
 	public static final field LET_LITERAL Ljava/lang/String;
@@ -81,6 +72,16 @@ public final class io/gitlab/arturbosch/detekt/rules/KtCallExpressionKt {
 	public static final fun isCalling (Lorg/jetbrains/kotlin/psi/KtCallExpression;Lorg/jetbrains/kotlin/name/FqName;Lorg/jetbrains/kotlin/resolve/BindingContext;)Z
 	public static final fun isCalling (Lorg/jetbrains/kotlin/resolve/calls/model/ResolvedCall;Lorg/jetbrains/kotlin/name/FqName;)Z
 	public static final fun isCallingWithNonNullCheckArgument (Lorg/jetbrains/kotlin/psi/KtCallExpression;Lorg/jetbrains/kotlin/name/FqName;Lorg/jetbrains/kotlin/resolve/BindingContext;)Z
+	public static final fun isUsedForNesting (Lorg/jetbrains/kotlin/psi/KtCallExpression;)Z
+	public static final fun receiverIsUsed (Lorg/jetbrains/kotlin/psi/KtCallExpression;Lorg/jetbrains/kotlin/resolve/BindingContext;)Z
+}
+
+public final class io/gitlab/arturbosch/detekt/rules/KtClassKt {
+	public static final fun companionObject (Lorg/jetbrains/kotlin/psi/KtClass;)Lorg/jetbrains/kotlin/psi/KtObjectDeclaration;
+}
+
+public final class io/gitlab/arturbosch/detekt/rules/KtClassOrObjectKt {
+	public static final fun hasCommentInside (Lorg/jetbrains/kotlin/psi/KtClassOrObject;)Z
 }
 
 public final class io/gitlab/arturbosch/detekt/rules/KtExpressionKt {
@@ -126,6 +127,11 @@ public final class io/gitlab/arturbosch/detekt/rules/MethodSignatureKt {
 	public static final fun isHashCodeFunction (Lorg/jetbrains/kotlin/psi/KtFunction;)Z
 	public static final fun isJvmFinalizeFunction (Lorg/jetbrains/kotlin/psi/KtNamedFunction;)Z
 	public static final fun isMainFunction (Lorg/jetbrains/kotlin/psi/KtNamedFunction;)Z
+}
+
+public final class io/gitlab/arturbosch/detekt/rules/PsiElementKt {
+	public static final fun getIntValueForPsiElement (Lorg/jetbrains/kotlin/com/intellij/psi/PsiElement;)Ljava/lang/Integer;
+	public static final fun hasCommentInside (Lorg/jetbrains/kotlin/com/intellij/psi/PsiElement;)Z
 }
 
 public final class io/gitlab/arturbosch/detekt/rules/StringExtensionsKt {

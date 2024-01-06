@@ -3,8 +3,12 @@ package io.gitlab.arturbosch.detekt.rules
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtBinaryExpression
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.bindingContextUtil.isUsedAsExpression
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.util.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -34,3 +38,17 @@ fun KtCallExpression.isCallingWithNonNullCheckArgument(
     val argument = valueArguments.firstOrNull()?.getArgumentExpression() as? KtBinaryExpression ?: return false
     return argument.isNonNullCheck() && isCalling(fqName, bindingContext)
 }
+
+fun KtCallExpression.isUsedForNesting(): Boolean = when (getCallNameExpression()?.text) {
+    "run", "let", "apply", "with", "use", "forEach" -> true
+    else -> false
+}
+
+fun KtCallExpression.receiverIsUsed(context: BindingContext): Boolean =
+    (parent as? KtQualifiedExpression)?.let {
+        val scopeOfApplyCall = parent.parent
+        !(
+            (scopeOfApplyCall == null || scopeOfApplyCall is KtBlockExpression) &&
+                (context == BindingContext.EMPTY || !it.isUsedAsExpression(context))
+            )
+    } ?: true
