@@ -6,9 +6,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
-import io.gitlab.arturbosch.detekt.rules.getIntValueForPsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtBinaryExpression
+import org.jetbrains.kotlin.psi.KtConstantExpression
 
 /**
  * Reports ranges which are empty.
@@ -73,4 +73,6 @@ class InvalidRange(config: Config) : Rule(config) {
     private fun checkDownTo(lower: Int, upper: Int) = lower < upper
 
     private fun checkUntil(lower: Int, upper: Int) = lower >= upper
+
+    private fun getIntValueForPsiElement(element: PsiElement): Int? = (element as? KtConstantExpression)?.text?.toIntOrNull()
 }
