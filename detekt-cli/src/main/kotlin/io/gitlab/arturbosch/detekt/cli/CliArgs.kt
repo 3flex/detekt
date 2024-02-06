@@ -54,9 +54,11 @@ class CliArgs {
 
     @Parameter(
         names = ["--plugins", "-p"],
-        description = "Extra paths to plugin jars separated by ',' or ';'."
+        description = "Extra paths to plugin jars separated by ',' or ';'.",
+        splitter = CommaOrSemicolonSplitter::class,
+        converter = ExistingPathConverter::class,
     )
-    var plugins: String? = null
+    var plugins: List<Path> = emptyList()
 
     @Parameter(
         names = ["--parallel"],
