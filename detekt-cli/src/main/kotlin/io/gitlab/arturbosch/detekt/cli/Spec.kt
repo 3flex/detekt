@@ -16,7 +16,7 @@ internal fun CliArgs.createSpec(output: Appendable, error: Appendable): Processi
 
         project {
             basePath = args.basePath
-            inputPaths = args.inputPaths
+            inputPaths = args.input
             excludes = args.excludes?.let(::asPatterns).orEmpty()
             includes = args.includes?.let(::asPatterns).orEmpty()
         }

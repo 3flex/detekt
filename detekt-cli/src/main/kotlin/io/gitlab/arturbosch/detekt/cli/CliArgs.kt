@@ -15,9 +15,11 @@ class CliArgs {
     @Parameter(
         names = ["--input", "-i"],
         description = "Input paths to analyze. Multiple paths are separated by comma. If not specified the " +
-            "current working directory is used."
+            "current working directory is used.",
+        splitter = CommaOrSemicolonSplitter::class,
+        converter = ExistingPathConverter::class,
     )
-    var input: String? = null
+    var input: List<Path> = listOf(Path(System.getProperty("user.dir")))
 
     @Parameter(
         names = ["--includes", "-in"],
@@ -198,10 +200,6 @@ class CliArgs {
         description = "Prints the detekt CLI version."
     )
     var showVersion: Boolean = false
-
-    val inputPaths: List<Path> by lazy {
-        MultipleExistingPathConverter().convert(input ?: System.getProperty("user.dir"))
-    }
 
     val reportPaths: List<ReportPath> by lazy {
         reports?.map { ReportPath.from(it) }.orEmpty()

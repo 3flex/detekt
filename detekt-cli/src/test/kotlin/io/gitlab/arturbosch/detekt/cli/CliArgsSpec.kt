@@ -28,15 +28,15 @@ internal class CliArgsSpec {
         @Test
         fun `the current working directory is used if parameter is not set`() {
             val cli = parseArguments(emptyArray())
-            assertThat(cli.inputPaths).hasSize(1)
-            assertThat(cli.inputPaths.first()).isEqualTo(Path(System.getProperty("user.dir")))
+            assertThat(cli.input).hasSize(1)
+            assertThat(cli.input.first()).isEqualTo(Path(System.getProperty("user.dir")))
         }
 
         @Test
         fun `a single value is converted to a path`() {
             val cli = parseArguments(arrayOf("--input", "$projectPath"))
-            assertThat(cli.inputPaths).hasSize(1)
-            assertThat(cli.inputPaths.first().absolute()).isEqualTo(projectPath)
+            assertThat(cli.input).hasSize(1)
+            assertThat(cli.input.first().absolute()).isEqualTo(projectPath)
         }
 
         @Test
@@ -44,8 +44,8 @@ internal class CliArgsSpec {
             val mainPath = projectPath.resolve("src/main").absolute()
             val testPath = projectPath.resolve("src/test").absolute()
             val cli = parseArguments(arrayOf("--input", "$mainPath,$testPath"))
-            assertThat(cli.inputPaths).hasSize(2)
-            assertThat(cli.inputPaths.map(Path::absolute)).containsExactlyInAnyOrder(mainPath, testPath)
+            assertThat(cli.input).hasSize(2)
+            assertThat(cli.input.map(Path::absolute)).containsExactlyInAnyOrder(mainPath, testPath)
         }
 
         @Test
@@ -53,8 +53,8 @@ internal class CliArgsSpec {
             val pathToNonExistentDirectory = projectPath.resolve("nonExistent")
             val params = arrayOf("--input", "$pathToNonExistentDirectory")
 
-            assertThatExceptionOfType(ParameterException::class.java)
-                .isThrownBy { parseArguments(params).inputPaths }
+            assertThatExceptionOfType(HandledArgumentViolation::class.java)
+                .isThrownBy { parseArguments(params).input }
                 .withMessageContaining("does not exist")
         }
     }
