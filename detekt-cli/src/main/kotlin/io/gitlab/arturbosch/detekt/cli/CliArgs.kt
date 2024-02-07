@@ -7,6 +7,7 @@ import io.github.detekt.tooling.api.spec.RulesSpec.FailurePolicy.FailOnSeverity
 import io.github.detekt.tooling.api.spec.RulesSpec.FailurePolicy.NeverFail
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageVersion
+import java.net.URL
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -43,9 +44,11 @@ class CliArgs {
 
     @Parameter(
         names = ["--config-resource", "-cr"],
-        description = "Path to the config resource on detekt's classpath (path/to/config.yml)."
+        description = "Path to the config resource on detekt's classpath (path/to/config.yml).",
+        splitter = CommaOrSemicolonSplitter::class,
+        converter = ClasspathResourceConverter::class,
     )
-    var configResource: String? = null
+    var configResource: List<URL> = emptyList()
 
     @Parameter(
         names = ["--generate-config", "-gc"],
