@@ -58,7 +58,7 @@ internal fun CliArgs.createSpec(output: Appendable, error: Appendable): Processi
         }
 
         compiler {
-            jvmTarget = args.jvmTarget.toString()
+            jvmTarget = args.jvmTarget
             languageVersion = args.languageVersion?.versionString
             classpath = args.classpath?.trim()
             jdkHome = args.jdkHome
