@@ -2,7 +2,6 @@ package io.gitlab.arturbosch.detekt.cli
 
 import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.ParameterException
-import com.beust.jcommander.converters.IParameterSplitter
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageVersion
 import java.net.URL
@@ -51,8 +50,4 @@ class FailureSeverityConverter : IStringConverter<FailureSeverity> {
     override fun convert(value: String): FailureSeverity {
         return FailureSeverity.fromString(value)
     }
-}
-
-class CommaOrSemicolonSplitter : IParameterSplitter {
-    override fun split(value: String): List<String> = value.split(SEPARATOR_COMMA, SEPARATOR_SEMICOLON)
 }
