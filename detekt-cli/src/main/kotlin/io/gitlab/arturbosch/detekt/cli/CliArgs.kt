@@ -38,9 +38,11 @@ class CliArgs {
     @Parameter(
         names = ["--config", "-c"],
         description = "Path to the config file (path/to/config.yml). " +
-            "Multiple configuration files can be specified with ',' or ';' as separator."
+            "Multiple configuration files can be specified with ',' or ';' as separator.",
+        splitter = CommaOrSemicolonSplitter::class,
+        converter = ExistingPathConverter::class,
     )
-    var config: String? = null
+    var config: List<Path> = emptyList()
 
     @Parameter(
         names = ["--config-resource", "-cr"],
