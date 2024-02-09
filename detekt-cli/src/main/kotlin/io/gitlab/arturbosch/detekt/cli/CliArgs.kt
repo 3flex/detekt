@@ -188,7 +188,8 @@ class CliArgs {
     @Parameter(
         names = ["--jvm-target"],
         description = "EXPERIMENTAL: Target version of the generated JVM bytecode that was generated during " +
-            "compilation and is now being used for type resolution. Value must be in the range [${JvmTarget.SUPPORTED_VERSIONS_DESCRIPTION}]",
+            "compilation and is now being used for type resolution. " +
+            "Value must be in the range [${JvmTarget.SUPPORTED_VERSIONS_DESCRIPTION}]",
         validateWith = [JvmTargetValidator::class],
     )
     var jvmTarget: String = JvmTarget.DEFAULT.toString()
