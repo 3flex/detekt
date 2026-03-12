@@ -9,6 +9,14 @@ dependencyResolutionManagement {
     repositories {
         exclusiveContent {
             forRepository {
+                maven("https://repo.gradle.org/artifactory/libs-releases/")
+            }
+            filter {
+                includeGroup("org.gradle.experimental")
+            }
+        }
+        exclusiveContent {
+            forRepository {
                 google()
             }
             filter {

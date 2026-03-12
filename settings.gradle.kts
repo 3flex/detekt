@@ -3,6 +3,10 @@ rootProject.name = "detekt"
 pluginManagement {
     includeBuild("build-logic")
     includeBuild("detekt-gradle-plugin")
+    repositories {
+        maven("https://repo.gradle.org/artifactory/libs-releases/")
+        gradlePluginPortal()
+    }
 }
 
 include("code-coverage-report")
@@ -83,6 +87,14 @@ buildCache {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
+        exclusiveContent {
+            forRepository {
+                maven("https://repo.gradle.org/artifactory/libs-releases/")
+            }
+            filter {
+                includeGroup("org.gradle.experimental")
+            }
+        }
         exclusiveContent {
             forRepository {
                 // Remove when this is closed: https://youtrack.jetbrains.com/issue/KT-56203/AA-Publish-analysis-api-standalone-and-dependencies-to-Maven-Central

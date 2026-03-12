@@ -1,6 +1,7 @@
 [versions]
 coroutines = "1.10.2"
 jacoco = "0.8.14"
+gradle-experimental = "9.3.1"
 junit = "6.0.3"
 kotlin = "2.3.10"
 ktlint = "1.8.0"
@@ -30,6 +31,8 @@ junit-jupiterApi = { module = "org.junit.jupiter:junit-jupiter-api", version = "
 # This represents the oldest Kotlin version that is supported by detekt's Gradle plugin.
 # This should only be updated when updating the minimum version supported by detekt's Gradle plugin.
 kotlin-gradlePluginApi = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version = "2.1.0" }
+
+gradle-public-api = { module = "org.gradle.experimental:gradle-public-api", version.ref = "gradle-experimental" }
 
 assertj-core = { module = "org.assertj:assertj-core", version = "3.27.7" }
 # This represents the oldest assertj version supported by detekt-test-assertj.
