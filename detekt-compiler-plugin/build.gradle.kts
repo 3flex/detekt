@@ -43,6 +43,7 @@ publishing {
 tasks.shadowJar {
     relocate("org.snakeyaml.engine", "dev.detekt.shaded.snakeyaml")
     mergeServiceFiles()
+    append("META-INF/detekt-compiler-plugin.kotlin_module")
     dependencies {
         include(dependency("dev.detekt:.*"))
         include(dependency("org.snakeyaml:snakeyaml-engine"))
