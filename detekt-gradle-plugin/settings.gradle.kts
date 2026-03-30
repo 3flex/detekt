@@ -2,11 +2,18 @@ rootProject.name = "detekt-gradle-plugin"
 
 pluginManagement {
     includeBuild("../build-logic")
+    repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+        gradlePluginPortal()
+    }
 }
 
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
         exclusiveContent {
             forRepository {
                 google()
@@ -32,7 +39,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("com.autonomousapps.build-health") version "3.6.1"
     // Kotlin plugin must be added to classpath to support build-health analysis
-    id("org.jetbrains.kotlin.jvm") version "2.3.20" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.4.0-Beta1-52" apply false
 }
 
 val isCiBuild = providers.environmentVariable("CI").isPresent

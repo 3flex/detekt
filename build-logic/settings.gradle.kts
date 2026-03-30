@@ -1,5 +1,12 @@
 rootProject.name = "build-logic"
 
+pluginManagement {
+    repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     id("com.gradle.develocity") version "4.4.0"
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
@@ -8,6 +15,8 @@ plugins {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
         gradlePluginPortal()
     }
 
