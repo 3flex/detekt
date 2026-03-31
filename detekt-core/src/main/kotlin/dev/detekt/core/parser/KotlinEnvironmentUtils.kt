@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.cli.jvm.configureAdvancedJvmOptions
 import org.jetbrains.kotlin.cli.jvm.setupJvmSpecificArguments
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.CompilerConfiguration.Internals
+import org.jetbrains.kotlin.cli.create
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import java.io.File
 import java.io.PrintStream
@@ -70,8 +70,7 @@ fun createCompilerConfiguration(
 
     validateArguments(jvmCompilerArguments.errors)?.let { throw IllegalStateException(it) }
 
-    @OptIn(Internals::class)
-    return CompilerConfiguration().apply {
+    return CompilerConfiguration.create().apply {
         addJavaSourceRoots(javaFiles)
         addKotlinSourceRoots(kotlinFiles)
         addJvmClasspathRoots(classpathFiles)

@@ -51,12 +51,14 @@ tasks.shadowJar {
 }
 
 val downloadKotlinCompiler by tasks.registering(Download::class) {
+    enabled = false
     src("https://github.com/JetBrains/kotlin/releases/download/v$kotlinVersion/kotlin-compiler-$kotlinVersion.zip")
     dest(file("$rootDir/build/kotlinc/kotlin-compiler-$kotlinVersion.zip"))
     overwrite(false)
 }
 
 val unzipKotlinCompiler by tasks.registering(Copy::class) {
+    enabled = false
     dependsOn(downloadKotlinCompiler)
     from(zipTree(downloadKotlinCompiler.get().dest))
     into(file("$rootDir/build/kotlinc/$kotlinVersion"))

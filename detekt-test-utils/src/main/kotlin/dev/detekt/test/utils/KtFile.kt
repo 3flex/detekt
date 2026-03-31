@@ -7,20 +7,20 @@ import org.jetbrains.kotlin.analysis.api.components.KaCompilerTarget
 import org.jetbrains.kotlin.analysis.api.diagnostics.KaDiagnosticWithPsi
 import org.jetbrains.kotlin.analysis.api.diagnostics.KaSeverity
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.CompilerConfiguration.Internals
+import org.jetbrains.kotlin.cli.create
 import org.jetbrains.kotlin.diagnostics.PsiDiagnosticUtils
 import org.jetbrains.kotlin.psi.KtFile
 
 /**
  * Throw an exception if the KtFile had any compilation error
  */
-@OptIn(KaExperimentalApi::class, Internals::class)
+@OptIn(KaExperimentalApi::class)
 internal fun KtFile.checkNoCompilationErrors() {
     val file = this
     analyze(file) {
         val result = compile(
             file,
-            CompilerConfiguration(),
+            CompilerConfiguration.create(),
             KaCompilerTarget.Jvm(isTestMode = false, compiledClassHandler = null, debuggerExtension = null)
         ) {
             it.severity != KaSeverity.ERROR

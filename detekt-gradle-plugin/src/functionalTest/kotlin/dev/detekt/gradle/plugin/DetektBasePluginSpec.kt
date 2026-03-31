@@ -29,6 +29,8 @@ class DetektBasePluginSpec {
                 repositories {
                     mavenLocal()
                     mavenCentral()
+                    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+                    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
                 }
             """.trimIndent(),
             dryRun = true,
@@ -63,6 +65,8 @@ class DetektBasePluginSpec {
                 repositories {
                     mavenLocal()
                     mavenCentral()
+                    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+                    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
                     google()
                 }
                 
@@ -108,6 +112,8 @@ class DetektBasePluginSpec {
                 repositories {
                     mavenLocal()
                     mavenCentral()
+                    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+                    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
                     google()
                 }
 
@@ -153,6 +159,8 @@ class DetektBasePluginSpec {
                 repositories {
                     mavenLocal()
                     mavenCentral()
+                    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+                    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
                 }
             """.trimIndent(),
             dryRun = true,
@@ -198,6 +206,8 @@ class DetektBasePluginSpec {
                 repositories {
                     mavenLocal()
                     mavenCentral()
+                    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+                    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
                     google()
                 }
                 

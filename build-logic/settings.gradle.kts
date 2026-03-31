@@ -3,6 +3,7 @@ rootProject.name = "build-logic"
 pluginManagement {
     repositories {
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
         gradlePluginPortal()
     }
 }
