@@ -80,6 +80,19 @@ testing {
                 implementation(gradleKotlinDsl())
             }
         }
+        all {
+            dependencies {
+                implementation(libs.gradle.public.api) {
+                    capabilities {
+                        requireCapability("org.gradle.experimental:gradle-public-api-internal")
+                    }
+                    attributes {
+                        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
+                        attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("9.3.1"))
+                    }
+                }
+            }
+        }
         register<JvmTestSuite>("functionalTest") {
             dependencies {
                 implementation(libs.assertj.core)
@@ -143,6 +156,15 @@ val testKitGradleMinVersionRuntimeOnly by configurations.registering
 dependencies {
     compileOnly(libs.android.gradleApi)
     compileOnly(libs.kotlin.gradlePluginApi)
+    compileOnly(libs.gradle.public.api) {
+        capabilities {
+            requireCapability("org.gradle.experimental:gradle-public-api-internal")
+        }
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
+            attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, objects.named("9.3.1"))
+        }
+    }
     compileOnly(libs.jetbrains.annotations)
 
     implementation(libs.sarif4k)
