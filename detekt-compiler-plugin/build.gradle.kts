@@ -43,6 +43,7 @@ publishing {
 tasks.shadowJar {
     relocate("org.snakeyaml.engine", "dev.detekt.shaded.snakeyaml")
     mergeServiceFiles()
+    append("META-INF/detekt-compiler-plugin.kotlin_module")
     dependencies {
         include(dependency("dev.detekt:.*"))
         include(dependency("org.snakeyaml:snakeyaml-engine"))
@@ -50,12 +51,14 @@ tasks.shadowJar {
 }
 
 val downloadKotlinCompiler by tasks.registering(Download::class) {
+    enabled = false
     src("https://github.com/JetBrains/kotlin/releases/download/v$kotlinVersion/kotlin-compiler-$kotlinVersion.zip")
     dest(file("$rootDir/build/kotlinc/kotlin-compiler-$kotlinVersion.zip"))
     overwrite(false)
 }
 
 val unzipKotlinCompiler by tasks.registering(Copy::class) {
+    enabled = false
     dependsOn(downloadKotlinCompiler)
     from(zipTree(downloadKotlinCompiler.get().dest))
     into(file("$rootDir/build/kotlinc/$kotlinVersion"))

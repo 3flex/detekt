@@ -10,13 +10,7 @@ abstract class DslTestBuilder {
     abstract val gradlePlugins: String
     abstract val gradleSubprojectsApplyPlugins: String
 
-    @Language("gradle.kts")
-    val gradleRepositories = """
-        repositories {
-            mavenLocal()
-            mavenCentral()
-        }
-    """.trimIndent()
+    abstract val gradleRepositories: String
 
     @Language("gradle.kts")
     private var detektConfig: String = ""
@@ -87,6 +81,16 @@ private class GroovyBuilder : DslTestBuilder() {
     override val gradleBuildName: String = "build.gradle"
 
     @Language("gradle")
+    override val gradleRepositories = """
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            maven { url "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev" }
+            maven { url "https://packages.jetbrains.team/maven/p/ij/intellij-dependencies" }
+        }
+    """.trimIndent()
+
+    @Language("gradle")
     override val gradlePlugins = """
         plugins {
             id 'org.jetbrains.kotlin.jvm'
@@ -114,6 +118,16 @@ private class GroovyBuilder : DslTestBuilder() {
 
 private class KotlinBuilder : DslTestBuilder() {
     override val gradleBuildName: String = "build.gradle.kts"
+
+    @Language("gradle.kts")
+    override val gradleRepositories = """
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+            maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+        }
+    """.trimIndent()
 
     @Language("gradle.kts")
     override val gradlePlugins = """

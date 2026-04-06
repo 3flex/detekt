@@ -3,6 +3,10 @@ rootProject.name = "detekt"
 pluginManagement {
     includeBuild("build-logic")
     includeBuild("detekt-gradle-plugin")
+    repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        gradlePluginPortal()
+    }
 }
 
 include("code-coverage-report")
@@ -49,9 +53,9 @@ plugins {
     id("com.gradle.develocity") version "4.4.0"
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.5.0"
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-    id("com.autonomousapps.build-health") version "3.6.1"
+    // id("com.autonomousapps.build-health") version "3.6.1"
     // Kotlin plugin must be added to classpath to support build-health analysis
-    id("org.jetbrains.kotlin.jvm") version "2.3.20" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.4.0-dev-8449" apply false
 }
 
 val isCiBuild = providers.environmentVariable("CI").isPresent
@@ -83,10 +87,11 @@ buildCache {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         exclusiveContent {
             forRepository {
                 // Remove when this is closed: https://youtrack.jetbrains.com/issue/KT-56203/AA-Publish-analysis-api-standalone-and-dependencies-to-Maven-Central
-                maven("https://redirector.kotlinlang.org/maven/intellij-dependencies")
+                maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
             }
             filter {
                 includeModuleByRegex("org.jetbrains.kotlin", ".*-for-ide")

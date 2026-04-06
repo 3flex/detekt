@@ -3,7 +3,8 @@ agp = "9.1.0"
 coroutines = "1.10.2"
 jacoco = "0.8.14"
 junit = "6.0.3"
-kotlin = "2.3.20"
+kotlin = "2.4.0-dev-8449"
+analysis-api = "2.4.0-dev-8449"
 ktlint = "1.8.0"
 slf4j = "2.0.17"
 
@@ -60,13 +61,13 @@ slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 snakeyaml-engine = { module = "org.snakeyaml:snakeyaml-engine", version = "2.10" }
 
 # Kotlin Analysis API artifacts
-kotlin-analysisApiPlatformInterface = { module = "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide", version.ref = "kotlin" }
-kotlin-analysisApiK2 = { module = "org.jetbrains.kotlin:analysis-api-k2-for-ide", version.ref = "kotlin" }
-kotlin-analysisApi = { module = "org.jetbrains.kotlin:analysis-api-for-ide", version.ref = "kotlin" }
-kotlin-analysisApiStandalone = { module = "org.jetbrains.kotlin:analysis-api-standalone-for-ide", version.ref = "kotlin" }
-kotlin-lowLevelApiFir = { module = "org.jetbrains.kotlin:low-level-api-fir-for-ide", version.ref = "kotlin" }
-kotlin-symbolLightClasses = { module = "org.jetbrains.kotlin:symbol-light-classes-for-ide", version.ref = "kotlin" }
-kotlin-analysisApiImplBase = { module = "org.jetbrains.kotlin:analysis-api-impl-base-for-ide", version.ref = "kotlin" }
+kotlin-analysisApiPlatformInterface = { module = "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide", version.ref = "analysis-api" }
+kotlin-analysisApiK2 = { module = "org.jetbrains.kotlin:analysis-api-k2-for-ide", version.ref = "analysis-api" }
+kotlin-analysisApi = { module = "org.jetbrains.kotlin:analysis-api-for-ide", version.ref = "analysis-api" }
+kotlin-analysisApiStandalone = { module = "org.jetbrains.kotlin:analysis-api-standalone-for-ide", version.ref = "analysis-api" }
+kotlin-lowLevelApiFir = { module = "org.jetbrains.kotlin:low-level-api-fir-for-ide", version.ref = "analysis-api" }
+kotlin-symbolLightClasses = { module = "org.jetbrains.kotlin:symbol-light-classes-for-ide", version.ref = "analysis-api" }
+kotlin-analysisApiImplBase = { module = "org.jetbrains.kotlin:analysis-api-impl-base-for-ide", version.ref = "analysis-api" }
 # Should be possible to remove when https://youtrack.jetbrains.com/issue/KT-81457 fixed
 kotlinx-coroutinesCore-intellij = { module = "org.jetbrains.intellij.deps.kotlinx:kotlinx-coroutines-core", version = "1.10.2-intellij-1" }
 # Can likely be removed in future - https://youtrack.jetbrains.com/issue/KT-73751/Analysis-API-Caffeine-dependency
