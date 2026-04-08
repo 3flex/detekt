@@ -1,5 +1,6 @@
 plugins {
     id("module")
+    id("com.gradleup.shadow") version "9.4.1"
 }
 
 val extraDepsToPackage by configurations.registering
@@ -39,19 +40,21 @@ consumeGeneratedConfig(
     forTask = tasks.processResources
 )
 
-val depsToPackage = setOf(
-    "org.ec4j.core",
-    "com.pinterest.ktlint",
-    "io.github.oshai",
-)
+shadow {
+    addShadowVariantIntoJavaComponent = false
+}
 
-tasks.jar {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
-    dependsOn(configurations.runtimeClasspath, extraDepsToPackage)
-    from(
-        configurations.runtimeClasspath.get()
-            .filter { dependency -> depsToPackage.any { it in dependency.toString() } }
-            .map { if (it.isDirectory) it else zipTree(it) },
-        extraDepsToPackage.get().map { zipTree(it) },
+publishing {
+    publications.named<MavenPublication>(DETEKT_PUBLICATION) {
+        artifact(tasks.shadowJar)
+    }
+}
+
+tasks.shadowJar {
+    configurations = listOf(
+        project.configurations.runtimeClasspath.get(),
+        extraDepsToPackage.get()
     )
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    mergeServiceFiles()
 }
