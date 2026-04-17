@@ -17,6 +17,17 @@ dependencyResolutionManagement {
                 includeGroup("com.google.testing.platform")
             }
         }
+        exclusiveContent {
+            forRepository {
+                maven("https://repo.gradle.org/artifactory/libs-releases/") {
+                    name = "GradleLibsReleases"
+                    mavenContent { releasesOnly() }
+                }
+            }
+            filter {
+                includeGroup("org.gradle.experimental")
+            }
+        }
         mavenCentral()
     }
 

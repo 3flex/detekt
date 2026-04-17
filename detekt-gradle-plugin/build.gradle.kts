@@ -32,6 +32,15 @@ buildConfig {
     buildConfigField("KOTLIN_IMPLEMENTATION_VERSION", libs.versions.kotlin.get())
 }
 
+// Drop the gradleApi() dependency that java-gradle-plugin contributes to the api configuration.
+// We pin the compile-time Gradle API via org.gradle.experimental:gradle-public-api so the
+// build-time Gradle distribution's Kotlin stdlib version no longer drives DGP's compile classpath.
+configurations.named("api").configure {
+    dependencies.removeIf { dep ->
+        dep is FileCollectionDependency && dep.files.toString().contains("gradle-api")
+    }
+}
+
 nexusPublishing {
     repositories {
         create("sonatype") {
@@ -143,6 +152,7 @@ val testKitGradleMinVersionRuntimeOnly by configurations.registering
 dependencies {
     compileOnly(libs.android.gradleApi)
     compileOnly(libs.kotlin.gradlePluginApi)
+    compileOnly(libs.gradle.publicApi)
     compileOnly(libs.jetbrains.annotations)
 
     implementation(libs.sarif4k)
