@@ -128,6 +128,10 @@ kotlin {
     @OptIn(ExperimentalBuildToolsApi::class, ExperimentalKotlinGradlePluginApi::class)
     compilerVersion = "2.1.21"
 
+    // Pin the kotlin-stdlib (and friends) added by the Kotlin Gradle plugin to match compilerVersion,
+    // so DGP's compile classpath does not receive stdlib 2.3 metadata that Kotlin 2.1 cannot read.
+    coreLibrariesVersion = "2.1.21"
+
     compilerOptions {
         suppressWarnings = true
         // Note: Currently there are warnings for detekt-gradle-plugin that seemingly can't be fixed
