@@ -41,6 +41,18 @@ configurations.named("api").configure {
     }
 }
 
+// Force kotlin-stdlib* to match the pinned compilerVersion. coreLibrariesVersion only sets the
+// KGP default; transitive deps (e.g. KGP-API, sarif4k) can still pull stdlib 2.3, whose metadata
+// the Kotlin 2.1.21 compiler cannot read.
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin-stdlib")) {
+            useVersion("2.1.21")
+            because("DGP compiles with Kotlin 2.1.21; stdlib metadata must be readable by the 2.1 compiler")
+        }
+    }
+}
+
 nexusPublishing {
     repositories {
         create("sonatype") {
