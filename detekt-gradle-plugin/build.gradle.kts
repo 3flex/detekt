@@ -152,7 +152,11 @@ val testKitGradleMinVersionRuntimeOnly by configurations.registering
 dependencies {
     compileOnly(libs.android.gradleApi)
     compileOnly(libs.kotlin.gradlePluginApi)
-    compileOnly(libs.gradle.publicApi)
+    compileOnly(libs.gradle.publicApi) {
+        capabilities {
+            requireCapability("org.gradle.experimental:gradle-public-api-internal")
+        }
+    }
     compileOnly(libs.jetbrains.annotations)
 
     implementation(libs.sarif4k)
