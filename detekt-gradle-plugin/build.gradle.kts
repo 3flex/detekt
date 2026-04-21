@@ -32,6 +32,27 @@ buildConfig {
     buildConfigField("KOTLIN_IMPLEMENTATION_VERSION", libs.versions.kotlin.get())
 }
 
+// Drop the gradleApi() dependency that java-gradle-plugin contributes to the api configuration.
+// We pin the compile-time Gradle API via org.gradle.experimental:gradle-public-api so the
+// build-time Gradle distribution's Kotlin stdlib version no longer drives DGP's compile classpath.
+configurations.named("api").configure {
+    dependencies.removeIf { dep ->
+        dep is FileCollectionDependency && dep.files.toString().contains("gradle-api")
+    }
+}
+
+// Force kotlin-stdlib* to match the pinned compilerVersion. coreLibrariesVersion only sets the
+// KGP default; transitive deps (e.g. KGP-API, sarif4k) can still pull stdlib 2.3, whose metadata
+// the Kotlin 2.1.21 compiler cannot read.
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin-stdlib")) {
+            useVersion("2.1.21")
+            because("DGP compiles with Kotlin 2.1.21; stdlib metadata must be readable by the 2.1 compiler")
+        }
+    }
+}
+
 nexusPublishing {
     repositories {
         create("sonatype") {
@@ -119,6 +140,10 @@ kotlin {
     @OptIn(ExperimentalBuildToolsApi::class, ExperimentalKotlinGradlePluginApi::class)
     compilerVersion = "2.1.21"
 
+    // Pin the kotlin-stdlib (and friends) added by the Kotlin Gradle plugin to match compilerVersion,
+    // so DGP's compile classpath does not receive stdlib 2.3 metadata that Kotlin 2.1 cannot read.
+    coreLibrariesVersion = "2.1.21"
+
     compilerOptions {
         suppressWarnings = true
         // Note: Currently there are warnings for detekt-gradle-plugin that seemingly can't be fixed
@@ -143,6 +168,11 @@ val testKitGradleMinVersionRuntimeOnly by configurations.registering
 dependencies {
     compileOnly(libs.android.gradleApi)
     compileOnly(libs.kotlin.gradlePluginApi)
+    compileOnly(libs.gradle.publicApi) {
+        capabilities {
+            requireCapability("org.gradle.experimental:gradle-public-api-internal")
+        }
+    }
     compileOnly(libs.jetbrains.annotations)
 
     implementation(libs.sarif4k)
