@@ -557,7 +557,10 @@ class CanBeNonNullable(config: Config) :
                     if (returnType is KaTypeParameterType) {
                         // todo<k2> ignoring some case which in pre k2 was passing as earlier
                         //  using BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL we were able to
-                        //  get the actual type of the implementation
+                        //  get the actual type of the implementation.
+                        //  Tracked upstream as https://youtrack.jetbrains.com/issue/KT-66039 — see the
+                        //  corresponding `@Disabled` tests in CanBeNonNullableSpec for cases that regress
+                        //  until this is resolved.
                         returnType.isNullable
                     } else {
                         returnType.isMarkedNullable
