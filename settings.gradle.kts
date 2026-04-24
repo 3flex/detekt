@@ -86,7 +86,12 @@ dependencyResolutionManagement {
         exclusiveContent {
             forRepository {
                 // Remove when this is closed: https://youtrack.jetbrains.com/issue/KT-56203/AA-Publish-analysis-api-standalone-and-dependencies-to-Maven-Central
-                maven("https://redirector.kotlinlang.org/maven/intellij-dependencies")
+                // Use local stub when JetBrains redirector is not accessible (offline dev environments)
+                if (file("/tmp/agp-local-repo").exists()) {
+                    maven { url = uri("/tmp/agp-local-repo") }
+                } else {
+                    maven("https://redirector.kotlinlang.org/maven/intellij-dependencies")
+                }
             }
             filter {
                 includeModuleByRegex("org.jetbrains.kotlin", ".*-for-ide")
@@ -94,7 +99,12 @@ dependencyResolutionManagement {
         }
         exclusiveContent {
             forRepository {
-                google()
+                // Use local stub when Google Maven is not accessible (offline dev environments)
+                if (file("/tmp/agp-local-repo").exists()) {
+                    maven { url = uri("/tmp/agp-local-repo") }
+                } else {
+                    google()
+                }
             }
             filter {
                 includeGroupAndSubgroups("com.android")

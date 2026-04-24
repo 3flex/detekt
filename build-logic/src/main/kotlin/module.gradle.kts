@@ -74,6 +74,10 @@ kotlin {
             // Only enable progressive mode in non-DGP modules. DGP doesn't compile with latest language version so
             // progressive mode is not appropriate.
             progressiveMode = true
+
+            freeCompilerArgs.add("-Xreturn-value-checker=full")
+            // -Xdata-flow-based-exhaustiveness is enabled by default from Kotlin 2.3; explicit flag is redundant.
+            freeCompilerArgs.add("-Xnullability-annotations=@org.jetbrains.annotations:strict")
         } else {
             freeCompilerArgs.add("-Xjvm-default=all")
         }
