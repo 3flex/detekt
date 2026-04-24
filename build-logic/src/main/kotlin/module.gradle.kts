@@ -75,7 +75,7 @@ kotlin {
             // progressive mode is not appropriate.
             progressiveMode = true
 
-            freeCompilerArgs.add("-Xreturn-value-checker=check")
+            freeCompilerArgs.add("-Xreturn-value-checker=full")
         } else {
             freeCompilerArgs.add("-Xjvm-default=all")
         }
