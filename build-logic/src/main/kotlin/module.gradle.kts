@@ -76,7 +76,7 @@ kotlin {
             progressiveMode = true
 
             freeCompilerArgs.add("-Xreturn-value-checker=full")
-            freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+            // -Xdata-flow-based-exhaustiveness is enabled by default from Kotlin 2.3; explicit flag is redundant.
         } else {
             freeCompilerArgs.add("-Xjvm-default=all")
         }
