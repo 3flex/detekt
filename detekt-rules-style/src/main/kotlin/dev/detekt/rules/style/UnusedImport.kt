@@ -10,6 +10,9 @@ import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.isPartOf
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
+import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassKind
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassLikeSymbol
@@ -18,7 +21,9 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
@@ -63,7 +68,20 @@ class UnusedImport(config: Config) :
             staticReferences.mapTo(mutableSetOf()) { it.text.trim('`') }
         }
         private val fqNames: Set<FqName> by lazy {
-            namedReferences.mapNotNullTo(mutableSetOf()) { it.fqNameOrNull() }
+            buildSet {
+                namedReferences.mapNotNullTo(this) { it.fqNameOrNull() }
+                // For extension callables invoked via dot notation (e.g. `Dispatchers.IO`
+                // where `IO` is an extension property on `Dispatchers`), resolving the
+                // selector alone may not produce the canonical import FQN - notably on
+                // KMP where the extension is an `expect` declaration (issue #9269).
+                // Also resolve each dot-qualified expression as a call and add the FQN
+                // of the invoked callable.
+                staticReferences.mapNotNullTo(this) { ref ->
+                    (ref.parent as? KtDotQualifiedExpression)
+                        ?.takeIf { it.receiverExpression == ref }
+                        ?.callableFqNameOrNull()
+                }
+            }
         }
 
         /**
@@ -169,7 +187,11 @@ class UnusedImport(config: Config) :
                     else -> classId
                 }?.asSingleFqName()
 
-                is KaCallableSymbol -> callableId?.asSingleFqName()
+                // Prefer the PSI-based FQN for callable declarations in source: it
+                // matches the canonical import path even for extension callables,
+                // where `callableId.asSingleFqName()` may not round-trip reliably.
+                is KaCallableSymbol ->
+                    (psi as? KtCallableDeclaration)?.fqName ?: callableId?.asSingleFqName()
 
                 else -> null
             }
@@ -177,6 +199,15 @@ class UnusedImport(config: Config) :
         private fun KtReferenceExpression.fqNameOrNull(): FqName? =
             analyze(this) {
                 mainReference.resolveToSymbol()?.fqNameForImport
+            }
+
+        private fun KtDotQualifiedExpression.callableFqNameOrNull(): FqName? =
+            analyze(this) {
+                resolveToCall()
+                    ?.successfulCallOrNull<KaCallableMemberCall<*, *>>()
+                    ?.partiallyAppliedSymbol
+                    ?.symbol
+                    ?.fqNameForImport
             }
     }
 
