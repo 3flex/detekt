@@ -77,7 +77,7 @@ kotlin {
 
             freeCompilerArgs.add("-Xreturn-value-checker=full")
             // -Xdata-flow-based-exhaustiveness is enabled by default from Kotlin 2.3; explicit flag is redundant.
-            freeCompilerArgs.add("-Xnullability-annotations=strict")
+            freeCompilerArgs.add("-Xnullability-annotations=@org.jetbrains.annotations:strict")
         } else {
             freeCompilerArgs.add("-Xjvm-default=all")
         }
