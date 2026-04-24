@@ -9,7 +9,12 @@ dependencyResolutionManagement {
     repositories {
         exclusiveContent {
             forRepository {
-                google()
+                // Use local stub when Google Maven is not accessible (offline dev environments)
+                if (file("/tmp/agp-local-repo").exists()) {
+                    maven { url = uri("/tmp/agp-local-repo") }
+                } else {
+                    google()
+                }
             }
             filter {
                 includeGroupAndSubgroups("com.android")
