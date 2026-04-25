@@ -26,6 +26,7 @@ class DetektAndroidBuiltInKotlinSpec {
         true, false"""
     )
     @ParameterizedClass
+    @EnabledIf("dev.detekt.gradle.DetektAndroidSpecKt#isAndroidSdkInstalled")
     class BuiltInKotlinEnabled {
 
         @Parameter(0)
