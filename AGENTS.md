@@ -23,8 +23,12 @@ This document provides guidance for AI coding agents (Claude, Codex, Copilot, et
 git clone https://github.com/detekt/detekt.git
 cd detekt
 
-# NOTE: Only required before running Gradle plugin functional tests
-# ./gradlew publishToMavenLocal
+# REQUIRED before running Gradle plugin (DGP) functional tests.
+# The functional tests resolve detekt artifacts (e.g. detekt-cli) from
+# mavenLocal(), so the locally built versions must be published first.
+# Without this step, stale cached artifacts cause path-separator mismatches
+# and widespread functional test failures.
+./gradlew publishToMavenLocal
 
 # Build (excluding slow documentation generation)
 ./gradlew build -x dokkaGenerate
