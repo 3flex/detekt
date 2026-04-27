@@ -37,7 +37,9 @@ dependencies {
     testImplementation(libs.assertj.core)
     testRuntimeOnly(projects.detektRulesKtlintWrapper)
 
-    pluginsJar(projects.detektRulesKtlintWrapper)
+    pluginsJar(projects.detektRulesKtlintWrapper) {
+        targetConfiguration = "shadow" // com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.CONFIGURATION_NAME
+    }
     pluginsJar(projects.detektRulesLibraries)
     pluginsJar(projects.detektRulesRuleauthors)
 }
