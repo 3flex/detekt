@@ -51,6 +51,7 @@ fun main(args: Array<String>) {
         "io.github.detekt.tooling.api.DetektCli"
     )
 )
+@IgnorableReturnValue
 fun buildRunner(args: Array<String>, outputPrinter: PrintStream, errorPrinter: PrintStream): Executable {
     check(KotlinCompilerVersion.VERSION == whichKotlin()) {
         """

@@ -87,6 +87,7 @@ class CoroutineLaunchedInTestWithoutRunTest(config: Config) :
 class FunCoroutineLaunchesTraverseHelper {
     val exploredFunctionsCache = mutableMapOf<KtNamedFunction, Boolean>()
 
+    @IgnorableReturnValue
     context(session: KaSession)
     fun isFunctionLaunchingCoroutines(initialFunction: KtNamedFunction): Boolean {
         val traversedFunctions = mutableSetOf<KtNamedFunction>()
@@ -124,6 +125,7 @@ class FunCoroutineLaunchesTraverseHelper {
 
         traversedFunctions.add(initialFunction)
         checkFunctionAndSaveToCache(initialFunction)
+        @Suppress("RETURN_VALUE_NOT_USED")
         getChildFunctionsOf(initialFunction, listOf(initialFunction))
 
         return traversedFunctions.any { exploredFunctionsCache[it] == true }

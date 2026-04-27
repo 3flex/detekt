@@ -47,9 +47,8 @@ object KtLintLineColCalculator {
 
         init {
             require(sortedArray.size > 1) { "At least two data points are required" }
-            sortedArray.reduce { current, next ->
+            sortedArray.asSequence().zipWithNext().forEach { (current, next) ->
                 require(current <= next) { "Data points are not sorted (ASC)" }
-                next
             }
         }
 

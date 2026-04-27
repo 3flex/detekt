@@ -25,10 +25,11 @@ class FindingsAssert(actual: List<Finding>) :
 
 class FindingAssert(val actual: Finding?) : AbstractAssert<FindingAssert, Finding>(actual, FindingAssert::class.java) {
 
+    @IgnorableReturnValue
     fun hasMessage(expectedMessage: String) =
         apply {
             isNotNull()
-            actual!!
+            val actual = checkNotNull(actual)
             if (actual.message != expectedMessage) {
                 throw failureWithActualExpected(
                     actual.message,
@@ -38,10 +39,11 @@ class FindingAssert(val actual: Finding?) : AbstractAssert<FindingAssert, Findin
             }
         }
 
+    @IgnorableReturnValue
     fun noSuppress() =
         apply {
             isNotNull()
-            actual!!
+            val actual = checkNotNull(actual)
             if (actual.suppressReasons.isNotEmpty()) {
                 throw failureWithActualExpected(
                     actual.suppressReasons,
@@ -51,15 +53,17 @@ class FindingAssert(val actual: Finding?) : AbstractAssert<FindingAssert, Findin
             }
         }
 
+    @IgnorableReturnValue
     fun hasStartSourceLocation(line: Int, column: Int) = hasStartSourceLocation(SourceLocation(line, column))
 
+    @IgnorableReturnValue
     fun hasStartSourceLocation(expected: SourceLocation) =
         apply {
             isNotNull()
-            actual!!
-            val actual = actual.location.source
+            val notNullActual = checkNotNull(actual)
+            val actual = notNullActual.location.source
             if (actual != expected) {
-                val code = this.actual.entity.ktElement.containingFile.text
+                val code = notNullActual.entity.ktElement.containingFile.text
                 assertSourceLocationInRange(code, expected)
                 throw failureWithActualExpected(
                     code.addPinAt(actual),
@@ -69,15 +73,17 @@ class FindingAssert(val actual: Finding?) : AbstractAssert<FindingAssert, Findin
             }
         }
 
+    @IgnorableReturnValue
     fun hasEndSourceLocation(line: Int, column: Int) = hasEndSourceLocation(SourceLocation(line, column))
 
+    @IgnorableReturnValue
     fun hasEndSourceLocation(expected: SourceLocation) =
         apply {
             isNotNull()
-            actual!!
-            val actual = actual.location.endSource
+            val notNullActual = checkNotNull(actual)
+            val actual = notNullActual.location.endSource
             if (actual != expected) {
-                val code = this.actual.entity.ktElement.containingFile.text
+                val code = notNullActual.entity.ktElement.containingFile.text
                 assertSourceLocationInRange(code, expected)
                 throw failureWithActualExpected(
                     code.addPinAt(actual),
@@ -87,15 +93,17 @@ class FindingAssert(val actual: Finding?) : AbstractAssert<FindingAssert, Findin
             }
         }
 
+    @IgnorableReturnValue
     fun hasTextLocation(expected: Pair<Int, Int>) = hasTextLocation(TextLocation(expected.first, expected.second))
 
+    @IgnorableReturnValue
     fun hasTextLocation(expected: TextLocation) =
         apply {
             isNotNull()
-            actual!!
-            val actual = actual.location.text
+            val notNullActual = checkNotNull(actual)
+            val actual = notNullActual.location.text
             if (actual != expected) {
-                val file = this.actual.entity.ktElement.containingFile.text
+                val file = notNullActual.entity.ktElement.containingFile.text
                 assertTextLocationInRange(file, expected)
                 throw failureWithActualExpected(
                     file.substring(actual.start, actual.end),
@@ -105,10 +113,11 @@ class FindingAssert(val actual: Finding?) : AbstractAssert<FindingAssert, Findin
             }
         }
 
+    @IgnorableReturnValue
     fun hasTextLocation(expected: String) =
         apply {
             isNotNull()
-            actual!!
+            val actual = checkNotNull(actual)
             val code = actual.entity.ktElement.containingFile.text
 
             val index = code.indexOf(expected)

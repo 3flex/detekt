@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.api
 
 import dev.detekt.api.testfixtures.createIssue
@@ -12,7 +14,7 @@ class DetektionSpec {
         Detektion(
             issues = emptyList(),
             rules = emptyList(),
-        )
+        ).let {}
     }
 
     @Test
@@ -20,7 +22,7 @@ class DetektionSpec {
         Detektion(
             emptyList(),
             rules,
-        )
+        ).let {}
     }
 
     @Test
@@ -31,7 +33,7 @@ class DetektionSpec {
                 createIssue(createRuleInstance("0")),
             ),
             rules,
-        )
+        ).let {}
     }
 
     @Test
@@ -45,7 +47,7 @@ class DetektionSpec {
                         createIssue(createRuleInstance("Unknown")),
                     ),
                     rules,
-                )
+                ).let {}
             }
             .withMessage("The rule Unknown was not reported as having been executed")
     }
@@ -62,7 +64,7 @@ class DetektionSpec {
                         createIssue(createRuleInstance("Unknown2")),
                     ),
                     rules,
-                )
+                ).let {}
             }
             .withMessage("The rules [Unknown, Unknown2] were not reported as having been executed")
     }

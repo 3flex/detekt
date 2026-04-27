@@ -11,5 +11,6 @@ interface ConfigValidator : Extension {
     /**
      * Executes queries on given config and reports any warnings or errors via [Notification]s.
      */
+    @IgnorableReturnValue
     fun validate(config: Config): Collection<Notification>
 }

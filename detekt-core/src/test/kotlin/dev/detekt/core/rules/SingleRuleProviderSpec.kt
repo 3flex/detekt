@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.core.rules
 
 import dev.detekt.api.Config
@@ -28,7 +30,7 @@ class SingleRuleProviderSpec {
     @Test
     fun `throws when the rule name doesn't exist`() {
         assertThatThrownBy {
-            SingleRuleProvider(RuleName("ARule"), CustomRuleSetProvider())
+            SingleRuleProvider(RuleName("ARule"), CustomRuleSetProvider()).let {}
         }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("There was not rule 'ARule' in rule set 'custom'.")

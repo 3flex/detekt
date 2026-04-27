@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.api.internal
 
 import dev.detekt.test.utils.compileContentForTest
@@ -51,6 +53,7 @@ class SignaturesSpec {
             compileContentForTest("{ fun data() = 0 }")
                 .findDescendantOfType<KtNamedFunction>()!!
                 .buildFullSignature()
+                .let {}
         }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Error building function signature")

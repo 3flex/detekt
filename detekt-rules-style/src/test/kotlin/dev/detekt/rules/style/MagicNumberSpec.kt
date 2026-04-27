@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.rules.style
 
 import dev.detekt.api.Config
@@ -506,7 +508,7 @@ class MagicNumberSpec {
 
         @Test
         fun `doesn't throw an exception`() {
-            MagicNumber(TestConfig(IGNORE_NUMBERS to emptyList<String>()))
+            MagicNumber(TestConfig(IGNORE_NUMBERS to emptyList<String>())).let {}
         }
     }
 

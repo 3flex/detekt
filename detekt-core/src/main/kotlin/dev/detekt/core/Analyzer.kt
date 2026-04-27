@@ -27,6 +27,7 @@ internal class Analyzer(
     private val processors: List<FileProcessListener>,
     private val analysisMode: AnalysisMode,
 ) {
+    @IgnorableReturnValue
     fun run(ktFiles: Collection<KtFile>): List<Issue> {
         val languageVersionSettings = settings.languageVersionSettings
 

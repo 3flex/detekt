@@ -4,6 +4,7 @@ import dev.detekt.generator.collection.Collector
 import dev.detekt.test.utils.compileContentForTest
 import org.intellij.lang.annotations.Language
 
+@IgnorableReturnValue
 fun <T> Collector<T>.run(@Language("kotlin") code: String): List<T> {
     val ktFile = compileContentForTest(code.trimIndent())
     visit(ktFile)

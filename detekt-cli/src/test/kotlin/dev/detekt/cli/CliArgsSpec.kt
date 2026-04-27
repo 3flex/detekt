@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.cli
 
 import dev.detekt.api.Severity
@@ -255,9 +257,9 @@ internal class CliArgsSpec {
         @Test
         fun `should fail on invalid config value`() {
             assertThatExceptionOfType(HandledArgumentViolation::class.java)
-                .isThrownBy { parseArguments(arrayOf("--config", "sfsjfsdkfsd")).toSpec() }
+                .isThrownBy { parseArguments(arrayOf("--config", "sfsjfsdkfsd")).toSpec().let {} }
             assertThatExceptionOfType(HandledArgumentViolation::class.java)
-                .isThrownBy { parseArguments(arrayOf("--config", "./i.do.not.exist.yml")).toSpec() }
+                .isThrownBy { parseArguments(arrayOf("--config", "./i.do.not.exist.yml")).toSpec().let {} }
         }
     }
 
@@ -458,7 +460,7 @@ internal class CliArgsSpec {
         @Test
         fun `fails when empty`() {
             assertThatExceptionOfType(HandledArgumentViolation::class.java)
-                .isThrownBy { parseArguments(arrayOf("--report", " ")).reportPaths }
+                .isThrownBy { parseArguments(arrayOf("--report", " ")).reportPaths.let {} }
                 .withMessage(
                     "Input ' ' must consist of two parts (report-id:path)."
                 )

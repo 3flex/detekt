@@ -30,6 +30,7 @@ class KotlinAnalysisApiEngine : AutoCloseable {
      *
      * @throws IllegalStateException if the given code snippet does not compile
      */
+    @IgnorableReturnValue
     fun compile(
         @Language("kotlin") code: String,
         dependencyCodes: List<String> = emptyList(),

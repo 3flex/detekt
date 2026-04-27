@@ -63,6 +63,7 @@ class ProcessingSettings private constructor(
 
 private fun ConfigSpec.extractUris(): Collection<URI> {
     fun initFileSystem(uri: URI) {
+        @Suppress("RETURN_VALUE_NOT_USED")
         runCatching {
             try {
                 FileSystems.getFileSystem(uri)

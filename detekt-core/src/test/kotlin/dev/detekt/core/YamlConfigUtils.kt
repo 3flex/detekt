@@ -8,4 +8,5 @@ import java.io.StringReader
 
 fun yamlConfig(name: String): YamlConfig = resource(name).toURL().openSafeStream().reader().use(YamlConfig::load)
 
+@IgnorableReturnValue
 fun yamlConfigFromContent(@Language("yaml") content: String): YamlConfig = StringReader(content).use(YamlConfig::load)

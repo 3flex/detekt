@@ -33,6 +33,7 @@ interface Config {
      * Retrieves a sub configuration or value based on given key. If configuration property cannot be found
      * the specified default value is returned.
      */
+    @IgnorableReturnValue
     fun <T : Any> valueOrDefault(key: String, default: T): T = valueOrNull(key) ?: default
 
     /**

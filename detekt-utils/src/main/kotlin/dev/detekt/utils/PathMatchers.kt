@@ -9,6 +9,7 @@ import java.nio.file.PathMatcher
  * We only support the "glob:" syntax to stay os independently.
  * Internally a globbing pattern is transformed to a regex respecting the Windows file system.
  */
+@IgnorableReturnValue
 internal fun pathMatcher(pattern: String): PathMatcher {
     val result = when (pattern.substringBefore(":")) {
         "glob" -> pattern

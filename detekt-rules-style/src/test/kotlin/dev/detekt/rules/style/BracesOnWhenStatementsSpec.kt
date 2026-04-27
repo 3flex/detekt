@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.rules.style
 
 import dev.detekt.api.Config
@@ -40,9 +42,9 @@ class BracesOnWhenStatementsSpec {
         assertThat("if"(2)(code)).isEqualTo(25 to 27)
         assertThat("if"(3)(code)).isEqualTo(35 to 37)
         assertThat("else"(1)(code)).isEqualTo(20 to 24)
-        assertThatCode { "if"(4)(code) }.isInstanceOf(IllegalArgumentException::class.java)
-        assertThatCode { "if"(0)(code) }.isInstanceOf(IllegalArgumentException::class.java)
-        assertThatCode { "else"(2)(code) }.isInstanceOf(IllegalArgumentException::class.java)
+        assertThatCode { "if"(4)(code).let {} }.isInstanceOf(IllegalArgumentException::class.java)
+        assertThatCode { "if"(0)(code).let {} }.isInstanceOf(IllegalArgumentException::class.java)
+        assertThatCode { "else"(2)(code).let {} }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Nested

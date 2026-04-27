@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.api
 
 import org.assertj.core.api.Assertions.assertThat
@@ -43,7 +45,7 @@ class PropertiesAwareSpec {
 
     @Test
     fun `throws an error on wrong type`() {
-        assertThatCode { store.getOrNull<Double>("bool") }
+        assertThatCode { store.getOrNull<Double>("bool").let {} }
             .isInstanceOf(IllegalStateException::class.java)
     }
 }

@@ -8,6 +8,7 @@ import dev.detekt.core.extractRuleName
 import dev.detekt.tooling.api.spec.RulesSpec
 import java.util.ServiceLoader
 
+@IgnorableReturnValue
 fun ProcessingSettings.createRuleProviders(): List<RuleSetProvider> {
     val ruleSetProviders = ServiceLoader.load(RuleSetProvider::class.java, pluginLoader)
         .filterNot { it.ruleSetId.value in spec.extensionsSpec.disabledExtensions }

@@ -14,6 +14,7 @@ class AssertionFailedErrorAssert(actual: AssertionFailedError) :
         AssertionFailedErrorAssert::class.java
     ) {
 
+    @IgnorableReturnValue
     fun hasActual(actual: Any) =
         apply {
             if (this.actual.actual.ephemeralValue != actual) {
@@ -25,6 +26,7 @@ class AssertionFailedErrorAssert(actual: AssertionFailedError) :
             }
         }
 
+    @IgnorableReturnValue
     fun hasExpected(expected: Any) =
         apply {
             if (this.actual.expected.ephemeralValue != expected) {

@@ -24,6 +24,7 @@ class AnalysisFacade(private val spec: ProcessingSpec) : Detekt {
     override fun run(files: Collection<KtFile>): AnalysisResult =
         runAnalysis { Lifecycle(spec.getDefaultConfiguration(), it) }
 
+    @IgnorableReturnValue
     internal fun runAnalysis(createLifecycle: (ProcessingSettings) -> Lifecycle): AnalysisResult =
         spec.withSettings {
             runCatching { createLifecycle(this).analyze() }.fold(
@@ -32,10 +33,10 @@ class AnalysisFacade(private val spec: ProcessingSpec) : Detekt {
                     @Suppress("TooGenericExceptionCaught")
                     try {
                         OutputFacade(this).run(detektion, if (fail != null) Show else Hidden)
+                        DefaultAnalysisResult(detektion, fail)
                     } catch (ex: Exception) {
                         DefaultAnalysisResult(detektion, UnexpectedError(ex))
                     }
-                    DefaultAnalysisResult(detektion, fail)
                 },
                 onFailure = { error ->
                     DefaultAnalysisResult(null, if (error is InvalidConfig) error else UnexpectedError(error))

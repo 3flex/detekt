@@ -5,6 +5,7 @@ import com.beust.jcommander.ParameterException
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.notExists
 
+@IgnorableReturnValue
 fun parseArguments(args: Array<out String>): CliArgs {
     val cli = CliArgs()
 

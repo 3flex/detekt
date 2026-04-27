@@ -6,6 +6,7 @@ import kotlin.io.path.Path
 data class ReportPath(val kind: String, val path: Path) {
 
     companion object {
+        @IgnorableReturnValue
         fun from(input: String): ReportPath {
             val parts = input.split(":", limit = 2)
 

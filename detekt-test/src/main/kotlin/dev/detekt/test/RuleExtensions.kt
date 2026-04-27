@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 private val shouldCompileTestSnippets: Boolean =
     System.getProperty("compile-test-snippets", "false")!!.toBoolean()
 
+@IgnorableReturnValue
 fun Rule.lint(
     @Language("kotlin") content: String,
     languageVersionSettings: LanguageVersionSettings = FakeLanguageVersionSettings(),
@@ -45,6 +46,7 @@ fun Rule.lint(
     return visitFile(ktFile, languageVersionSettings = languageVersionSettings).filterSuppressed(this)
 }
 
+@IgnorableReturnValue
 fun <T> T.lintWithContext(
     environment: KotlinEnvironmentContainer,
     @Language("kotlin") content: String,
@@ -63,6 +65,7 @@ fun <T> T.lintWithContext(
         visitFile(ktFile, languageVersionSettings).filterSuppressed(this)
     }
 
+@IgnorableReturnValue
 fun Rule.lint(
     ktFile: KtFile,
     languageVersionSettings: LanguageVersionSettings = FakeLanguageVersionSettings(),

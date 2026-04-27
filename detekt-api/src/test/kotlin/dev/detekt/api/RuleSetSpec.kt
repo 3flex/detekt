@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.api
 
 import org.assertj.core.api.Assertions.assertThatCode
@@ -9,7 +11,7 @@ class RuleSetSpec {
     @ParameterizedTest(name = "should allow RuleSet with name {0}")
     @MethodSource("getValidNames")
     fun shouldAllowValidNames(ruleSetId: String) {
-        assertThatCode { RuleSet(RuleSetId(ruleSetId), emptyList()) }.doesNotThrowAnyException()
+        assertThatCode { RuleSet(RuleSetId(ruleSetId), emptyList()).let {} }.doesNotThrowAnyException()
     }
 
     @ParameterizedTest(name = "should not allow RuleSet with name {0}")
@@ -19,7 +21,7 @@ class RuleSetSpec {
             RuleSet(
                 RuleSetId(ruleSetId),
                 emptyList()
-            )
+            ).let {}
         }.withMessageStartingWith("id '$ruleSetId' must match")
     }
 

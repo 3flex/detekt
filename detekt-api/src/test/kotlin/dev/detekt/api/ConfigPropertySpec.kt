@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.api
 
 import dev.detekt.test.TestConfig
@@ -148,7 +150,7 @@ class ConfigPropertySpec {
                                 )
                             ) {
                                 val present: ValuesWithReason by config(defaultValue)
-                            }.present
+                            }.present.let {}
                         }.isInstanceOf(InvalidConfigurationError::class.java)
                     }
 
@@ -161,7 +163,7 @@ class ConfigPropertySpec {
                                 )
                             ) {
                                 val present: ValuesWithReason by config(defaultValue)
-                            }.present
+                            }.present.let {}
                         }.isInstanceOf(InvalidConfigurationError::class.java)
                     }
 
@@ -174,7 +176,7 @@ class ConfigPropertySpec {
                                 )
                             ) {
                                 val present: ValuesWithReason by config(defaultValue)
-                            }.present
+                            }.present.let {}
                         }.isInstanceOf(InvalidConfigurationError::class.java)
                     }
                 }
@@ -258,7 +260,7 @@ class ConfigPropertySpec {
 
             @Test
             fun throws() {
-                assertThatThrownBy { subject.prop }
+                assertThatThrownBy { subject.prop.let {} }
                     .isInstanceOf(IllegalStateException::class.java)
                     .hasMessageContaining("is not supported")
             }
@@ -273,7 +275,7 @@ class ConfigPropertySpec {
 
             @Test
             fun throws() {
-                assertThatThrownBy { subject.prop }
+                assertThatThrownBy { subject.prop.let {} }
                     .isInstanceOf(IllegalStateException::class.java)
                     .hasMessageContaining("is not supported")
             }
@@ -288,7 +290,7 @@ class ConfigPropertySpec {
 
             @Test
             fun throws() {
-                assertThatThrownBy { subject.prop }
+                assertThatThrownBy { subject.prop.let {} }
                     .isInstanceOf(IllegalStateException::class.java)
                     .hasMessageContaining("is not supported")
             }
@@ -303,7 +305,7 @@ class ConfigPropertySpec {
 
             @Test
             fun throws() {
-                assertThatThrownBy { subject.prop }
+                assertThatThrownBy { subject.prop.let {} }
                     .isInstanceOf(IllegalStateException::class.java)
                     .hasMessageContaining("lists of strings are supported")
             }

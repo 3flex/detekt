@@ -15,6 +15,7 @@ class CompilationAssert(private val result: JvmCompilationResult) :
     private val regex = "\\w+\\.kt:\\d+:\\d+ (\\w+): .*".toRegex()
     private val detektViolations = detektMessages.mapNotNull { line -> regex.find(line)?.groupValues?.get(1) }
 
+    @IgnorableReturnValue
     fun passCompilation(expectedStatus: Boolean = true) =
         apply {
             val expectedErrorCode = if (expectedStatus) OK else COMPILATION_ERROR
@@ -28,6 +29,7 @@ class CompilationAssert(private val result: JvmCompilationResult) :
             }
         }
 
+    @IgnorableReturnValue
     fun passDetekt(expectedStatus: Boolean = true) =
         apply {
             // The status message is `i: Success?: false`
@@ -48,8 +50,10 @@ class CompilationAssert(private val result: JvmCompilationResult) :
             }
         }
 
+    @IgnorableReturnValue
     fun withNoViolations() = withViolations(0)
 
+    @IgnorableReturnValue
     fun withViolations(expectedViolationNumber: Int) =
         apply {
             if (detektViolations.size != expectedViolationNumber) {

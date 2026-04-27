@@ -54,6 +54,7 @@ internal fun checkConfiguration(settings: ProcessingSettings, baseline: Config) 
     }
 }
 
+@IgnorableReturnValue
 internal fun validateConfig(config: Config, baseline: Config, excludePatterns: Set<Regex>): List<Notification> {
     require(baseline != Config.empty) { "Cannot validate configuration based on an empty baseline config." }
     require(baseline is YamlConfig) {

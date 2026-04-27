@@ -21,6 +21,7 @@ internal data class RuleDescriptor(
     val ruleInstance: RuleInstance,
 )
 
+@IgnorableReturnValue
 internal fun getRules(
     analysisMode: AnalysisMode,
     ruleSetProviders: List<RuleSetProvider>,

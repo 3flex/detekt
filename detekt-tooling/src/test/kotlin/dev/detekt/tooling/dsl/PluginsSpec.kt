@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.tooling.dsl
 
 import dev.detekt.tooling.internal.PluginsHolder
@@ -13,26 +15,26 @@ class PluginsSpec {
             ExtensionsSpecBuilder().apply {
                 fromPaths { emptyList() }
                 fromClassloader { javaClass.classLoader }
-            }.build()
+            }.build().let {}
         }.isInstanceOf(IllegalArgumentException::class.java)
 
         assertThatCode {
             ExtensionsSpecBuilder().apply {
                 fromClassloader { javaClass.classLoader }
                 fromPaths { emptyList() }
-            }.build()
+            }.build().let {}
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
     fun `throws when both sources are supplied via internal helper class`() {
-        assertThatCode { PluginsHolder(emptyList(), javaClass.classLoader) }
+        assertThatCode { PluginsHolder(emptyList(), javaClass.classLoader).let {} }
             .isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
     fun `plugins from paths must exist`() {
-        assertThatCode { PluginsHolder(listOf(Path("/does/not/exist")), null) }
+        assertThatCode { PluginsHolder(listOf(Path("/does/not/exist")), null).let {} }
             .isInstanceOf(IllegalArgumentException::class.java)
     }
 }

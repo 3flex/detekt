@@ -7,6 +7,7 @@ import kotlin.reflect.KClass
 private fun Config.keySequence(key: String): String =
     if (parentPath == null) key else "$parentPath $CONFIG_SEPARATOR $key"
 
+@IgnorableReturnValue
 fun Config.valueOrDefaultInternal(
     key: String,
     result: Any?,

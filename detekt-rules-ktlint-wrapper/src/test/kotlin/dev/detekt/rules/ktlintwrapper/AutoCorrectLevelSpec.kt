@@ -39,8 +39,6 @@ class AutoCorrectLevelSpec {
             )
         )
 
-        config.toString()
-
         val (file, findings) = runRule(config)
 
         assertThat(findings).isNotEmpty()

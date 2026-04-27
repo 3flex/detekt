@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.core.baseline
 
 import dev.detekt.test.utils.resourceAsPath
@@ -45,16 +47,16 @@ class BaselineFormatSpec {
             val (manuallySuppressedIssues, currentIssues) = BaselineFormat().read(path)
 
             assertThat(manuallySuppressedIssues).hasSize(2)
-            assertThat(manuallySuppressedIssues).anySatisfy { it.startsWith("LongParameterList") }
-            assertThat(manuallySuppressedIssues).anySatisfy { it.startsWith("LongMethod") }
+            assertThat(manuallySuppressedIssues).anyMatch { it.startsWith("LongParameterList") }
+            assertThat(manuallySuppressedIssues).anyMatch { it.startsWith("LongMethod") }
             assertThat(currentIssues).hasSize(1)
-            assertThat(currentIssues).anySatisfy { it.startsWith("FeatureEnvy") }
+            assertThat(currentIssues).anyMatch { it.startsWith("FeatureEnvy") }
         }
 
         @Test
         fun `throws on an invalid baseline file extension`() {
             val path = resourceAsPath("/baseline_feature/invalid-txt-baseline.txt")
-            assertThatThrownBy { BaselineFormat().read(path) }
+            assertThatThrownBy { BaselineFormat().read(path).let {} }
                 .isInstanceOf(BaselineFormat.InvalidState::class.java)
         }
 
@@ -62,7 +64,7 @@ class BaselineFormatSpec {
         fun `throws on an invalid baseline ID declaration`() {
             val path = resourceAsPath("/baseline_feature/missing-temporary-suppressed-baseline.xml")
             assertThatIllegalStateException()
-                .isThrownBy { BaselineFormat().read(path) }
+                .isThrownBy { BaselineFormat().read(path).let {} }
                 .withMessage("The content of the ID element must not be empty")
         }
     }

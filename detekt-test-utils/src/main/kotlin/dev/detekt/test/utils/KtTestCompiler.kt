@@ -26,6 +26,7 @@ internal object KtTestCompiler {
     fun createKtFile(@Language("kotlin") content: String, path: Path): KtFile =
         psiFileFactory.createPhysicalFile(path.name, StringUtilRt.convertLineSeparators(content))
 
+    @IgnorableReturnValue
     fun compile(path: Path): KtFile {
         require(path.isRegularFile()) { "Given path '$path' should be a regular file!" }
 

@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryLet")
+
 package dev.detekt.api
 
 import org.assertj.core.api.Assertions.assertThat
@@ -264,7 +266,7 @@ internal class SimplePatternToRegexSpec {
     inner class `invalid pattern` {
         @Test
         fun `fails during creation`() {
-            assertThatThrownBy { """a[b""".simplePatternToRegex() }
+            assertThatThrownBy { """a[b""".simplePatternToRegex().let {} }
                 .isInstanceOf(IllegalArgumentException::class.java)
         }
     }

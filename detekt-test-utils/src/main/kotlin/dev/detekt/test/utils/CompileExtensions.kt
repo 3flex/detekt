@@ -9,6 +9,7 @@ import kotlin.io.path.absolute
 /**
  * Use this method if you define a kt file/class as a plain string in your test.
  */
+@IgnorableReturnValue
 fun compileContentForTest(@Language("kotlin") content: String, filename: String = "Test.kt"): KtFile {
     require('/' !in filename && '\\' !in filename) {
         "filename must be a file name only and not contain any path elements"
@@ -19,6 +20,7 @@ fun compileContentForTest(@Language("kotlin") content: String, filename: String 
 /**
  * Use this method if you define a kt file/class as a plain string in your test.
  */
+@IgnorableReturnValue
 fun compileContentForTest(
     @Language("kotlin") content: String,
     environment: KotlinEnvironmentContainer,
@@ -39,6 +41,7 @@ fun compileContentForTest(
 /**
  * Use this method if you define a kt file/class as a plain string in your test.
  */
+@IgnorableReturnValue
 fun compileContentForTest(@Language("kotlin") content: String, path: Path): KtFile =
     KtTestCompiler.createKtFile(content, path)
 

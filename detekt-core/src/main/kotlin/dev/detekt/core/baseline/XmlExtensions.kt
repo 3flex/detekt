@@ -17,6 +17,7 @@ internal fun Writer.streamXml(): XMLStreamWriter = XMLOutputFactory.newFactory()
 
 internal fun XMLStreamWriter.prettyPrinter(): XMLStreamWriter = IndentingXMLStreamWriter(this)
 
+@IgnorableReturnValue
 internal inline fun XMLStreamWriter.document(
     version: String? = null,
     encoding: String? = null,
@@ -31,6 +32,7 @@ internal inline fun XMLStreamWriter.document(
     writeEndDocument()
 }
 
+@IgnorableReturnValue
 internal inline fun XMLStreamWriter.tag(name: String, init: XMLStreamWriter.() -> Unit) =
     apply {
         writeStartElement(name)

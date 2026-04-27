@@ -16,6 +16,7 @@ interface ReportingExtension : Extension {
     /**
      * Allows to transform the reported issues e.g. apply custom filtering.
      */
+    @IgnorableReturnValue
     fun transformIssues(issues: List<Issue>): List<Issue> = issues
 
     /**

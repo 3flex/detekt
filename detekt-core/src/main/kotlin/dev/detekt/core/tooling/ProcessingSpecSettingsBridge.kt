@@ -40,6 +40,7 @@ internal fun <R> ProcessingSpec.withSettings(execute: ProcessingSettings.() -> R
     return result
 }
 
+@IgnorableReturnValue
 internal fun ProcessingSpec.loadConfiguration(): Config =
     with(configSpec) {
         return when {

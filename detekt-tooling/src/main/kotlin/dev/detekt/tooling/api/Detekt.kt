@@ -10,8 +10,10 @@ import org.jetbrains.kotlin.psi.KtFile
 interface Detekt {
 
     // Used by detekt-cli
+    @IgnorableReturnValue
     fun run(): AnalysisResult
 
     // Used by detekt-compiler-plugin
+    @IgnorableReturnValue
     fun run(files: Collection<KtFile>): AnalysisResult
 }
