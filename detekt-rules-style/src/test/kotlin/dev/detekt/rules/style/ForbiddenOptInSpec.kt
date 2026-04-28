@@ -114,4 +114,88 @@ class ForbiddenOptInSpec(val env: KotlinEnvironmentContainer) {
         assertThat(findings).singleElement()
             .hasStartSourceLocation(1, 1)
     }
+
+    @Test
+    fun `should report forbidden opt-in referenced by fully qualified name`() {
+        val code = """
+            @OptIn(annotations.ForbiddenApi::class)
+            fun main() {}
+        """.trimIndent()
+        val findings = ForbiddenOptIn(optInConfig).lintWithContext(env, code, ANNOTAION_DECLARATIONS)
+
+        assertThat(findings).singleElement()
+            .hasStartSourceLocation(1, 1)
+            .hasMessage("The opt-in `ForbiddenApi` has been forbidden in the detekt config.")
+    }
+
+    @Test
+    fun `should report forbidden opt-in at file level when referenced by fully qualified name`() {
+        val code = """
+            @file:OptIn(annotations.DoNotUseApi::class)
+
+            fun main() {}
+        """.trimIndent()
+        val findings = ForbiddenOptIn(optInConfig).lintWithContext(env, code, ANNOTAION_DECLARATIONS)
+
+        assertThat(findings).singleElement()
+            .hasStartSourceLocation(1, 1)
+            .hasMessage("The opt-in `DoNotUseApi` has been forbidden: Do not use!")
+    }
+
+    @Test
+    fun `should report forbidden opt-ins when mixing simple and fully qualified names`() {
+        val code = """
+            import annotations.AllowedApi
+            import annotations.DoNotUseApi
+
+            @OptIn(annotations.ForbiddenApi::class, AllowedApi::class, DoNotUseApi::class)
+            fun main() {}
+        """.trimIndent()
+        val findings = ForbiddenOptIn(optInConfig).lintWithContext(env, code, ANNOTAION_DECLARATIONS)
+
+        assertThat(findings)
+            .extracting("message")
+            .containsExactlyInAnyOrder(
+                "The opt-in `DoNotUseApi` has been forbidden: Do not use!",
+                "The opt-in `ForbiddenApi` has been forbidden in the detekt config."
+            )
+    }
+
+    @Test
+    fun `should report when fully qualified marker is configured and source uses simple name`() {
+        val fqOptInConfig = TestConfig(
+            "markerClasses" to listOf(
+                ValueWithReason("annotations.ForbiddenApi").toConfig(),
+            )
+        )
+        val code = """
+            import annotations.*
+
+            @OptIn(ForbiddenApi::class)
+            fun main() {}
+        """.trimIndent()
+        val findings = ForbiddenOptIn(fqOptInConfig).lintWithContext(env, code, ANNOTAION_DECLARATIONS)
+
+        assertThat(findings).singleElement()
+            .hasStartSourceLocation(3, 1)
+            .hasMessage("The opt-in `annotations.ForbiddenApi` has been forbidden in the detekt config.")
+    }
+
+    @Test
+    fun `should report when fully qualified marker is configured and source uses fully qualified name`() {
+        val fqOptInConfig = TestConfig(
+            "markerClasses" to listOf(
+                ValueWithReason("annotations.ForbiddenApi", "Use a different API.").toConfig(),
+            )
+        )
+        val code = """
+            @OptIn(annotations.ForbiddenApi::class)
+            fun main() {}
+        """.trimIndent()
+        val findings = ForbiddenOptIn(fqOptInConfig).lintWithContext(env, code, ANNOTAION_DECLARATIONS)
+
+        assertThat(findings).singleElement()
+            .hasStartSourceLocation(1, 1)
+            .hasMessage("The opt-in `annotations.ForbiddenApi` has been forbidden: Use a different API.")
+    }
 }

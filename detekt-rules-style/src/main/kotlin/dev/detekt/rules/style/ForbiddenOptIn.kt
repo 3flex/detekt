@@ -14,11 +14,13 @@ import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClassLiteralExpression
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 
 /**
  * This rule allows to set a list of forbidden opt-ins. This can be used to avoid opting into an api by accident.
  * By default, the list of forbidden opt-ins is empty.
+ *
+ * Marker classes can be configured by either their simple name or their fully qualified name. The rule
+ * also detects opt-ins that reference the marker class with a fully qualified name in source.
  */
 class ForbiddenOptIn(config: Config) :
     Rule(
@@ -40,27 +42,25 @@ class ForbiddenOptIn(config: Config) :
             return
         }
 
-        analyze(annotation) {
+        val forbidden = analyze(annotation) {
             if (annotation.typeReference?.type?.symbol?.classId != optInClassId) {
                 return
             }
+            annotation.valueArguments.mapNotNull { arg ->
+                val classLiteral = arg.getArgumentExpression() as? KtClassLiteralExpression
+                val classId = classLiteral?.receiverExpression?.expressionType?.symbol?.classId
+                    ?: return@mapNotNull null
+                val fqName = classId.asSingleFqName().asString()
+                val simpleName = classId.shortClassName.asString()
+                markerClasses[fqName] ?: markerClasses[simpleName]
+            }
         }
-        checkOptIn(annotation)
-    }
 
-    private fun checkOptIn(annotation: KtAnnotationEntry) {
-        val usedOptIn = annotation.valueArguments.mapNotNull { arg ->
-            val optInClassArgument = arg.getArgumentExpression() as? KtClassLiteralExpression
-            (optInClassArgument?.receiverExpression as? KtNameReferenceExpression)?.getReferencedName()
-        }.toSet()
-
-        val forbidden = usedOptIn.intersect(markerClasses.keys)
-        forbidden.forEach { forbiddenOptIn ->
-            val reason = markerClasses[forbiddenOptIn]?.reason
-            val message = if (reason != null) {
-                "The opt-in `$forbiddenOptIn` has been forbidden: $reason"
+        forbidden.forEach { entry ->
+            val message = if (entry.reason != null) {
+                "The opt-in `${entry.value}` has been forbidden: ${entry.reason}"
             } else {
-                "The opt-in `$forbiddenOptIn` has been forbidden in the detekt config."
+                "The opt-in `${entry.value}` has been forbidden in the detekt config."
             }
             report(Finding(Entity.from(annotation), message))
         }
