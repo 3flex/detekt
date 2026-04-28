@@ -197,6 +197,18 @@ style:
       - 'java.lang.Class.getResourceAsStream'
       - 'java.lang.ClassLoader.getResourceAsStream'
       - 'kotlin.system.measureTimeMillis'
+  ForbiddenOptIn:
+    active: true
+    excludes: ['**/detekt-rules-style/**/OptionalUnit.kt']
+    markerClasses:
+      - value: 'KaImplementationDetail'
+        reason: 'Code marked with this annotation is an implementation detail of the analysis-api and should not be used externally.'
+      - value: 'KaNonPublicApi'
+        reason: 'Code marked with this annotation is not part of the analysis-api public API and should not be used externally.'
+      - value: 'KaIdeApi'
+        reason: 'Code marked with this annotation is intended for IDE use only and should not be used externally.'
+      - value: 'KaPlatformInterface'
+        reason: 'Code marked with this annotation is intended to be implemented by analysis-api platforms only.'
   ForbiddenVoid:
     active: true
     ignoreOverridden: true
