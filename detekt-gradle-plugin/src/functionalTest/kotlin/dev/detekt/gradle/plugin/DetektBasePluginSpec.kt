@@ -131,6 +131,50 @@ class DetektBasePluginSpec {
     }
 
     @Test
+    fun `generates source set tasks for Android project (disallowKotlinSourceSets=true) #9198`() {
+        val gradleRunner = DslGradleRunner(
+            projectLayout = ProjectLayout(
+                numberOfSourceFilesInRootPerSourceDir = 1,
+                srcDirs = listOf(
+                    "src/main/kotlin",
+                    "src/debug/kotlin",
+                    "src/test/kotlin",
+                    "src/androidTest/kotlin",
+                ),
+            ),
+            buildFileName = "build.gradle.kts",
+            mainBuildFileContent = """
+                plugins {
+                    id("com.android.application")
+                    id("dev.detekt")
+                }
+
+                repositories {
+                    mavenLocal()
+                    mavenCentral()
+                    google()
+                }
+
+                android {
+                    compileSdk = 34
+                    namespace = "dev.detekt.gradle.plugin.app"
+                }
+            """.trimIndent(),
+            gradleProperties = mapOf(
+                "android.disallowKotlinSourceSets" to "true",
+            ),
+            dryRun = true,
+        ).also {
+            it.setupProject()
+        }
+
+        gradleRunner.checkTask("main")
+        gradleRunner.checkTask("debug")
+        gradleRunner.checkTask("test")
+        gradleRunner.checkTask("androidTest")
+    }
+
+    @Test
     fun `generates source set tasks when multiple plugins of type KotlinBasePlugin are applied #8613`() {
         val gradleRunner = DslGradleRunner(
             projectLayout = ProjectLayout(

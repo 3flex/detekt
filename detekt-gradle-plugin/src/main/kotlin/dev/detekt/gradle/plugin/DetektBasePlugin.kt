@@ -81,39 +81,43 @@ class DetektBasePlugin : Plugin<Project> {
                 ?.sourceSets
                 ?.configureEach { sourceSet ->
                     val taskName = "${DetektPlugin.DETEKT_TASK_NAME}${sourceSet.name.capitalize()}SourceSet"
-                    tasks.register(taskName, Detekt::class.java) { detektTask ->
-                        detektTask.source = sourceSet.kotlin
-                        detektTask.baseline.convention(
-                            project.layout.file(
-                                extension.baseline.flatMap {
-                                    providers.provider {
-                                        it.asFile.existingVariantOrBaseFile("${sourceSet.name}SourceSet")
+                    if (taskName !in tasks.names) {
+                        tasks.register(taskName, Detekt::class.java) { detektTask ->
+                            detektTask.source = sourceSet.kotlin
+                            detektTask.baseline.convention(
+                                project.layout.file(
+                                    extension.baseline.flatMap {
+                                        providers.provider {
+                                            it.asFile.existingVariantOrBaseFile("${sourceSet.name}SourceSet")
+                                        }
                                     }
-                                }
+                                )
                             )
-                        )
-                        if (sourceSet.name == "main") {
-                            detektTask.explicitApi.convention(mapExplicitArgMode())
+                            if (sourceSet.name == "main") {
+                                detektTask.explicitApi.convention(mapExplicitArgMode())
+                            }
+                            detektTask.description = "Run detekt analysis for ${sourceSet.name} source set"
                         }
-                        detektTask.description = "Run detekt analysis for ${sourceSet.name} source set"
                     }
 
                     val baseLineTaskName = "${DetektPlugin.BASELINE_TASK_NAME}${sourceSet.name.capitalize()}SourceSet"
-                    tasks.register(baseLineTaskName, DetektCreateBaselineTask::class.java) { createBaselineTask ->
-                        createBaselineTask.source = sourceSet.kotlin
+                    if (baseLineTaskName !in tasks.names) {
+                        tasks.register(baseLineTaskName, DetektCreateBaselineTask::class.java) { createBaselineTask ->
+                            createBaselineTask.source = sourceSet.kotlin
 
-                        createBaselineTask.baseline.convention(
-                            project.layout.file(
-                                extension.baseline.flatMap {
-                                    providers.provider { it.asFile.addVariantName("${sourceSet.name}SourceSet") }
-                                }
+                            createBaselineTask.baseline.convention(
+                                project.layout.file(
+                                    extension.baseline.flatMap {
+                                        providers.provider { it.asFile.addVariantName("${sourceSet.name}SourceSet") }
+                                    }
+                                )
                             )
-                        )
 
-                        if (sourceSet.name == "main") {
-                            createBaselineTask.explicitApi.convention(mapExplicitArgMode())
+                            if (sourceSet.name == "main") {
+                                createBaselineTask.explicitApi.convention(mapExplicitArgMode())
+                            }
+                            createBaselineTask.description = "Creates detekt baseline for ${sourceSet.name} source set"
                         }
-                        createBaselineTask.description = "Creates detekt baseline for ${sourceSet.name} source set"
                     }
                 }
                 ?: return@withType

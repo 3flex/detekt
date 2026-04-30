@@ -12,6 +12,7 @@ import dev.detekt.gradle.internal.DetektPlain
 import dev.detekt.gradle.plugin.DetektBasePlugin.Companion.CONFIG_DIR_NAME
 import dev.detekt.gradle.plugin.DetektBasePlugin.Companion.CONFIG_FILE
 import dev.detekt.gradle.plugin.internal.DetektAndroidCompilations
+import dev.detekt.gradle.plugin.internal.DetektAndroidSourceSets
 import dev.detekt.gradle.plugin.internal.DetektJvmCompilations
 import dev.detekt.gradle.plugin.internal.DetektKmpJvmCompilations
 import dev.detekt.gradle.plugin.internal.conventionCompat
@@ -81,6 +82,7 @@ class DetektPlugin : Plugin<Project> {
             if (builtInGradlePropertyEnabled() && agp9() && enableKotlinDslEnabled()) {
                 DetektAndroidCompilations.registerTasks(project, extension)
                 DetektAndroidCompilations.linkTasks(project, extension)
+                DetektAndroidSourceSets.registerTasks(project, extension)
             }
 
             // Enabling built-in Kotlin with the plugin (only available in AGP 9 and higher)
@@ -88,6 +90,7 @@ class DetektPlugin : Plugin<Project> {
                 if (!builtInGradlePropertyEnabled() && enableKotlinDslEnabled()) {
                     DetektAndroidCompilations.registerTasks(project, extension)
                     DetektAndroidCompilations.linkTasks(project, extension)
+                    DetektAndroidSourceSets.registerTasks(project, extension)
                 }
             }
 
