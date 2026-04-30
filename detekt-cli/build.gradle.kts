@@ -37,7 +37,7 @@ dependencies {
     testImplementation(libs.assertj.core)
     testRuntimeOnly(projects.detektRulesKtlintWrapper)
 
-    pluginsJar(projects.detektRulesKtlintWrapper)
+    pluginsJar(project(":detekt-rules-ktlint-wrapper", "shadow"))
     pluginsJar(projects.detektRulesLibraries)
     pluginsJar(projects.detektRulesRuleauthors)
 }
