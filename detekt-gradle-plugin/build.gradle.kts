@@ -7,6 +7,7 @@ import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import org.jetbrains.kotlin.buildtools.api.ExperimentalBuildToolsApi
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("module")
@@ -217,6 +218,30 @@ signing {
 }
 
 tasks {
+    /*
+     * Ignore metadata version checks for tests. Gradle API is on the classpath which includes stdlib and reflect libs
+     * that have Kotlin metadata too new for the Kotlin compiler version used in this build to read. This affects test
+     * compilations only. The suppress-gradle-api system property set for this build does not affect test compilations
+     * at this stage, so replacing the Gradle API with the separately published Gradle API is not currently possible.
+     */
+    named<KotlinJvmCompile>("compileFunctionalTestKotlin") {
+        compilerOptions {
+            freeCompilerArgs.add("-Xskip-metadata-version-check")
+        }
+    }
+
+    named<KotlinJvmCompile>("compileTestFixturesKotlin") {
+        compilerOptions {
+            freeCompilerArgs.add("-Xskip-metadata-version-check")
+        }
+    }
+
+    named<KotlinJvmCompile>("compileFunctionalTestMinSupportedGradleKotlin") {
+        compilerOptions {
+            freeCompilerArgs.add("-Xskip-metadata-version-check")
+        }
+    }
+
     // Manually inject dependency to gradle-testkit since the default injected plugin classpath is from `main.runtime`.
     pluginUnderTestMetadata {
         pluginClasspath.from(testKitRuntimeOnly)
