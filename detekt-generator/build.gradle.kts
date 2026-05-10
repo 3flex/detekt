@@ -12,7 +12,7 @@ application {
 
 val detektCli = configurations.dependencyScope("detektCli")
 val detektCliClasspath = configurations.resolvable("detektCliClasspath") {
-    extendsFrom(detektCli.get())
+    extendsFrom(detektCli)
 }
 
 dependencies {

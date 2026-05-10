@@ -18,7 +18,7 @@ nexusPublishing {
 
 val releaseArtifacts = configurations.dependencyScope("releaseArtifacts")
 val releaseAssetFiles = configurations.resolvable("releaseAssetFiles") {
-    extendsFrom(releaseArtifacts.get())
+    extendsFrom(releaseArtifacts)
 }
 
 val version = Versions.currentOrSnapshot()

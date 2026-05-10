@@ -7,7 +7,7 @@ plugins {
 
 val aaDependency = configurations.dependencyScope("aaDependency")
 val aaDependencies = configurations.resolvable("aaDependencies") {
-    extendsFrom(aaDependency.get())
+    extendsFrom(aaDependency)
 }
 
 dependencies {

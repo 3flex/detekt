@@ -13,7 +13,7 @@ val pluginsJar = configurations.dependencyScope("pluginsJar") {
 }
 
 val pluginsJarFiles = configurations.resolvable("pluginsJarFiles") {
-    extendsFrom(pluginsJar.get())
+    extendsFrom(pluginsJar)
 }
 
 dependencies {
