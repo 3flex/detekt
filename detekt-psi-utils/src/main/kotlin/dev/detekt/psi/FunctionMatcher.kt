@@ -27,10 +27,8 @@ sealed class FunctionMatcher {
 
         override fun match(propertySymbol: KaPropertySymbol?, symbol: KaCallableSymbol): Boolean =
             if (propertySymbol != null) {
-                getNameForGetterOrSetter(
-                    propertySymbol,
-                    symbol
-                ) == fullyQualifiedName
+                getNameForGetterOrSetter(propertySymbol, symbol) == fullyQualifiedName ||
+                    propertySymbol.asFqNameString() == fullyQualifiedName
             } else {
                 match(symbol)
             }
@@ -67,7 +65,8 @@ sealed class FunctionMatcher {
 
         override fun match(propertySymbol: KaPropertySymbol?, symbol: KaCallableSymbol): Boolean =
             if (propertySymbol != null) {
-                getNameForGetterOrSetter(propertySymbol, symbol) == fullyQualifiedName
+                getNameForGetterOrSetter(propertySymbol, symbol) == fullyQualifiedName ||
+                    propertySymbol.asFqNameString() == fullyQualifiedName
             } else {
                 match(symbol)
             }
