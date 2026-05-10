@@ -5,6 +5,7 @@
 import dev.detekt.buildlogic.osDependent
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
+import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.buildtools.api.ExperimentalBuildToolsApi
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -178,12 +179,18 @@ gradlePlugin {
             displayName = "Static code analysis for Kotlin - Base Plugin"
             description = "Static code analysis for Kotlin - Base Plugin"
             implementationClass = "dev.detekt.gradle.plugin.DetektBasePlugin"
+            compatibility {
+                features.configurationCache = true
+            }
         }
         create("detektPlugin") {
             id = "dev.detekt"
             displayName = "Static code analysis for Kotlin"
             description = "Static code analysis for Kotlin"
             implementationClass = "dev.detekt.gradle.plugin.DetektPlugin"
+            compatibility {
+                features.configurationCache = true
+            }
         }
         create("detektCompilerPlugin") {
             id = "dev.detekt.gradle.compiler-plugin"
