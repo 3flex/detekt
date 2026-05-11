@@ -27,10 +27,8 @@ sealed class FunctionMatcher {
 
         override fun match(propertySymbol: KaPropertySymbol?, symbol: KaCallableSymbol): Boolean =
             if (propertySymbol != null) {
-                getNameForGetterOrSetter(
-                    propertySymbol,
-                    symbol
-                ) == fullyQualifiedName
+                getNameForGetterOrSetter(propertySymbol, symbol) == fullyQualifiedName ||
+                    propertySymbol.asFqNameString() == fullyQualifiedName
             } else {
                 match(symbol)
             }
@@ -67,7 +65,8 @@ sealed class FunctionMatcher {
 
         override fun match(propertySymbol: KaPropertySymbol?, symbol: KaCallableSymbol): Boolean =
             if (propertySymbol != null) {
-                getNameForGetterOrSetter(propertySymbol, symbol) == fullyQualifiedName
+                getNameForGetterOrSetter(propertySymbol, symbol) == fullyQualifiedName ||
+                    propertySymbol.asFqNameString() == fullyQualifiedName
             } else {
                 match(symbol)
             }
@@ -121,26 +120,20 @@ sealed class FunctionMatcher {
         }
 
         fun getNameForGetterOrSetter(propertySymbol: KaPropertySymbol, symbol: KaCallableSymbol): String? {
-            return if (symbol.callableId != null) {
-                // in case it is Java getter or setter then callableId id will be not null and can be used
-                symbol.asFqNameString()
+            val callableId = propertySymbol.callableId
+            val propertyName = callableId?.callableName?.asString()
+            if (propertyName.isNullOrEmpty()) return null
+            val capitalPropertyName = propertyName[0].uppercaseChar() + propertyName.substring(1)
+            return if (symbol is KaPropertyGetterSymbol || symbol is KaPropertySetterSymbol) {
+                val getterOrSetterName = if (symbol is KaPropertyGetterSymbol) "get" else "set"
+                callableId
+                    .copy(
+                        Name.identifier("$getterOrSetterName$capitalPropertyName")
+                    )
+                    .asSingleFqName()
+                    .asString()
             } else {
-                // when it's a Kotlin property and getX and setX synthetic methods are only from Java side
-                val callableId = propertySymbol.callableId
-                val propertyName = callableId?.callableName?.asString()
-                if (propertyName.isNullOrEmpty()) return null
-                val capitalPropertyName = propertyName[0].uppercaseChar() + propertyName.substring(1)
-                if (symbol is KaPropertyGetterSymbol || symbol is KaPropertySetterSymbol) {
-                    val getterOrSetterName = if (symbol is KaPropertyGetterSymbol) "get" else "set"
-                    callableId
-                        .copy(
-                            Name.identifier("$getterOrSetterName$capitalPropertyName")
-                        )
-                        .asSingleFqName()
-                        .asString()
-                } else {
-                    null
-                }
+                null
             }
         }
     }
