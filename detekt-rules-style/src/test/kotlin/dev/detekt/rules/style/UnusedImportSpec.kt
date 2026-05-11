@@ -942,4 +942,50 @@ class UnusedImportSpec(val env: KotlinEnvironmentContainer) {
             .singleElement()
             .hasMessage("The import 'kotlin.io.path.Path' is unused.")
     }
+
+    @Test
+    fun `does not report extension property accessed via dot notation - #9269`() {
+        val main =
+            """
+            import kotlinx.coroutines.Dispatchers
+            import kotlinx.coroutines.IO
+
+            fun foo() {
+                println(Dispatchers.IO)
+            }
+            """.trimIndent()
+        val coroutines =
+            """
+            package kotlinx.coroutines
+
+            object Dispatchers
+            val Dispatchers.IO: String get() = "io"
+            """.trimIndent()
+        assertThat(subject.lintWithContext(env, main, coroutines)).isEmpty()
+    }
+
+    @Test
+    fun `does report unused extension property import alongside used one - #9269`() {
+        val main =
+            """
+            import kotlinx.coroutines.Dispatchers
+            import kotlinx.coroutines.IO
+            import kotlinx.coroutines.Default
+
+            fun foo() {
+                println(Dispatchers.IO)
+            }
+            """.trimIndent()
+        val coroutines =
+            """
+            package kotlinx.coroutines
+
+            object Dispatchers
+            val Dispatchers.IO: String get() = "io"
+            val Dispatchers.Default: String get() = "default"
+            """.trimIndent()
+        assertThat(subject.lintWithContext(env, main, coroutines))
+            .singleElement()
+            .hasMessage("The import 'kotlinx.coroutines.Default' is unused.")
+    }
 }
