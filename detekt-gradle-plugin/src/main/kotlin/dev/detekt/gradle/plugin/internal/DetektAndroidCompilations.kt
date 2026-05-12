@@ -80,18 +80,24 @@ internal object DetektAndroidCompilations {
         project.extensions.findByType(AndroidComponentsExtension::class.java)?.let { componentsExtension ->
             componentsExtension.onVariants { variant ->
                 if (!extension.matchesIgnoredConfiguration(variant)) {
-                    mainTaskProvider.configure {
-                        it.dependsOn(DetektPlugin.DETEKT_TASK_NAME + variant.name.capitalize())
+                    mainTaskProvider.configure { task ->
+                        task.dependsOn(DetektPlugin.DETEKT_TASK_NAME + variant.name.replaceFirstChar { it.uppercase() })
                     }
-                    mainBaselineTaskProvider.configure {
-                        it.dependsOn(DetektPlugin.BASELINE_TASK_NAME + variant.name.capitalize())
+                    mainBaselineTaskProvider.configure { task ->
+                        task.dependsOn(
+                            DetektPlugin.BASELINE_TASK_NAME + variant.name.replaceFirstChar { it.uppercase() }
+                        )
                     }
                     variant.nestedComponents.forEach { testVariant ->
-                        testTaskProvider.configure {
-                            it.dependsOn(DetektPlugin.DETEKT_TASK_NAME + testVariant.name.capitalize())
+                        testTaskProvider.configure { task ->
+                            task.dependsOn(
+                                DetektPlugin.DETEKT_TASK_NAME + testVariant.name.replaceFirstChar { it.uppercase() }
+                            )
                         }
-                        testBaselineTaskProvider.configure {
-                            it.dependsOn(DetektPlugin.BASELINE_TASK_NAME + testVariant.name.capitalize())
+                        testBaselineTaskProvider.configure { task ->
+                            task.dependsOn(
+                                DetektPlugin.BASELINE_TASK_NAME + testVariant.name.replaceFirstChar { it.uppercase() }
+                            )
                         }
                     }
                 }
