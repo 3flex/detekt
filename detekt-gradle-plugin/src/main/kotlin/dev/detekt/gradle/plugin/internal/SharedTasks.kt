@@ -21,8 +21,12 @@ internal fun Project.registerJvmCompilationDetektTask(
     target: KotlinTarget? = null,
     source: ConfigurableFileCollection = sourceProvider(compilation),
 ) {
-    val taskSuffix = if (target != null) compilation.name + target.name.capitalize() else compilation.name
-    tasks.register(DetektPlugin.DETEKT_TASK_NAME + taskSuffix.capitalize(), Detekt::class.java) { detektTask ->
+    val taskSuffix =
+        if (target != null) compilation.name + target.name.replaceFirstChar { it.uppercase() } else compilation.name
+    tasks.register(
+        DetektPlugin.DETEKT_TASK_NAME + taskSuffix.replaceFirstChar { it.uppercase() },
+        Detekt::class.java
+    ) { detektTask ->
         val siblingTask = compilation.compileTaskProvider.map { it as KotlinJvmCompile }
 
         detektTask.source(source)
@@ -75,9 +79,10 @@ internal fun Project.registerJvmCompilationCreateBaselineTask(
     target: KotlinTarget? = null,
     source: ConfigurableFileCollection = sourceProvider(compilation),
 ) {
-    val taskSuffix = if (target != null) compilation.name + target.name.capitalize() else compilation.name
+    val taskSuffix =
+        if (target != null) compilation.name + target.name.replaceFirstChar { it.uppercase() } else compilation.name
     tasks.register(
-        DetektPlugin.BASELINE_TASK_NAME + taskSuffix.capitalize(),
+        DetektPlugin.BASELINE_TASK_NAME + taskSuffix.replaceFirstChar { it.uppercase() },
         DetektCreateBaselineTask::class.java,
     ) { createBaselineTask ->
         val siblingTask = compilation.compileTaskProvider.map { it as KotlinJvmCompile }
