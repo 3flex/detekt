@@ -126,6 +126,8 @@ kotlin {
         // https://youtrack.jetbrains.com/issue/KT-72247/KGP-Cannot-use-unsupported-API-version-with-compilerVersion-that-supports-it#focus=Comments-27-11050897.0-0
         freeCompilerArgs.addAll("-language-version", "1.8")
         freeCompilerArgs.addAll("-api-version", "1.7")
+        // Suppress warning about deprecated API version. When DGP compiles with Kotlin 2.4 change this to suppress DEPRECATED_LANGUAGE_VERSION diagnostic (see KT-83765)
+        freeCompilerArgs.add("-Xsuppress-version-warnings")
     }
 
     // Some functional tests reference internal functions in the Gradle plugin. This should become unnecessary as further
