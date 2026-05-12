@@ -151,10 +151,8 @@ dependencies {
             requireCapability("org.gradle.experimental:gradle-public-api-internal")
         }
     }
-    compileOnly(libs.jetbrains.annotations)
 
     implementation(libs.sarif4k)
-    testFixturesCompileOnly(libs.jetbrains.annotations)
 
     testKitRuntimeOnly(libs.kotlin.gradle.plugin)
     testKitRuntimeOnly(libs.android.gradle.plugin)
