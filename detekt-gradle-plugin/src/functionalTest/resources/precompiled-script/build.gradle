@@ -1,0 +1,10 @@
+plugins {
+    id 'org.gradle.kotlin-dsl'
+    id 'dev.detekt'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+}

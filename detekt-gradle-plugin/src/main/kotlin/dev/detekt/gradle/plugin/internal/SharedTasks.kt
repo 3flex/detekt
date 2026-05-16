@@ -26,6 +26,7 @@ internal fun Project.registerJvmCompilationDetektTask(
         val siblingTask = compilation.compileTaskProvider.map { it as KotlinJvmCompile }
 
         detektTask.source(source)
+        detektTask.exclude(GRADLE_KTS_EXCLUDE_PATTERN)
         detektTask.classpath.conventionCompat(
             compilation.output.classesDirs,
             siblingTask.map { it.libraries }
@@ -83,6 +84,7 @@ internal fun Project.registerJvmCompilationCreateBaselineTask(
         val siblingTask = compilation.compileTaskProvider.map { it as KotlinJvmCompile }
 
         createBaselineTask.source(source)
+        createBaselineTask.exclude(GRADLE_KTS_EXCLUDE_PATTERN)
         createBaselineTask.classpath.conventionCompat(
             compilation.output.classesDirs,
             siblingTask.map { it.libraries }
@@ -142,3 +144,8 @@ private fun Project.sourceProvider(compilation: KotlinCompilation<*>): Configura
             compilation.allKotlinSourceSets.map { it.kotlin.sourceDirectories }
         }
     )
+
+// Gradle precompiled script plugins are compiled by the kotlin-dsl plugin's own pipeline, not by
+// compileKotlin. The standalone Analysis API session detekt uses cannot resolve their synthesized
+// declarations and crashes with NoDescriptorForDeclarationException. See detekt/detekt#5501.
+private const val GRADLE_KTS_EXCLUDE_PATTERN = "**/*.gradle.kts"
