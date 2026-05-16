@@ -942,4 +942,18 @@ class UnusedImportSpec(val env: KotlinEnvironmentContainer) {
             .singleElement()
             .hasMessage("The import 'kotlin.io.path.Path' is unused.")
     }
+
+    @Test
+    fun `does not report import of top-level extension property from a binary - #9269`() {
+        val mainFile =
+            """
+            package com.example
+
+            import kotlinx.coroutines.Dispatchers
+            import kotlinx.coroutines.IO
+
+            val dispatcher = Dispatchers.IO
+            """.trimIndent()
+        assertThat(subject.lintWithContext(env, mainFile)).isEmpty()
+    }
 }

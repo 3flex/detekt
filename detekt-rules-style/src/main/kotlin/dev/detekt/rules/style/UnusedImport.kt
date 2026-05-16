@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaClassKind
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassLikeSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolOrigin
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.name.FqName
@@ -63,18 +64,18 @@ class UnusedImport(config: Config) :
             staticReferences.mapTo(mutableSetOf()) { it.text.trim('`') }
         }
         private val fqNames: Set<FqName> by lazy {
-            namedReferences.mapNotNullTo(mutableSetOf()) { it.fqNameOrNull() }
+            namedReferences.flatMapTo(mutableSetOf()) { it.fqNamesOrEmpty() }
         }
 
         /**
-         * All [namedReferences] whose [KtReferenceExpression.fqNameOrNull] cannot be resolved
+         * All [namedReferences] whose [KtReferenceExpression.fqNamesOrEmpty] is empty
          * mapped to their text. String matches to such references shouldn't be marked as unused
          * imports since they could match the unknown value being imported.
          */
         @Suppress("DocumentationOverPrivateProperty")
         private val unresolvedNamedReferencesAsString: Set<String> by lazy {
             namedReferences.mapNotNullTo(mutableSetOf()) {
-                if (it.fqNameOrNull() == null) it.text.trim('`') else null
+                if (it.fqNamesOrEmpty().isEmpty()) it.text.trim('`') else null
             }
         }
 
@@ -160,23 +161,40 @@ class UnusedImport(config: Config) :
         }
 
         @Suppress("ClassOrdering")
-        private val KaSymbol.fqNameForImport: FqName?
+        private val KaSymbol.fqNamesForImport: Set<FqName>
             get() = when (this) {
                 is KaClassLikeSymbol -> when {
                     this is KaClassSymbol && classKind == KaClassKind.COMPANION_OBJECT ->
                         classId?.outerClassId
 
                     else -> classId
-                }?.asSingleFqName()
+                }?.asSingleFqName()?.let { setOf(it) }.orEmpty()
 
-                is KaCallableSymbol -> callableId?.asSingleFqName()
+                is KaCallableSymbol -> {
+                    val cId = callableId
+                    if (cId == null) {
+                        emptySet()
+                    } else {
+                        // The K2 Analysis API reports `callableId.classId` as the
+                        // extension receiver type for top-level extension callables
+                        // deserialized from binaries (e.g. `kotlinx.coroutines.IO`
+                        // becomes `kotlinx.coroutines.Dispatchers.IO`). Their actual
+                        // import path is `packageName.callableName`, so accept both
+                        // forms as valid matches for binary-origin callables.
+                        if (origin == KaSymbolOrigin.LIBRARY && cId.classId != null) {
+                            setOf(cId.asSingleFqName(), cId.packageName.child(cId.callableName))
+                        } else {
+                            setOf(cId.asSingleFqName())
+                        }
+                    }
+                }
 
-                else -> null
+                else -> emptySet()
             }
 
-        private fun KtReferenceExpression.fqNameOrNull(): FqName? =
+        private fun KtReferenceExpression.fqNamesOrEmpty(): Set<FqName> =
             analyze(this) {
-                mainReference.resolveToSymbol()?.fqNameForImport
+                mainReference.resolveToSymbol()?.fqNamesForImport.orEmpty()
             }
     }
 
