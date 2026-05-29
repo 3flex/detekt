@@ -33,7 +33,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Check build health
-        run: ./gradlew buildHealth :detekt-gradle-plugin:buildHealth
+        run: ./gradlew buildHealth :detekt-gradle-plugin:buildHealth --warning-mode all
 
   gradle:
     strategy:
@@ -63,10 +63,10 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Assemble and publish artifacts to Maven Local
-        run: ./gradlew publishToMavenLocal
+        run: ./gradlew publishToMavenLocal --warning-mode all
 
       - name: Build detekt
-        run: ./gradlew build -x detekt
+        run: ./gradlew build -x detekt --warning-mode all
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -92,7 +92,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Verify Generated Detekt Config File
-        run: ./gradlew verifyGeneratorOutput
+        run: ./gradlew verifyGeneratorOutput --warning-mode all
 
   compile-test-snippets:
     runs-on: ubuntu-latest
@@ -112,7 +112,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build and compile test snippets
-        run: ./gradlew test -Pcompile-test-snippets=true
+        run: ./gradlew test -Pcompile-test-snippets=true --warning-mode all
 
   warnings-as-errors:
     runs-on: ubuntu-latest
@@ -132,7 +132,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Run with allWarningsAsErrors
-        run: ./gradlew compileKotlin compileTestKotlin compileTestFixturesKotlin -PwarningsAsErrors=true
+        run: ./gradlew compileKotlin compileTestKotlin compileTestFixturesKotlin -PwarningsAsErrors=true --warning-mode all
 
   build-detekt-sample-extensions:
     runs-on: ubuntu-latest
@@ -142,5 +142,5 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Build sample extensions
-        run: ./gradlew build
+        run: ./gradlew build --warning-mode all
         working-directory: detekt-sample-extensions
