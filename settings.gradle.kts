@@ -44,6 +44,7 @@ include("detekt-utils")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")
 
 plugins {
     id("com.gradle.develocity") version "4.4.2"
