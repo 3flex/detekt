@@ -15,8 +15,8 @@ import dev.detekt.psi.absolutePath
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import java.nio.file.Path
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.Collections
+import java.util.WeakHashMap
 
 /**
  * Coordinator that runs every enabled [KtlintRule] wrapping against each Kotlin file in a single
@@ -31,15 +31,22 @@ import java.util.concurrent.atomic.AtomicInteger
  *    index, and the findings produced by walking the AST once and dispatching each node to every
  *    registered wrapping (via fresh per-file [StandardRule] instances from [KtlintRule.newWrapping]
  *    so concurrent files do not race on shared ktlint state).
- *  * [ruleDoneWithFile] is invoked from [KtlintRule.visit] after each rule has consumed its
- *    findings; once the last rule has signalled, the context is evicted and the PSI copy can be
- *    garbage collected.
+ *  * A cached context is reused only while the file still holds the text the context was built from
+ *    (or the text the context itself produced via autocorrect); any other change to the file's
+ *    effective text — an external autocorrect from a previous run, or a test resetting
+ *    [modifiedText] — is treated as staleness and forces a rebuild. The cache is weakly keyed on the
+ *    [KtFile], so a file (and its PSI copy) can be garbage collected once it is no longer reachable,
+ *    without relying on an explicit eviction signal.
  */
 internal object KtlintEngine {
 
     private val registry = mutableListOf<KtlintRule>()
 
-    private val contexts = ConcurrentHashMap<KtFile, Lazy<FileContext>>()
+    // Weakly keyed so a KtFile that goes out of scope (and its PSI copy) can be collected without an
+    // explicit eviction signal; wrapped in a synchronized map for safe concurrent access by files
+    // processed on different threads.
+    private val contexts: MutableMap<KtFile, FileContext> =
+        Collections.synchronizedMap(WeakHashMap())
 
     /**
      * Registers (or replaces) the canonical [KtlintRule] instance for its [RuleId]. Latest-wins so
@@ -58,25 +65,50 @@ internal object KtlintEngine {
         }
     }
 
-    fun contextFor(root: KtFile): FileContext = contexts.computeIfAbsent(root) { lazy { build(it) } }.value
-
-    fun ruleDoneWithFile(root: KtFile, context: FileContext) {
-        if (context.remainingVisits.decrementAndGet() <= 0) {
-            contexts.remove(root)
+    fun contextFor(root: KtFile): FileContext {
+        val effectiveText = root.modifiedText ?: root.text
+        synchronized(contexts) {
+            contexts[root]?.let { if (it.isFreshFor(effectiveText)) return it }
         }
+        // Build outside the lock so files processed concurrently do not serialize on a single walk.
+        val built = build(root)
+        synchronized(contexts) {
+            // Another thread may have built a fresh context for the same file in the meantime.
+            contexts[root]?.let { if (it.isFreshFor(effectiveText)) return it }
+            contexts[root] = built
+            return built
+        }
+    }
+
+    /**
+     * Clears all registered rules and cached contexts. Intended for test isolation so that state
+     * from one test (triggered rules, cached per-file contexts) cannot bleed into the next.
+     */
+    internal fun reset() {
+        synchronized(this) { registry.clear() }
+        synchronized(contexts) { contexts.clear() }
     }
 
     internal class FileContext(
         val fileCopy: KtFile,
         val findings: Map<RuleId, List<Finding>>,
-        val remainingVisits: AtomicInteger,
-    )
+        /** Effective text the shared walk consumed. */
+        val sourceText: String,
+        /** [fileCopy] text after the walk; equals [sourceText] when nothing was autocorrected. */
+        val producedText: String,
+    ) {
+        /**
+         * A cached context is reusable only if the file still holds the text this context was built
+         * from, or the text this context itself produced via autocorrect. Any other change is
+         * staleness and must trigger a rebuild.
+         */
+        fun isFreshFor(effectiveText: String): Boolean =
+            effectiveText == sourceText || effectiveText == producedText
+    }
 
     private fun build(root: KtFile): FileContext {
-        val fileCopy = KtPsiFactory(root.project).createPhysicalFile(
-            root.name,
-            root.modifiedText ?: root.text,
-        )
+        val sourceText = root.modifiedText ?: root.text
+        val fileCopy = KtPsiFactory(root.project).createPhysicalFile(root.name, sourceText)
         val positionByOffset = KtLintLineColCalculator.calculateLineColByOffset(fileCopy.text)
         val originalPath = root.absolutePath()
 
@@ -86,7 +118,7 @@ internal object KtlintEngine {
         // whose AST mutations would otherwise leak into the test's modifiedText assertions.
         val active = snapshotRegistry().filter { it.triggeredVisit || it.isActiveByConfig() }
         if (active.isEmpty()) {
-            return FileContext(fileCopy, emptyMap(), AtomicInteger(0))
+            return FileContext(fileCopy, emptyMap(), sourceText, sourceText)
         }
         // Fresh per-file ktlint StandardRule instances so different files dispatching through
         // the engine concurrently do not race on shared per-file state (counters, last-token, etc.).
@@ -105,7 +137,7 @@ internal object KtlintEngine {
             root.modifiedText = fileCopy.text
         }
 
-        return FileContext(fileCopy, findings, AtomicInteger(active.size))
+        return FileContext(fileCopy, findings, sourceText, fileCopy.text)
     }
 
     private fun snapshotRegistry(): List<KtlintRule> = synchronized(this) { registry.toList() }

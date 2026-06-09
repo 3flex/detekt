@@ -66,11 +66,7 @@ internal abstract class KtlintRule(config: Config, description: String) : Rule(c
             triggeredVisit = true
         }
         val context = KtlintEngine.contextFor(root)
-        try {
-            context.findings[wrapping.ruleId]?.forEach(::report)
-        } finally {
-            KtlintEngine.ruleDoneWithFile(root, context)
-        }
+        context.findings[wrapping.ruleId]?.forEach(::report)
     }
 
     open fun overrideEditorConfigProperties(): Map<EditorConfigProperty<*>, String>? = null

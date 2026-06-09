@@ -61,47 +61,40 @@ class KtlintEngineSpec {
 
     @Test
     fun `a later visit on a reused KtFile must not be served a stale context after modifiedText changes`() {
-        // Reproduces the cross-test flake: the engine seeds remainingVisits with the number of
-        // rules participating in the shared walk (active.size), but only decrements it for rules
-        // that actually call visit(). Whenever more rules are registered than visit a given file,
-        // the eviction counter can never reach zero, the per-file context is never evicted, and a
-        // later visit on the same KtFile is served the stale cached findings instead of rebuilding
-        // from the (now changed) modifiedText.
-
-        // Trigger a second, unrelated rule on a different file so the engine's registry holds two
-        // active rules. This guarantees remainingVisits starts at >= 2 regardless of test ordering.
+        // Regression test: when the same KtFile is visited again after its effective text changed
+        // (e.g. a prior autocorrect cleaned it), the engine must rebuild rather than serve the
+        // findings cached from the previous, now-stale text. A second unrelated rule is triggered
+        // so more than one rule is registered, mirroring a real run where many rules share the
+        // per-file walk.
         val otherFile = compileContentForTest("fun other() = Unit\n", "EngineStaleOther.kt")
         NoSemicolons(Config.empty).visitFile(otherFile, FakeLanguageVersionSettings())
 
         val ktFile = compileContentForTest("fun main()\n= Unit", "EngineStaleContext.kt")
         val rule = NoLineBreakBeforeAssignment(Config.empty)
 
-        // First pass: the file still has the violation, so one finding is expected. Building the
-        // context seeds remainingVisits = 2; this single rule then decrements it to 1 (not evicted).
+        // First pass: the file still has the violation, so one finding is expected.
         assertThat(rule.visitFile(ktFile, FakeLanguageVersionSettings())).hasSize(1)
 
         // Simulate a prior autocorrect having cleaned the file.
         ktFile.modifiedText = "fun main() = Unit\n"
 
-        // The second pass should re-read modifiedText (now clean) and report nothing. With the
-        // never-evicted stale context it is instead served the original dirty findings.
+        // The second pass must re-read modifiedText (now clean) and report nothing.
         val secondPass = rule.visitFile(ktFile, FakeLanguageVersionSettings())
 
         assertThat(secondPass).isEmpty()
     }
 
     @Test
-    fun `ruleDoneWithFile evicts the per-file context once remaining visits reach zero`() {
-        val ktFile = compileContentForTest("fun main()\n= Unit", "EngineSpecEviction.kt")
+    fun `a changed file rebuilds the context while an unchanged file reuses it`() {
+        val ktFile = compileContentForTest("fun main()\n= Unit", "EngineSpecRebuild.kt")
         NoLineBreakBeforeAssignment(Config.empty).visitFile(ktFile, FakeLanguageVersionSettings())
 
         val context = KtlintEngine.contextFor(ktFile)
-        while (context.remainingVisits.get() > 0) {
-            KtlintEngine.ruleDoneWithFile(ktFile, context)
-        }
+        // Unchanged content: the cached context is reused.
+        assertThat(KtlintEngine.contextFor(ktFile)).isSameAs(context)
 
-        // After draining, a subsequent contextFor must build a fresh context (different identity).
-        val rebuilt = KtlintEngine.contextFor(ktFile)
-        assertThat(rebuilt).isNotSameAs(context)
+        // Changed content: the stale context is dropped and a fresh one is built.
+        ktFile.modifiedText = "fun main() = Unit\n"
+        assertThat(KtlintEngine.contextFor(ktFile)).isNotSameAs(context)
     }
 }
