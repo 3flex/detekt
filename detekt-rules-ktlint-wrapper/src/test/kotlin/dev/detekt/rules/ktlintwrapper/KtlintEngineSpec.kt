@@ -3,6 +3,7 @@ package dev.detekt.rules.ktlintwrapper
 import dev.detekt.api.Config
 import dev.detekt.api.modifiedText
 import dev.detekt.rules.ktlintwrapper.wrappers.NoLineBreakBeforeAssignment
+import dev.detekt.rules.ktlintwrapper.wrappers.NoSemicolons
 import dev.detekt.test.FakeLanguageVersionSettings
 import dev.detekt.test.utils.compileContentForTest
 import org.assertj.core.api.Assertions.assertThat
@@ -56,6 +57,37 @@ class KtlintEngineSpec {
             .visitFile(ktFile, FakeLanguageVersionSettings())
 
         assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `a later visit on a reused KtFile must not be served a stale context after modifiedText changes`() {
+        // Reproduces the cross-test flake: the engine seeds remainingVisits with the number of
+        // rules participating in the shared walk (active.size), but only decrements it for rules
+        // that actually call visit(). Whenever more rules are registered than visit a given file,
+        // the eviction counter can never reach zero, the per-file context is never evicted, and a
+        // later visit on the same KtFile is served the stale cached findings instead of rebuilding
+        // from the (now changed) modifiedText.
+
+        // Trigger a second, unrelated rule on a different file so the engine's registry holds two
+        // active rules. This guarantees remainingVisits starts at >= 2 regardless of test ordering.
+        val otherFile = compileContentForTest("fun other() = Unit\n", "EngineStaleOther.kt")
+        NoSemicolons(Config.empty).visitFile(otherFile, FakeLanguageVersionSettings())
+
+        val ktFile = compileContentForTest("fun main()\n= Unit", "EngineStaleContext.kt")
+        val rule = NoLineBreakBeforeAssignment(Config.empty)
+
+        // First pass: the file still has the violation, so one finding is expected. Building the
+        // context seeds remainingVisits = 2; this single rule then decrements it to 1 (not evicted).
+        assertThat(rule.visitFile(ktFile, FakeLanguageVersionSettings())).hasSize(1)
+
+        // Simulate a prior autocorrect having cleaned the file.
+        ktFile.modifiedText = "fun main() = Unit\n"
+
+        // The second pass should re-read modifiedText (now clean) and report nothing. With the
+        // never-evicted stale context it is instead served the original dirty findings.
+        val secondPass = rule.visitFile(ktFile, FakeLanguageVersionSettings())
+
+        assertThat(secondPass).isEmpty()
     }
 
     @Test
