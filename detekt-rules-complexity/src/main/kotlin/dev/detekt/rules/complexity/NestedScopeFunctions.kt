@@ -114,8 +114,8 @@ class NestedScopeFunctions(config: Config) :
         private fun KtCallExpression.isScopeFunction(): Boolean =
             analyze(this) { callableSymbols()?.any { it.matchesScopeFunction() } ?: false }
 
-        context(session: KaSession)
         @OptIn(KaExperimentalApi::class)
+        context(session: KaSession)
         private fun KtCallExpression.callableSymbols() =
             with(session) {
                 resolveCall()?.let {
