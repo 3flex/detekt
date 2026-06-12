@@ -7,6 +7,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.rules.coroutines.utils.CoroutineCallableIds
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaCompoundVariableAccessCall
@@ -164,12 +165,12 @@ class SuspendFunSwallowedCancellation(config: Config) :
             }
         }
 
+    @OptIn(KaExperimentalApi::class)
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
 
         val callableId = analyze(expression) {
-            expression.resolveToCall()
-                ?.successfulFunctionCallOrNull()
+            expression.resolveCall()
                 ?.symbol
                 ?.callableId
         }
@@ -211,12 +212,12 @@ class SuspendFunSwallowedCancellation(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun shouldTraverseInsideImpl(element: PsiElement): Boolean =
         when (element) {
             is KtCallExpression -> {
                 analyze(element) {
-                    val functionSymbol = element.resolveToCall()
-                        ?.successfulFunctionCallOrNull()
+                    val functionSymbol = element.resolveCall()
                         ?.symbol
                         as? KaNamedFunctionSymbol
 
@@ -228,8 +229,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
                 val parentCallExpression = element.getParentOfType<KtCallExpression>(true) ?: return false
                 val elementArgument = element.getArgumentExpression()
                 analyze(parentCallExpression) {
-                    val valueSymbol = parentCallExpression.resolveToCall()
-                        ?.successfulFunctionCallOrNull()
+                    val valueSymbol = parentCallExpression.resolveCall()
                         ?.valueArgumentMapping
                         ?.get(elementArgument)
                         ?.symbol
@@ -241,6 +241,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
             else -> true
         }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KtExpression.hasSuspendCalls(): Boolean =
         when (this) {
             is KtForExpression -> {
@@ -268,8 +269,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
 
             is KtNameReferenceExpression -> {
                 analyze(this) {
-                    resolveToCall()
-                        ?.successfulCallOrNull<KaCallableMemberCall<*, *>>()
+                    (this@hasSuspendCalls.resolveCall() as? KaCallableMemberCall<*, *>)
                         ?.symbol
                         ?.callableId == CoroutineCallableIds.CoroutineContextCallableId
                 }
@@ -302,6 +302,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
      * Checking for a [KtThrowExpression] which throws the same element as we received from the [KtCatchClause]. This
      * returns false if another exception with the same shadowed name as [cancellationException] is thrown.
      */
+    @OptIn(KaExperimentalApi::class)
     private fun KtCatchClause.exceptionWasRethrown(cancellationException: KtParameter): Boolean {
         val thrownElements = catchBody
             ?.getChildrenOfType<KtThrowExpression>()
@@ -311,7 +312,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
             .filterIsInstance<KtNameReferenceExpression>()
             .map { expr ->
                 analyze(expr) {
-                    expr.mainReference.resolveToSymbol()?.psi
+                    expr.resolveSymbol()?.psi
                 }
             }
             .toList()

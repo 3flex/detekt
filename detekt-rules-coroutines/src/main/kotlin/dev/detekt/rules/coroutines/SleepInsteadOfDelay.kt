@@ -7,6 +7,7 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
@@ -91,13 +92,14 @@ class SleepInsteadOfDelay(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     context(session: KaSession)
     private fun getNearestParentForSuspension(psiElement: PsiElement): PsiElement? {
         fun KtValueArgument.isNearestParentForSuspension(): Boolean {
             val parent = this.getParentOfTypes(true, KtCallExpression::class.java) ?: return false
             with(session) {
-                val functionCall = parent.resolveToCall()?.singleFunctionCallOrNull() ?: return false
+                val functionCall = parent.resolveCall() ?: return false
                 val functionSymbol = functionCall.symbol as? KaNamedFunctionSymbol ?: return false
                 val parameterSymbol = functionCall.valueArgumentMapping[getArgumentExpression()]?.symbol ?: return false
                 return functionSymbol.isInline.not() || parameterSymbol.isNoinline || parameterSymbol.isCrossinline
@@ -127,12 +129,13 @@ class SleepInsteadOfDelay(config: Config) :
             else -> false
         }
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtValueArgument.isSuspendAllowed(): Boolean {
         val parent = this.getParentOfTypes(true, KtCallExpression::class.java) ?: return false
         val argumentExpression = this.getArgumentExpression() ?: return false
         with(session) {
-            val parameter = parent.resolveToCall()?.singleFunctionCallOrNull()?.valueArgumentMapping[argumentExpression]
+            val parameter = parent.resolveCall()?.valueArgumentMapping[argumentExpression]
             return parameter?.returnType?.isSuspendFunctionType == true
         }
     }
