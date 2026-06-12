@@ -59,6 +59,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.workers.WorkerExecutor
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import javax.inject.Inject
 
 @CacheableTask
@@ -93,15 +95,15 @@ abstract class Detekt @Inject constructor(
 
     @get:Input
     @get:Optional
-    abstract val apiVersion: Property<String>
+    abstract val apiVersion: Property<KotlinVersion>
 
     @get:Input
     @get:Optional
-    abstract val languageVersion: Property<String>
+    abstract val languageVersion: Property<KotlinVersion>
 
     @get:Input
     @get:Optional
-    abstract val jvmTarget: Property<String>
+    abstract val jvmTarget: Property<JvmTarget>
 
     @get:Internal
     abstract val jdkHome: DirectoryProperty
@@ -174,9 +176,9 @@ abstract class Detekt @Inject constructor(
         get() = listOf(
             InputArgument(source),
             ClasspathArgument(classpath),
-            ApiVersionArgument(apiVersion.orNull),
-            LanguageVersionArgument(languageVersion.orNull),
-            JvmTargetArgument(jvmTarget.orNull),
+            ApiVersionArgument(apiVersion.orNull?.version),
+            LanguageVersionArgument(languageVersion.orNull?.version),
+            JvmTargetArgument(jvmTarget.orNull?.target),
             JdkHomeArgument(jdkHome),
             ConfigArgument(config),
             BaselineArgumentOrEmpty(baseline.orNull),

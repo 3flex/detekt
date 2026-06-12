@@ -24,7 +24,7 @@ internal fun Project.setDetektTaskDefaults(extension: DetektExtension) {
         project.plugins.withId("org.jetbrains.kotlin.jvm") { _ ->
             val compilerOptions = project.extensions.getByType(KotlinJvmExtension::class.java).compilerOptions
 
-            it.jvmTarget.convention(compilerOptions.jvmTarget.map { jvmTarget -> jvmTarget.target })
+            it.jvmTarget.convention(compilerOptions.jvmTarget)
         }
 
         it.debug.convention(extension.debug)
@@ -56,7 +56,7 @@ internal fun Project.setCreateBaselineTaskDefaults(extension: DetektExtension) {
         project.plugins.withId("org.jetbrains.kotlin.jvm") { _ ->
             val compilerOptions = project.extensions.getByType(KotlinJvmExtension::class.java).compilerOptions
 
-            it.jvmTarget.convention(compilerOptions.jvmTarget.map { jvmTarget -> jvmTarget.target })
+            it.jvmTarget.convention(compilerOptions.jvmTarget)
         }
 
         it.config.conventionCompat(project.provider { extension.config })

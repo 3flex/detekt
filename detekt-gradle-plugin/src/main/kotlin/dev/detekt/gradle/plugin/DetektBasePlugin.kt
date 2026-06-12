@@ -65,8 +65,26 @@ class DetektBasePlugin : Plugin<Project> {
         }
 
         project.setTaskDefaults(extension)
-        project.registerSourceSetTasks(extension)
+        if (kotlinGradlePluginOnClasspath()) {
+            project.registerSourceSetTasks(extension)
+        } else {
+            project.logger.warn(KOTLIN_GRADLE_PLUGIN_MISSING_WARNING)
+        }
     }
+
+    /**
+     * Detekt's tasks reference types from the Kotlin Gradle plugin API (e.g.
+     * [org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin]). Those types are only present on the
+     * build's plugin classpath when a Kotlin Gradle plugin is also on it. Probe the plugin
+     * classloader so we can warn instead of failing with an opaque [NoClassDefFoundError].
+     */
+    private fun kotlinGradlePluginOnClasspath(): Boolean =
+        try {
+            Class.forName("org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin")
+            true
+        } catch (_: ClassNotFoundException) {
+            false
+        }
 
     private fun Project.setTaskDefaults(extension: DetektExtension) {
         setDetektTaskDefaults(extension)
@@ -145,6 +163,11 @@ class DetektBasePlugin : Plugin<Project> {
 
         // This flag is ignored unless the compiler plugin is applied to the project
         private const val DEFAULT_COMPILER_PLUGIN_ENABLED = true
+
+        internal const val KOTLIN_GRADLE_PLUGIN_MISSING_WARNING =
+            "The Detekt plugin was applied but no Kotlin Gradle plugin was found on the build's plugin classpath. " +
+                "Detekt requires a Kotlin Gradle plugin (e.g. 'org.jetbrains.kotlin.jvm') to be on the classpath. " +
+                "Detekt tasks that need it will be unavailable."
     }
 }
 

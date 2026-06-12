@@ -6,6 +6,8 @@ import dev.detekt.gradle.testkit.ProjectLayout
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.repositories
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.junit.jupiter.api.Test
 
@@ -27,9 +29,9 @@ class DetektJvmSpec {
                 }
             }
             tasks.named("detektTest", Detekt::class.java) {
-                it.jvmTarget.set("1.8")
-                it.languageVersion.set("1.6")
-                it.apiVersion.set("1.5")
+                it.jvmTarget.set(JvmTarget.JVM_1_8)
+                it.languageVersion.set(KotlinVersion.KOTLIN_2_1)
+                it.apiVersion.set(KotlinVersion.KOTLIN_2_0)
             }
         },
     ).also(DslGradleRunner::setupProject)
@@ -66,8 +68,8 @@ class DetektJvmSpec {
         assertThat(argumentString).contains("--classpath")
         assertThat(argumentString).contains("--analysis-mode full")
         assertThat(argumentString).contains("--jvm-target 1.8")
-        assertThat(argumentString).contains("--api-version 1.5")
-        assertThat(argumentString).contains("--language-version 1.6")
+        assertThat(argumentString).contains("--api-version 2.0")
+        assertThat(argumentString).contains("--language-version 2.1")
         assertThat(argumentString).contains("--fail-on-severity error")
     }
 }

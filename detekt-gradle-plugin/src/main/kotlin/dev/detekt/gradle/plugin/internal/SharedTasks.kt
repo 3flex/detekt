@@ -39,15 +39,15 @@ internal fun Project.registerJvmCompilationDetektTask(
             siblingTask.map { it.friendPaths }
         )
         detektTask.apiVersion.convention(
-            siblingTask.flatMap { task -> task.compilerOptions.apiVersion.map { it.version } }
+            siblingTask.flatMap { task -> task.compilerOptions.apiVersion }
         )
         detektTask.languageVersion.convention(
-            siblingTask.flatMap { task -> task.compilerOptions.languageVersion.map { it.version } }
+            siblingTask.flatMap { task -> task.compilerOptions.languageVersion }
         )
         /* Note: jvmTarget convention is also set in setDetektTaskDefaults. There may be a race between setting it here
            as well, but they should both set the same value. This should possibly be revisited in the future. */
         detektTask.jvmTarget.convention(
-            siblingTask.flatMap { task -> task.compilerOptions.jvmTarget.map { it.target } }
+            siblingTask.flatMap { task -> task.compilerOptions.jvmTarget }
         )
         detektTask.freeCompilerArgs.convention(siblingTask.flatMap { it.compilerOptions.freeCompilerArgs })
         detektTask.optIn.convention(siblingTask.flatMap { it.compilerOptions.optIn })
@@ -97,15 +97,15 @@ internal fun Project.registerJvmCompilationCreateBaselineTask(
             siblingTask.map { it.friendPaths }
         )
         createBaselineTask.apiVersion.convention(
-            siblingTask.flatMap { task -> task.compilerOptions.apiVersion.map { it.version } }
+            siblingTask.flatMap { task -> task.compilerOptions.apiVersion }
         )
         createBaselineTask.languageVersion.convention(
-            siblingTask.flatMap { task -> task.compilerOptions.languageVersion.map { it.version } }
+            siblingTask.flatMap { task -> task.compilerOptions.languageVersion }
         )
         /* Note: jvmTarget convention is also set in setCreateBaselineTaskDefaults. There may be a race between setting
            it here as well, but they should both set the same value. This should possibly be revisited in the future. */
         createBaselineTask.jvmTarget.convention(
-            siblingTask.flatMap { task -> task.compilerOptions.jvmTarget.map { it.target } }
+            siblingTask.flatMap { task -> task.compilerOptions.jvmTarget }
         )
         createBaselineTask.freeCompilerArgs.convention(siblingTask.flatMap { it.compilerOptions.freeCompilerArgs })
         createBaselineTask.optIn.convention(siblingTask.flatMap { it.compilerOptions.optIn })

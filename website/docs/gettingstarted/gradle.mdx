@@ -363,11 +363,11 @@ More information on type resolution are available on the [type resolution](type-
 
 ```groovy
 tasks.withType(dev.detekt.gradle.Detekt).configureEach {
-    jvmTarget = '1.8'
+    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
     jdkHome.set(file('path/to/jdkHome'))
 }
 tasks.withType(dev.detekt.gradle.DetektCreateBaselineTask).configureEach {
-    jvmTarget = '1.8'
+    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
     jdkHome.set(file('path/to/jdkHome'))
 }
 ```
@@ -376,11 +376,11 @@ tasks.withType(dev.detekt.gradle.DetektCreateBaselineTask).configureEach {
 
 ```kotlin
 tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
-    jvmTarget.set("1.8")
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
     jdkHome.set(file("path/to/jdkHome"))
 }
 tasks.withType<dev.detekt.gradle.DetektCreateBaselineTask>().configureEach {
-    jvmTarget.set("1.8")
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
     jdkHome.set(file("path/to/jdkHome"))
 }
 ```
