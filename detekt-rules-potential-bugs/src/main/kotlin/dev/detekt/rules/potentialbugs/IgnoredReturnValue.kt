@@ -13,9 +13,9 @@ import dev.detekt.api.config
 import dev.detekt.psi.FunctionMatcher
 import dev.detekt.psi.isCalling
 import dev.detekt.psi.pathGlobToRegex
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaDeclarationSymbol
@@ -111,12 +111,13 @@ class IgnoredReturnValue(config: Config) :
         it.map(FunctionMatcher::fromFunctionSignature)
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ComplexCondition", "ReturnCount")
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
 
         analyze(expression) {
-            val functionCall = expression.resolveToCall()?.singleFunctionCallOrNull() ?: return
+            val functionCall = expression.resolveCall() ?: return
             val symbol = functionCall.symbol
             val returnType = functionCall.signature.returnType
             if (returnType.isUnitType || returnType.isNothingType) return

@@ -7,8 +7,9 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
@@ -61,6 +62,7 @@ class MissingSuperCall(config: Config) :
         )
     ) { it.map(::FqName) }
 
+    @OptIn(KaExperimentalApi::class)
     override fun visitNamedFunction(function: KtNamedFunction) {
         super.visitNamedFunction(function)
 
@@ -72,7 +74,7 @@ class MissingSuperCall(config: Config) :
             }?.callableId ?: return
 
             val hasSuperCall = function.anyDescendantOfType<KtQualifiedExpression> {
-                it.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.callableId == superFunctionId
+                (it.resolveCall() as? KaFunctionCall<*>)?.symbol?.callableId == superFunctionId
             }
 
             if (!hasSuperCall) {

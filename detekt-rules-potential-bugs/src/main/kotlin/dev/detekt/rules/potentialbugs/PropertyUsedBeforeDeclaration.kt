@@ -5,8 +5,9 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.successfulVariableAccessCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -55,6 +56,7 @@ class PropertyUsedBeforeDeclaration(config: Config) :
     ),
     RequiresAnalysisApi {
 
+    @OptIn(KaExperimentalApi::class)
     override fun visitClassOrObject(classOrObject: KtClassOrObject) {
         super.visitClassOrObject(classOrObject)
 
@@ -74,7 +76,7 @@ class PropertyUsedBeforeDeclaration(config: Config) :
                     val property = allProperties[it.text]
                     if (property != null &&
                         property !in declaredProperties &&
-                        property == it.resolveToCall()?.successfulVariableAccessCall()?.symbol?.callableId
+                        property == (it.resolveCall() as? KaVariableAccessCall)?.symbol?.callableId
                     ) {
                         report(Finding(Entity.from(it), "'${it.text}' is used before declaration."))
                     }

@@ -8,9 +8,9 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.FunctionMatcher
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolOrigin
 import org.jetbrains.kotlin.name.Name
@@ -109,6 +109,7 @@ class UnnamedParameterUse(config: Config) :
     }
 
     @Suppress("ReturnCount", "CyclomaticComplexMethod")
+    @OptIn(KaExperimentalApi::class)
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
 
@@ -118,7 +119,7 @@ class UnnamedParameterUse(config: Config) :
         }
 
         analyze(expression) {
-            val call = expression.resolveToCall()?.singleFunctionCallOrNull() ?: return
+            val call = expression.resolveCall() ?: return
             val symbol = call.symbol
             if (!symbol.hasStableParameterNames) return
             if (symbol.origin.let { it == KaSymbolOrigin.JAVA_SOURCE || it == KaSymbolOrigin.JAVA_LIBRARY }) return

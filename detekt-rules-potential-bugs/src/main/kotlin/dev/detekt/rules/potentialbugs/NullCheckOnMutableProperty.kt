@@ -8,7 +8,9 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.isNonNullCheck
 import dev.detekt.psi.isNullCheck
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.singleVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.name.FqName
@@ -78,6 +80,7 @@ class NullCheckOnMutableProperty(config: Config) :
             }
         }
 
+        @OptIn(KaExperimentalApi::class)
         override fun visitIfExpression(expression: KtIfExpression) {
             // Extract all possible null-checks within the if-expression.
             val nonNullChecks = (expression.condition as? KtBinaryExpression)
@@ -86,12 +89,13 @@ class NullCheckOnMutableProperty(config: Config) :
 
             val modifiedCandidateQueues = analyze(expression) {
                 nonNullChecks.mapNotNull { nonNullCondition ->
-                    if (nonNullCondition.left is KtConstantExpression) {
-                        nonNullCondition.right as? KtNameReferenceExpression
-                    } else {
-                        nonNullCondition.left as? KtNameReferenceExpression
-                    }?.resolveToCall()
-                        ?.singleVariableAccessCall()
+                    (
+                        if (nonNullCondition.left is KtConstantExpression) {
+                            nonNullCondition.right as? KtNameReferenceExpression
+                        } else {
+                            nonNullCondition.left as? KtNameReferenceExpression
+                        }?.resolveCall() as? KaVariableAccessCall
+                        )
                         ?.symbol
                         ?.callableId
                         ?.asSingleFqName()
