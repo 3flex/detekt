@@ -20,8 +20,16 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
 
+/**
+ * The main detekt Gradle plugin, applied with the `dev.detekt` plugin id.
+ *
+ * On top of the configuration provided by [DetektBasePlugin], it registers the detekt tasks for the
+ * applied Kotlin plugins (JVM, Android and Multiplatform) as well as the `detektGenerateConfig` task,
+ * and wires up the `detekt` and `detektPlugins` dependency configurations.
+ */
 class DetektPlugin : Plugin<Project> {
 
+    /** Applies the plugin to the given [project]. */
     override fun apply(project: Project) {
         project.pluginManager.apply(DetektBasePlugin::class.java)
 
@@ -191,5 +199,11 @@ internal const val CONFIGURATION_DETEKT = "detekt"
 internal fun ProviderFactory.isWorkerApiEnabled(): Boolean =
     gradleProperty("detekt.use.worker.api").getOrElse("false") == "true"
 
+/**
+ * Returns the version of Kotlin that this detekt Gradle plugin was compiled against.
+ *
+ * This is useful for verifying that the detekt analysis runs against a Kotlin version compatible with
+ * the one used to build the project.
+ */
 @Incubating
 fun getSupportedKotlinVersion(): String = BuildConfig.KOTLIN_IMPLEMENTATION_VERSION

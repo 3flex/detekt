@@ -20,6 +20,12 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
+/**
+ * Gradle task that generates a detekt configuration file inside the project.
+ *
+ * The plugin registers a single instance of this task named `detektGenerateConfig`. If the target
+ * [configFile] already exists it is left untouched.
+ */
 @CacheableTask
 abstract class DetektGenerateConfigTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
@@ -31,12 +37,15 @@ abstract class DetektGenerateConfigTask @Inject constructor(
         group = LifecycleBasePlugin.VERIFICATION_GROUP
     }
 
+    /** The classpath containing the detekt CLI used to generate the configuration. */
     @get:Classpath
     abstract val detektClasspath: ConfigurableFileCollection
 
+    /** The classpath containing additional detekt rule set plugins whose default configuration is included. */
     @get:Classpath
     abstract val pluginClasspath: ConfigurableFileCollection
 
+    /** The location where the generated configuration file is written. */
     @get:OutputFile
     abstract val configFile: RegularFileProperty
 
@@ -46,6 +55,7 @@ abstract class DetektGenerateConfigTask @Inject constructor(
             GenerateConfigArgument(configFile.get())
         ).flatMap(CliArgument::toArgument)
 
+    /** Generates the detekt configuration file unless it already exists. */
     @TaskAction
     fun generateConfig() {
         if (configFile.get().asFile.exists()) {

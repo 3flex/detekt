@@ -18,9 +18,16 @@ import org.gradle.api.reporting.ReportingExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 
+/**
+ * The base detekt Gradle plugin shared by the main [DetektPlugin] and the [DetektKotlinCompilerPlugin].
+ *
+ * It creates the project-wide `detekt` [DetektExtension], registers the per-source-set `detekt` and
+ * `detektBaseline` tasks for the applied Kotlin plugins and sets the conventions for all detekt tasks.
+ */
 class DetektBasePlugin : Plugin<Project> {
     private var sourceSetListenerConfigured = false
 
+    /** Applies the plugin to the given [project]. */
     override fun apply(project: Project) {
         project.pluginManager.apply(ReportingBasePlugin::class.java)
 

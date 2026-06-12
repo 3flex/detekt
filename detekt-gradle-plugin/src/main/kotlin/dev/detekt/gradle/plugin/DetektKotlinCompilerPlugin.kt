@@ -19,8 +19,16 @@ import java.io.ObjectOutputStream
 import java.security.MessageDigest
 import java.util.Base64
 
+/**
+ * The detekt Kotlin compiler plugin support plugin, applied with the `dev.detekt.compiler` plugin id.
+ *
+ * It runs detekt as part of Kotlin compilation instead of as a separate task, adding a per-compile-task
+ * `detekt` [KotlinCompileTaskDetektExtension] and wiring the detekt compiler plugin into each applicable
+ * JVM compilation.
+ */
 class DetektKotlinCompilerPlugin : KotlinCompilerPluginSupportPlugin {
 
+    /** Applies the plugin to the given [target] project. */
     override fun apply(target: Project) {
         target.pluginManager.apply(DetektBasePlugin::class.java)
 
@@ -41,6 +49,7 @@ class DetektKotlinCompilerPlugin : KotlinCompilerPluginSupportPlugin {
         }
     }
 
+    /** Maps the [KotlinCompileTaskDetektExtension] of the given compilation to the compiler plugin options. */
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
 
@@ -89,11 +98,14 @@ class DetektKotlinCompilerPlugin : KotlinCompilerPluginSupportPlugin {
         return options
     }
 
+    /** Returns the compiler plugin id used to pass options to the detekt compiler plugin. */
     override fun getCompilerPluginId(): String = "detekt-compiler-plugin"
 
+    /** Returns the Maven artifact that provides the detekt compiler plugin. */
     override fun getPluginArtifact(): SubpluginArtifact =
         SubpluginArtifact("dev.detekt", "detekt-compiler-plugin", BuildConfig.DETEKT_COMPILER_PLUGIN_VERSION)
 
+    /** Returns `true` for JVM and Android compilations, which detekt's compiler plugin supports. */
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
         kotlinCompilation.platformType in setOf(KotlinPlatformType.jvm, KotlinPlatformType.androidJvm)
 }

@@ -12,16 +12,25 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Gradle task that merges the Checkstyle XML or SARIF reports of several detekt runs into a single file.
+ *
+ * This is commonly used in multi-module builds to combine the per-module reports into one aggregated
+ * report. The format is derived from the input files, which must all share the same format.
+ */
 @CacheableTask
 abstract class ReportMergeTask : DefaultTask() {
 
+    /** The report files to merge. All inputs must be of the same report format. */
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val input: ConfigurableFileCollection
 
+    /** The file the merged report is written to. */
     @get:OutputFile
     abstract val output: RegularFileProperty
 
+    /** Merges all existing [input] reports into the [output] file. */
     @TaskAction
     fun merge() {
         logger.info("Input")

@@ -61,6 +61,12 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
+/**
+ * Gradle task that runs a detekt analysis on a set of Kotlin source files and produces the configured reports.
+ *
+ * The plugin registers one instance of this task per source set (for example `detektMain` and `detektTest`),
+ * with its properties configured from the project's [dev.detekt.gradle.extensions.DetektExtension].
+ */
 @CacheableTask
 abstract class Detekt @Inject constructor(
     private val objects: ObjectFactory,
@@ -68,75 +74,96 @@ abstract class Detekt @Inject constructor(
     private val providers: ProviderFactory,
 ) : SourceTask() {
 
+    /** The classpath containing the detekt CLI used to run the analysis. */
     @get:Classpath
     abstract val detektClasspath: ConfigurableFileCollection
 
+    /** The classpath containing additional detekt rule set plugins to load. */
     @get:Classpath
     abstract val pluginClasspath: ConfigurableFileCollection
 
+    /** The baseline file containing findings that should be suppressed during this run. */
     @get:InputFiles // Why not InputFile? See https://github.com/gradle/gradle/issues/2016
     @get:Optional
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val baseline: RegularFileProperty
 
+    /** The detekt configuration file(s) used for the analysis. */
     @get:InputFiles
     @get:Optional
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val config: ConfigurableFileCollection
 
+    /** The classpath of the analyzed sources, used to enable type resolution. */
     @get:Classpath
     @get:Optional
     abstract val classpath: ConfigurableFileCollection
 
+    /** Paths to friend modules that grant access to their `internal` declarations during analysis. */
     @get:Internal
     abstract val friendPaths: ConfigurableFileCollection
 
+    /** The Kotlin API version used when analyzing the sources, for example `2.0`. */
     @get:Input
     @get:Optional
     abstract val apiVersion: Property<String>
 
+    /** The Kotlin language version used when analyzing the sources, for example `2.0`. */
     @get:Input
     @get:Optional
     abstract val languageVersion: Property<String>
 
+    /** The target JVM version of the analyzed sources, for example `1.8` or `17`. */
     @get:Input
     @get:Optional
     abstract val jvmTarget: Property<String>
 
+    /** The JDK home used to resolve the JDK classes referenced by the analyzed sources. */
     @get:Internal
     abstract val jdkHome: DirectoryProperty
 
+    /** Whether to print debug output during task execution. */
     @get:Console
     abstract val debug: Property<Boolean>
 
+    /** Whether to build the abstract syntax tree in parallel. */
     @get:Internal
     abstract val parallel: Property<Boolean>
 
+    /** Whether to disable all default detekt rule sets and only run custom rules. */
     @get:Input
     abstract val disableDefaultRuleSets: Property<Boolean>
 
+    /** Whether to apply the [config] files on top of detekt's default configuration. */
     @get:Input
     abstract val buildUponDefaultConfig: Property<Boolean>
 
+    /** Whether to enable all available rules, including those disabled by default. */
     @get:Input
     abstract val allRules: Property<Boolean>
 
+    /** The list of opt-in requirement markers to acknowledge during analysis. */
     @get:Input
     abstract val optIn: ListProperty<String>
 
+    /** Whether to exclude the JDK from the analysis classpath. */
     @get:Input
     abstract val noJdk: Property<Boolean>
 
+    /** Whether the analyzed sources are part of a Kotlin Multiplatform project. */
     @get:Input
     abstract val multiPlatformEnabled: Property<Boolean>
 
+    /** Whether the build should still succeed when detekt reports issues. */
     @get:Input
     abstract val ignoreFailures: Property<Boolean>
 
+    /** The minimum issue severity that causes the build to fail. */
     @get:Input
     @get:Optional
     abstract val failOnSeverity: Property<FailOnSeverity>
 
+    /** Whether rules that support auto correction are allowed to modify the analyzed source files. */
     @get:Input
     @get:Option(option = "auto-correct", description = "Allow rules to auto correct code if they support it")
     abstract val autoCorrect: Property<Boolean>
@@ -148,6 +175,7 @@ abstract class Detekt @Inject constructor(
     @get:Optional
     abstract val basePath: Property<String>
 
+    /** The reports produced by this task. Use [reports] to configure which formats are generated. */
     @get:Nested
     /*
     Property must be open (as do the @Nested properties in DetektReports), see
@@ -157,6 +185,7 @@ abstract class Detekt @Inject constructor(
 
     private val isDryRun = project.providers.gradleProperty(DRY_RUN_PROPERTY)
 
+    /** Additional compiler arguments passed through to the Kotlin compiler when analyzing the sources. */
     @get:Input
     @get:Incubating
     abstract val freeCompilerArgs: ListProperty<String>
@@ -205,16 +234,23 @@ abstract class Detekt @Inject constructor(
             .plus("-no-stdlib")
             .plus("-no-reflect")
 
+    /** The Kotlin source files analyzed by this task. */
     @InputFiles
     @SkipWhenEmpty
     @IgnoreEmptyDirectories
     @PathSensitive(PathSensitivity.RELATIVE)
     override fun getSource(): FileTree = super.getSource()
 
+    /**
+     * Configures the [reports] produced by this task.
+     *
+     * @param configure action used to enable or customize the individual report formats
+     */
     fun reports(configure: Action<DetektReports>) {
         configure.execute(reports)
     }
 
+    /** Runs the detekt analysis and generates the configured reports. */
     @TaskAction
     fun check() {
         if (debug.get()) printCliCommand()
