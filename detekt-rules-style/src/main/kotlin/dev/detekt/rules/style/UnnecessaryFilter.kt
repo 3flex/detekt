@@ -6,6 +6,7 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
@@ -88,6 +89,7 @@ class UnnecessaryFilter(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     private fun KtExpression.nextCall(): KtExpression? {
         getQualifiedExpressionForReceiver()?.selectorExpression?.let { return it }
@@ -99,7 +101,7 @@ class UnnecessaryFilter(config: Config) :
                 val propertyName = propertySymbol.name.asString()
                 val singleReferrer = property.siblings(forward = true, withItself = false).flatMap { sibling ->
                     sibling.collectDescendantsOfType<KtNameReferenceExpression> {
-                        it.text == propertyName && it.mainReference.resolveToSymbol() == propertySymbol
+                        it.text == propertyName && it.resolveSymbol() == propertySymbol
                     }
                 }.singleOrNull()
                 val qualified = singleReferrer?.getQualifiedExpressionForReceiver()

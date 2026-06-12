@@ -11,6 +11,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.isOperator
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
@@ -183,6 +184,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
      * for the whole file as Kotlin allows access to private and internal object declarations
      * from everywhere in the file.
      */
+    @OptIn(KaExperimentalApi::class)
     override fun visitReferenceExpression(expression: KtReferenceExpression) {
         super.visitReferenceExpression(expression)
         val name = when (expression) {
@@ -194,7 +196,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
 
             is KtCallExpression -> {
                 analyze(expression) {
-                    val symbol = expression.resolveToCall()?.singleFunctionCallOrNull()?.symbol
+                    val symbol = expression.resolveCall()?.symbol
                     val psi = symbol?.psi
                     if ((psi as? KtNamedFunction)?.isOperator() == true) {
                         invokeOperatorReferences.getOrPut(symbol) { mutableListOf() }.add(expression)

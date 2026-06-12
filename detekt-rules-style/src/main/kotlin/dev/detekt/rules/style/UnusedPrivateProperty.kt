@@ -12,6 +12,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.isExpect
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaConstructorSymbol
@@ -165,12 +166,13 @@ private class UnusedPrivatePropertyVisitor(private val allowedNames: Regex) : De
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     override fun visitReferenceExpression(expression: KtReferenceExpression) {
         super.visitReferenceExpression(expression)
 
         analyze(expression) {
             val references = when (expression) {
-                is KtNameReferenceExpression -> listOfNotNull(expression.mainReference.resolveToSymbol())
+                is KtNameReferenceExpression -> listOfNotNull(expression.resolveSymbol())
 
                 is KtCallExpression -> expression.getChildrenOfType<KtValueArgumentList>()
                     .flatMap { it.arguments }

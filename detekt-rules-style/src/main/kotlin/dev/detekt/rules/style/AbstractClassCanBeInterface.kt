@@ -12,13 +12,13 @@ import dev.detekt.psi.isConstant
 import dev.detekt.psi.isInternal
 import dev.detekt.psi.isOpen
 import dev.detekt.psi.isProtected
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassKind
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolModality
 import org.jetbrains.kotlin.analysis.api.types.symbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtConstantExpression
@@ -168,6 +168,7 @@ class AbstractClassCanBeInterface(config: Config) :
      *
      * Only literal values (e.g. 404, "text") and direct references to const vals are considered constant.
      */
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtCallableDeclaration.hasConstOrNoBackingField(): Boolean =
         when (val initializer = (this as? KtProperty)?.initializer) {
@@ -179,7 +180,7 @@ class AbstractClassCanBeInterface(config: Config) :
 
             // Reference to a const val. Effectively a compile-time constant, safe for interface getters
             is KtNameReferenceExpression -> {
-                val symbol = with(session) { initializer.mainReference.resolveToSymbol() }
+                val symbol = with(session) { initializer.resolveSymbol() }
                 val psi = symbol?.psi as? KtProperty
                 psi?.isConstant() == true
             }

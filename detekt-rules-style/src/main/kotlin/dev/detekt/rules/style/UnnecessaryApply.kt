@@ -7,15 +7,13 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.receiverIsUsed
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaImplicitReceiverValue
-import org.jetbrains.kotlin.analysis.api.resolution.singleCallOrNull
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
@@ -54,13 +52,14 @@ class UnnecessaryApply(config: Config) :
     ),
     RequiresAnalysisApi {
 
+    @OptIn(KaExperimentalApi::class)
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
 
         if (expression.calleeExpression?.text != "apply") return
 
         analyze(expression) {
-            if (expression.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.callableId == applyCallableId &&
+            if (expression.resolveCall()?.symbol?.callableId == applyCallableId &&
                 expression.hasOnlyOneMemberAccessStatement() &&
                 !expression.receiverIsUsed()
             ) {
@@ -74,6 +73,7 @@ class UnnecessaryApply(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     context(session: KaSession)
     private fun KtCallExpression.hasOnlyOneMemberAccessStatement(): Boolean {
@@ -96,7 +96,7 @@ class UnnecessaryApply(config: Config) :
             val lambdaSymbol = lambda.functionLiteral.symbol
             return singleStatement.collectDescendantsOfType<KtNameReferenceExpression> {
                 val symbol = if (it.parent is KtThisExpression) {
-                    it.mainReference.resolveToSymbol()
+                    it.resolveSymbol()
                 } else {
                     it.implicitReceiver()
                 }
@@ -105,10 +105,11 @@ class UnnecessaryApply(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     fun KtNameReferenceExpression.implicitReceiver(): KaSymbol? {
         with(session) {
-            val symbol = resolveToCall()?.singleCallOrNull<KaCallableMemberCall<*, *>>()?.partiallyAppliedSymbol
+            val symbol = (resolveCall() as? KaCallableMemberCall<*, *>)?.partiallyAppliedSymbol
             val implicitReceiver = (symbol?.dispatchReceiver ?: symbol?.extensionReceiver) as? KaImplicitReceiverValue
             return implicitReceiver?.symbol
         }

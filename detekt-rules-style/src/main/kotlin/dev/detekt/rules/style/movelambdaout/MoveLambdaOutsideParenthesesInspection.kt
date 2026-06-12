@@ -1,11 +1,11 @@
 package dev.detekt.rules.style.movelambdaout
 
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
-import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.types.KaFunctionType
 import org.jetbrains.kotlin.analysis.api.types.KaType
@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.unpackFunctionLiteral
 
 // source from https://github.com/JetBrains/intellij-community/blob/88e23175cefa446adb4aa64dda8096112a37e2f8/plugins/kotlin/core/src/org/jetbrains/kotlin/idea/core/psiModificationUtils.kt
+@OptIn(KaExperimentalApi::class)
 @Suppress("ReturnCount")
 private fun KtCallExpression.canMoveLambdaOutsideParentheses(): Boolean {
     if (isEligible().not()) return false
@@ -42,7 +43,7 @@ private fun KtCallExpression.canMoveLambdaOutsideParentheses(): Boolean {
                 valueArguments.count { it.getArgumentExpression() is KtCallableReferenceExpression }
 
             val candidate =
-                callee.resolveToCall()?.successfulCallOrNull<KaCallableMemberCall<*, *>>()
+                callee.resolveCall() as? KaCallableMemberCall<*, *>
                     ?: return false
             val paramsType = when (candidate) {
                 is KaFunctionCall -> {

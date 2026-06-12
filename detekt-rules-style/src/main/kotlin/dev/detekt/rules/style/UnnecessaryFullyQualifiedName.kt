@@ -5,11 +5,11 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.KaScopeKind
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
-import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
@@ -140,6 +140,7 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         )
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount", "CyclomaticComplexMethod")
     override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
         super.visitDotQualifiedExpression(expression)
@@ -160,7 +161,7 @@ class UnnecessaryFullyQualifiedName(config: Config) :
             ?: return
 
         analyze(expression) {
-            val resolvedCall = expression.resolveToCall()?.successfulCallOrNull<KaCallableMemberCall<*, *>>()
+            val resolvedCall = expression.resolveCall() as? KaCallableMemberCall<*, *>
             val symbol = resolvedCall?.partiallyAppliedSymbol?.symbol ?: return
             val packageFqName = symbol.packageFqName() ?: return
             if (!receiverText.startsWith(packageFqName)) return
@@ -189,9 +190,10 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KaSession.isReceiverLocalVariableOrProperty(receiver: KtExpression): Boolean {
         val leftmost = leftmostReference(receiver) ?: return false
-        return leftmost.mainReference.resolveToSymbol() is KaVariableSymbol
+        return leftmost.resolveSymbol() is KaVariableSymbol
     }
 
     private fun leftmostReference(expression: KtExpression): KtNameReferenceExpression? =

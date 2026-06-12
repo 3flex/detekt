@@ -5,9 +5,9 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
@@ -84,10 +84,11 @@ class ExplicitCollectionElementAccessMethod(config: Config) :
             else -> false
         } && unusedReturnValue(expression)
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtCallExpression.getFunctionSymbol(): KaNamedFunctionSymbol? =
         with(session) {
-            resolveToCall()?.singleFunctionCallOrNull()?.symbol as? KaNamedFunctionSymbol
+            resolveCall()?.symbol as? KaNamedFunctionSymbol
         }
 
     private fun canReplace(expression: KtCallExpression, function: KaNamedFunctionSymbol): Boolean {
@@ -127,10 +128,11 @@ class ExplicitCollectionElementAccessMethod(config: Config) :
         )
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     private fun KaSession.isCallerMap(expression: KtCallExpression): Boolean {
         if (expression.valueArguments.size != 2) return false
-        val symbol = expression.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.containingSymbol as? KaClassSymbol
+        val symbol = expression.resolveCall()?.symbol?.containingSymbol as? KaClassSymbol
             ?: return false
 
         val mapClass = ClassId.fromString("kotlin/collections/Map")

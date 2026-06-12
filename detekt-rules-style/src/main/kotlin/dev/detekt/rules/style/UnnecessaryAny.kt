@@ -7,6 +7,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.firstParameterOrNull
 import dev.detekt.psi.isCalling
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
@@ -196,11 +197,12 @@ class UnnecessaryAny(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.getItUsageCount(symbol: KaDeclarationSymbol) =
         with(session) {
             collectDescendantsOfType<KtNameReferenceExpression>().count {
-                it.mainReference.resolveToSymbol() == symbol
+                it.resolveSymbol() == symbol
             }
         }
 

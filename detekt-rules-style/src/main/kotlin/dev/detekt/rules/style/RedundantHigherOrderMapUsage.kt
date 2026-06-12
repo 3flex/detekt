@@ -6,9 +6,9 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaValueParameterSymbol
 import org.jetbrains.kotlin.idea.references.mainReference
@@ -79,6 +79,7 @@ class RedundantHigherOrderMapUsage(config: Config) :
     ),
     RequiresAnalysisApi {
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
@@ -89,7 +90,7 @@ class RedundantHigherOrderMapUsage(config: Config) :
         val lambdaStatements = functionLiteral?.bodyExpression?.statements ?: return
 
         analyze(functionLiteral) {
-            val functionCall = expression.resolveToCall()?.singleFunctionCallOrNull() ?: return
+            val functionCall = expression.resolveCall() ?: return
             val symbol = functionCall.symbol
             if (symbol.callableId !in mapCallableIds) return
 
@@ -135,12 +136,13 @@ class RedundantHigherOrderMapUsage(config: Config) :
         return labeledReturnExpressions.all { isReferenceTo(it, lambdaParameter) }
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KaSession.isReferenceTo(expression: KtExpression, symbol: KaValueParameterSymbol): Boolean {
         val nameReference = when (expression) {
             is KtReturnExpression -> expression.returnedExpression
             else -> expression
         } as? KtNameReferenceExpression ?: return false
-        return nameReference.mainReference.resolveToSymbol() == symbol
+        return nameReference.resolveSymbol() == symbol
     }
 
     companion object {
