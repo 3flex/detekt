@@ -9,9 +9,9 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.FunctionMatcher
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -115,9 +115,10 @@ class NestedScopeFunctions(config: Config) :
             analyze(this) { callableSymbols()?.any { it.matchesScopeFunction() } ?: false }
 
         context(session: KaSession)
+        @OptIn(KaExperimentalApi::class)
         private fun KtCallExpression.callableSymbols() =
             with(session) {
-                resolveToCall()?.singleFunctionCallOrNull()?.let {
+                resolveCall()?.let {
                     sequence {
                         yield(it.symbol)
                         yieldAll(it.symbol.allOverriddenSymbols)
