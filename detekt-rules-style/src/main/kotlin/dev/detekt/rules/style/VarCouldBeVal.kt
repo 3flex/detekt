@@ -15,12 +15,13 @@ import dev.detekt.psi.isOverride
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleVariableAccessCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtIfExpression
@@ -38,6 +39,7 @@ import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.isObjectLiteral
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 import org.jetbrains.kotlin.psi.psiUtil.lastBlockStatementOrThis
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.util.containingNonLocalDeclaration
 
 /**
@@ -99,6 +101,7 @@ class VarCouldBeVal(config: Config) :
         fun getNonReAssignedDeclarations(): List<KtNamedDeclaration> =
             declarationCandidates.filterNot { it.hasAssignments() }
 
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         context(session: KaSession)
         private fun KtNamedDeclaration.hasAssignments(): Boolean {
             val declarationName = nameAsSafeName.toString()
@@ -107,7 +110,7 @@ class VarCouldBeVal(config: Config) :
             with(session) {
                 val declarationSymbol = symbol
                 return assignments.any {
-                    it.resolveToCall()?.singleVariableAccessCall()?.symbol == declarationSymbol
+                    ((it as? KtResolvableCall)?.resolveCall() as? KaVariableAccessCall)?.symbol == declarationSymbol
                 }
             }
         }

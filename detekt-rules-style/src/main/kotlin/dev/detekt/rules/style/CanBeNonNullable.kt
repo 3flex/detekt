@@ -17,8 +17,6 @@ import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
-import org.jetbrains.kotlin.analysis.api.resolution.singleVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
@@ -31,6 +29,7 @@ import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtIfExpression
@@ -58,6 +57,7 @@ import org.jetbrains.kotlin.psi.psiUtil.containingClass
 import org.jetbrains.kotlin.psi.psiUtil.forEachDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.isFirstStatement
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
 /**
@@ -203,11 +203,11 @@ class CanBeNonNullable(config: Config) :
                 }
         }
 
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         override fun visitCallExpression(expression: KtCallExpression) {
             val calleeName = expression.calleeExpression?.let {
                 analyze(it) {
-                    it.resolveToCall()
-                        ?.singleFunctionCallOrNull()
+                    ((it as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
                         ?.symbol
                         ?.callableId
                         ?.callableName
@@ -394,12 +394,11 @@ class CanBeNonNullable(config: Config) :
                 }
             }
 
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         private fun KtIsExpression.evaluateIsExpression(): List<KaVariableSymbol> {
             val descriptor = analyze(this.leftHandSide) {
-                this@evaluateIsExpression.leftHandSide.resolveToCall()
-                    ?.singleVariableAccessCall()
-                    ?.symbol
-            } ?: return emptyList()
+                (this@evaluateIsExpression.leftHandSide as? KtResolvableCall)?.resolveCall() as? KaVariableAccessCall
+            }?.symbol ?: return emptyList()
             return if (isNullableCheck(typeReference, isNegated)) {
                 nullableParams[descriptor]?.let { it.isNullChecked = true }
                 emptyList()
@@ -457,9 +456,10 @@ class CanBeNonNullable(config: Config) :
         private fun KtExpression?.isValidElseExpression(): Boolean =
             this != null && this !is KtIfExpression && this !is KtWhenExpression
 
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         private fun updateNullableParam(expression: KtExpression, updateCallback: (NullableParam) -> Unit) {
             analyze(expression) {
-                expression.resolveToCall()?.singleVariableAccessCall()?.let {
+                ((expression as? KtResolvableCall)?.resolveCall() as? KaVariableAccessCall)?.let {
                     nullableParams[it.symbol]
                 }?.let(updateCallback)
             }
@@ -506,13 +506,13 @@ class CanBeNonNullable(config: Config) :
             }
         }
 
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         override fun visitBinaryExpression(expression: KtBinaryExpression) {
             if (expression.operationToken == KtTokens.EQ) {
                 val fqName = expression.left
                     ?.let {
                         analyze(it) {
-                            it.resolveToCall()
-                                ?.singleVariableAccessCall()
+                            ((it as? KtResolvableCall)?.resolveCall() as? KaVariableAccessCall)
                                 ?.symbol
                                 ?.callableId
                                 ?.asSingleFqName()

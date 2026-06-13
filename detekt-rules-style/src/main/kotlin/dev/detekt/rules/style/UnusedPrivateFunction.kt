@@ -13,7 +13,7 @@ import dev.detekt.api.config
 import dev.detekt.psi.isOperator
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -34,6 +35,7 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.types.expressions.OperatorConventions
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
@@ -72,6 +74,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
     private val invokeOperatorReferences = mutableMapOf<KaCallableSymbol, MutableList<KtReferenceExpression>>()
     private val propertyDelegates = mutableListOf<KtPropertyDelegate>()
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     fun getUnusedReports(): List<Finding> {
         val propertyDelegateSymbols by lazy(LazyThreadSafetyMode.NONE) {
@@ -117,7 +120,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
                         val referenceSymbols = (references + referencesViaOperator)
                             .mapNotNull {
                                 analyze(it) {
-                                    it.resolveToCall()?.singleFunctionCallOrNull()?.symbol
+                                    ((it as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)?.symbol
                                         ?: it.mainReference.resolveToSymbol() as? KaFunctionSymbol
                                 }
                             }

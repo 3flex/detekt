@@ -7,18 +7,20 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.isOverride
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
-import org.jetbrains.kotlin.analysis.api.resolution.singleCallOrNull
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtObjectLiteralExpression
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
  * An anonymous object that does nothing other than the implementation of a single method
@@ -55,12 +57,13 @@ class ObjectLiteralToLambda(config: Config) :
             }
         }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.containsOwnMethodCall(objectSymbol: KaClassSymbol) =
         with(session) {
             anyDescendantOfType<KtExpression> { expr ->
                 val symbol =
-                    expr.resolveToCall()?.singleCallOrNull<KaCallableMemberCall<*, *>>()?.partiallyAppliedSymbol
+                    ((expr as? KtResolvableCall)?.resolveCall() as? KaCallableMemberCall<*, *>)?.partiallyAppliedSymbol
                 listOfNotNull(
                     symbol?.dispatchReceiver,
                     symbol?.extensionReceiver

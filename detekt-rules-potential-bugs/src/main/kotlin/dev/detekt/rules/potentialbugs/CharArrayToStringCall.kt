@@ -5,9 +5,9 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.name.CallableId
@@ -78,8 +78,9 @@ class CharArrayToStringCall(config: Config) :
         }
     }
 
-    private fun KaSession.isToStringCall(expression: KtExpression) =
-        expression.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.callableId == toStringCallableId
+    @OptIn(KaExperimentalApi::class)
+    private fun KaSession.isToStringCall(expression: KtCallExpression) =
+        expression.resolveCall()?.symbol?.callableId == toStringCallableId
 
     private fun KaSession.isCharArray(expression: KtExpression) = classId(expression) == charArrayClassId
 

@@ -11,8 +11,7 @@ import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaCompoundVariableAccessCall
-import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
-import org.jetbrains.kotlin.analysis.api.resolution.successfulFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.idea.references.mainReference
@@ -25,6 +24,7 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCatchClause
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
@@ -43,6 +43,7 @@ import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -241,7 +242,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
             else -> true
         }
 
-    @OptIn(KaExperimentalApi::class)
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtExpression.hasSuspendCalls(): Boolean =
         when (this) {
             is KtForExpression -> {
@@ -254,14 +255,16 @@ class SuspendFunSwallowedCancellation(config: Config) :
 
             is KtCallExpression, is KtOperationExpression -> {
                 analyze(this) {
-                    resolveToCall()
-                        ?.successfulCallOrNull<KaCompoundVariableAccessCall>()
+                    ((this@hasSuspendCalls as? KtResolvableCall)?.resolveCall() as? KaCompoundVariableAccessCall)
                         ?.compoundOperation
                         ?.operationCall
                         ?.signature
                         ?.symbol
                         ?.isSuspend
-                        ?: (resolveToCall()?.successfulFunctionCallOrNull()?.symbol as? KaNamedFunctionSymbol)
+                        ?: (
+                            ((this@hasSuspendCalls as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
+                                ?.symbol as? KaNamedFunctionSymbol
+                            )
                             ?.isSuspend
                         ?: false
                 }

@@ -7,17 +7,19 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
-import org.jetbrains.kotlin.analysis.api.resolution.singleCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForReceiver
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelectorOrThis
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
  * Long chains of collection operations will have a performance penalty due to a new list being created for each call. Consider using sequences instead. Read more about this in the [documentation](https://kotlinlang.org/docs/sequences.html)
@@ -69,13 +71,14 @@ class CouldBeSequence(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtExpression.isCallingCollectionFunPresentInSequenceReturningSequence(): Boolean {
         ((this as? KtCallExpression)?.getCallNameExpression()?.getReferencedName())?.let {
             if (it in listOfAllowedFunFromCollections) return false
         }
+        val resolvableCall = this as? KtResolvableCall
         return analyze(this) {
-            val callableId = resolveToCall()
-                ?.singleCallOrNull<KaCallableMemberCall<*, *>>()
+            val callableId = (resolvableCall?.resolveCall() as? KaCallableMemberCall<*, *>)
                 ?.symbol
                 ?.callableId
             callableId?.packageName == StandardClassIds.BASE_COLLECTIONS_PACKAGE &&

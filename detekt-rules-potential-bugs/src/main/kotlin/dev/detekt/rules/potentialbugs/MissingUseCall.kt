@@ -8,11 +8,11 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
-import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtClassInitializer
 import org.jetbrains.kotlin.psi.KtContainerNodeForControlStructureBody
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
@@ -43,6 +44,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypes
 import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
 import org.jetbrains.kotlin.psi.psiUtil.siblings
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
  * Prefer using the `use` function with `Closeable` or `AutoCloseable`. As `use` function ensures proper closure of
@@ -121,11 +123,15 @@ class MissingUseCall(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KaSession.isChildOfCloseable(expr: KtExpression): Boolean {
         val symbol = if (expr is KtObjectLiteralExpression) {
             expr.symbol
         } else {
-            KtPsiUtil.safeDeparenthesize(expr).resolveToCall()?.singleFunctionCallOrNull()?.symbol?.returnType?.symbol
+            ((KtPsiUtil.safeDeparenthesize(expr) as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
+                ?.symbol
+                ?.returnType
+                ?.symbol
         } ?: return false
         return isChildOfCloseable(symbol)
     }
@@ -197,21 +203,24 @@ class MissingUseCall(config: Config) :
         return isChildOfCloseable(symbol)
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtQualifiedExpression.doesEndWithUse(): Boolean =
         with(session) {
-            receiverExpression.resolveToCall()?.successfulCallOrNull<KaCallableMemberCall<*, *>>()?.symbol?.let {
+            ((receiverExpression as? KtResolvableCall)?.resolveCall() as? KaCallableMemberCall<*, *>)?.symbol?.let {
                 usedReferences.add(it)
             }
-            selectorExpression?.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.callableId
+            ((selectorExpression as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)?.symbol?.callableId
                 ?.asSingleFqName() in useFqNames
         }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtElement?.isCloseableNotUsed(): Boolean {
         this ?: return true
         return with(session) {
-            resolveToCall()?.singleFunctionCallOrNull()?.symbol as? KaSymbol in usedReferences
+            val symbol = ((this@isCloseableNotUsed as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)?.symbol
+            symbol as? KaSymbol in usedReferences
         }
     }
 
@@ -288,11 +297,12 @@ class MissingUseCall(config: Config) :
         return expression
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtQualifiedExpression.firstCallableReceiverOrNull(): KtElement? {
         fun KtExpression.isCallableExpression(): Boolean =
             with(session) {
-                resolveToCall()?.singleFunctionCallOrNull() != null
+                (this@isCallableExpression as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*> != null
             }
 
         var expression = receiverExpression

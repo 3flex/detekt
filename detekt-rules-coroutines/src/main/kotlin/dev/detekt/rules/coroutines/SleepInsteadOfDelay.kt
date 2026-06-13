@@ -10,7 +10,7 @@ import dev.detekt.api.Rule
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
@@ -26,6 +27,7 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypes
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypesAndPredicate
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
  * Report usages of `Thread.sleep` in suspending functions and coroutine blocks. A thread can
@@ -72,6 +74,7 @@ class SleepInsteadOfDelay(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.isThreadSleepFunction(): Boolean {
         fun KtCallableReferenceExpression.isSleepCallableRef(): Boolean =
@@ -85,7 +88,8 @@ class SleepInsteadOfDelay(config: Config) :
             this.isSleepCallableRef()
         } else {
             with(session) {
-                val symbol = resolveToCall()?.singleFunctionCallOrNull()?.symbol
+                val symbol = ((this@isThreadSleepFunction as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
+                    ?.symbol
                     ?: mainReference?.resolveToSymbol() as? KaCallableSymbol
                 symbol?.callableId?.asSingleFqName() == FqName("java.lang.Thread.sleep")
             }

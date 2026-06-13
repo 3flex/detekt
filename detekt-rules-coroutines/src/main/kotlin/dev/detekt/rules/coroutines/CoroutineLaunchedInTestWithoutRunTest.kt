@@ -8,18 +8,21 @@ import dev.detekt.api.Rule
 import dev.detekt.psi.hasAnnotation
 import dev.detekt.rules.coroutines.utils.isCoroutineScope
 import dev.detekt.rules.coroutines.utils.isCoroutinesFlow
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
 /**
@@ -69,10 +72,13 @@ class CoroutineLaunchedInTestWithoutRunTest(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtNamedFunction.runsInRunTestBlock(): Boolean =
         with(session) {
-            bodyExpression?.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.callableId == RUN_TEST_CALLABLE_ID
+            ((bodyExpression as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
+                ?.symbol
+                ?.callableId == RUN_TEST_CALLABLE_ID
         }
 
     companion object {
@@ -87,6 +93,7 @@ class CoroutineLaunchedInTestWithoutRunTest(config: Config) :
 class FunCoroutineLaunchesTraverseHelper {
     val exploredFunctionsCache = mutableMapOf<KtNamedFunction, Boolean>()
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     fun isFunctionLaunchingCoroutines(initialFunction: KtNamedFunction): Boolean {
         val traversedFunctions = mutableSetOf<KtNamedFunction>()
@@ -106,7 +113,7 @@ class FunCoroutineLaunchesTraverseHelper {
         ): Set<KtNamedFunction> {
             function.collectDescendantsOfType<KtExpression>().mapNotNull {
                 with(session) {
-                    it.resolveToCall()?.singleFunctionCallOrNull()?.symbol?.psi as? KtNamedFunction
+                    ((it as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)?.symbol?.psi as? KtNamedFunction
                 }
             }.forEach {
                 traversedFunctions.add(it)

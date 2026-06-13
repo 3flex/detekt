@@ -8,11 +8,11 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.isOpen
 import dev.detekt.rules.coroutines.utils.CoroutineCallableIds
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
-import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolModality
@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -27,6 +28,7 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtOperationReferenceExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /*
  * Based on code from Kotlin project:
@@ -86,6 +88,7 @@ class RedundantSuspendModifier(config: Config) :
             this is KtCallExpression ||
             this is KtArrayAccessExpression // for get() operator function calls
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtExpression.hasSuspendCalls(): Boolean {
         if (!isValidCandidateExpression()) return false
 
@@ -102,8 +105,7 @@ class RedundantSuspendModifier(config: Config) :
 
             else -> {
                 analyze(this) {
-                    val call = this@hasSuspendCalls.resolveToCall()
-                        ?.successfulCallOrNull<KaCallableMemberCall<*, *>>()
+                    val call = (this@hasSuspendCalls as? KtResolvableCall)?.resolveCall() as? KaCallableMemberCall<*, *>
                         ?: return false
                     when (call) {
                         is KaFunctionCall -> {

@@ -11,8 +11,7 @@ import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
-import org.jetbrains.kotlin.analysis.api.resolution.singleCallOrNull
-import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaDeclarationSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaDestructuringDeclarationSymbol
@@ -27,12 +26,14 @@ import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
  * Turn on this rule to flag usage of `any` which can either be replaced with simple `contains` call
@@ -144,6 +145,7 @@ class UnnecessaryAny(config: Config) :
             }
         }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     @Suppress("ReturnCount")
     context(session: KaSession)
     private fun isUsageOfValueAndItEligible(
@@ -177,12 +179,11 @@ class UnnecessaryAny(config: Config) :
                     val itExpressionType = (leftExpression.mainReference?.resolveToSymbol() as? KaVariableSymbol)
                         ?.returnType
                         ?: return null
-                    val valueExpressionType = rightExpression
-                        .resolveToCall()
-                        ?.singleCallOrNull<KaCallableMemberCall<*, *>>()
-                        ?.symbol
-                        ?.returnType
-                        ?: return null
+                    val valueExpressionType =
+                        ((rightExpression as? KtResolvableCall)?.resolveCall() as? KaCallableMemberCall<*, *>)
+                            ?.symbol
+                            ?.returnType
+                            ?: return null
                     if (valueExpressionType.isSubtypeOf(itExpressionType)) {
                         USE_CONTAINS_MSG
                     } else {
@@ -206,11 +207,14 @@ class UnnecessaryAny(config: Config) :
             }
         }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression?.isCallingEquals(): Boolean {
         if (this == null) return false
         with(session) {
-            val symbol = resolveToCall()?.singleFunctionCallOrNull()?.symbol as? KaNamedFunctionSymbol ?: return false
+            val symbol =
+                ((this@isCallingEquals as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
+                    ?.symbol as? KaNamedFunctionSymbol ?: return false
             return symbol.name == Name.identifier("equals") &&
                 symbol.returnType.isBooleanType &&
                 symbol.valueParameters.singleOrNull()?.returnType?.let { it.isAnyType && it.isMarkedNullable } == true

@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaCompoundArrayAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaCompoundVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaDelegatedPropertyCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaForLoopCall
-import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaPropertyAccessorSymbol
@@ -30,11 +29,13 @@ import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtOperationReferenceExpression
 import org.jetbrains.kotlin.psi.KtPostfixExpression
 import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.psiUtil.isDotSelector
+import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.resolve.calls.util.asCallableReferenceExpression
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
@@ -124,13 +125,17 @@ class ForbiddenMethodCall(config: Config) :
         check(expression.callableReference)
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun check(expression: KtExpression) {
         analyze(expression) {
-            val call = expression.resolveToCall()
-                ?: expression.asCallableReferenceExpression()?.resolveToCall()
+            // Operator references (e.g. `==`, `++`) are not themselves resolvable; their enclosing
+            // operator expression is, so fall back to the parent when the element itself is not resolvable.
+            val call = (expression as? KtResolvableCall)?.resolveCall()
+                ?: (expression.parent as? KtResolvableCall)?.resolveCall()
+                ?: expression.asCallableReferenceExpression()?.resolveCall()
                 ?: return
 
-            val successfulCall = call.successfulCallOrNull<KaCall>() ?: return
+            val successfulCall = call as? KaCall ?: return
 
             getCallInfos(successfulCall, expression).forEach { (expressionPropertySymbol, symbol) ->
                 symbol ?: return@forEach
