@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
 import org.jetbrains.kotlin.analysis.api.types.KaTypeParameterType
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtBinaryExpression
@@ -57,6 +56,7 @@ import org.jetbrains.kotlin.psi.psiUtil.containingClass
 import org.jetbrains.kotlin.psi.psiUtil.forEachDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.isFirstStatement
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
+import org.jetbrains.kotlin.resolution.KtResolvable
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
@@ -548,12 +548,12 @@ class CanBeNonNullable(config: Config) :
             return isSetToNonNullable && cannotSetViaNonPrivateMeans
         }
 
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         private fun KtPropertyDelegate?.returnsNullable(): Boolean {
             val delegate = this ?: return true
             return analyze(delegate) {
-                val functionSymbol = delegate
-                    .mainReference
-                    ?.resolveToSymbols()
+                val functionSymbol = (delegate as? KtResolvable)
+                    ?.resolveSymbols()
                     ?.filterIsInstance<KaFunctionSymbol>()
                     ?.firstOrNull {
                         it.callableId?.callableName == OperatorNameConventions.GET_VALUE

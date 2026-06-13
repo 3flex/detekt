@@ -20,10 +20,10 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolVisibility
 import org.jetbrains.kotlin.analysis.api.symbols.KaValueParameterSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtConstructor
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 import org.jetbrains.kotlin.psi.psiUtil.isPropertyParameter
+import org.jetbrains.kotlin.resolution.KtResolvable
 
 /**
  * An unused private property can be removed to simplify the source file.
@@ -166,7 +167,7 @@ private class UnusedPrivatePropertyVisitor(private val allowedNames: Regex) : De
         }
     }
 
-    @OptIn(KaExperimentalApi::class)
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     override fun visitReferenceExpression(expression: KtReferenceExpression) {
         super.visitReferenceExpression(expression)
 
@@ -176,7 +177,7 @@ private class UnusedPrivatePropertyVisitor(private val allowedNames: Regex) : De
 
                 is KtCallExpression -> expression.getChildrenOfType<KtValueArgumentList>()
                     .flatMap { it.arguments }
-                    .mapNotNull { it.getArgumentExpression()?.mainReference?.resolveToSymbol() }
+                    .mapNotNull { (it.getArgumentExpression() as? KtResolvable)?.resolveSymbol() }
 
                 else -> return
             }

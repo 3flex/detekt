@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolModality
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -95,11 +94,9 @@ class RedundantSuspendModifier(config: Config) :
         return when (this) {
             is KtForExpression -> {
                 analyze(this) {
-                    this@hasSuspendCalls.mainReference?.run {
-                        resolveToSymbols()
-                            .filterIsInstance<KaNamedFunctionSymbol>()
-                            .any { it.isSuspend }
-                    } ?: false
+                    this@hasSuspendCalls.resolveSymbols()
+                        .filterIsInstance<KaNamedFunctionSymbol>()
+                        .any { it.isSuspend }
                 }
             }
 

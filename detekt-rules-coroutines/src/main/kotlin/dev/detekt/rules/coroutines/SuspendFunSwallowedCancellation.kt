@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaCompoundVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -247,8 +246,8 @@ class SuspendFunSwallowedCancellation(config: Config) :
         when (this) {
             is KtForExpression -> {
                 analyze(this) {
-                    mainReference?.resolveToSymbols()?.filterIsInstance<KaNamedFunctionSymbol>()
-                        .orEmpty()
+                    this@hasSuspendCalls.resolveSymbols()
+                        .filterIsInstance<KaNamedFunctionSymbol>()
                         .any { it.isSuspend }
                 }
             }

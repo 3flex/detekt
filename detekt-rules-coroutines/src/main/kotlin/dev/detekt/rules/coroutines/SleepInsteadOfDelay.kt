@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
@@ -27,6 +26,7 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypes
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypesAndPredicate
+import org.jetbrains.kotlin.resolution.KtResolvable
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
@@ -90,7 +90,7 @@ class SleepInsteadOfDelay(config: Config) :
             with(session) {
                 val symbol = ((this@isThreadSleepFunction as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
                     ?.symbol
-                    ?: mainReference?.resolveToSymbol() as? KaCallableSymbol
+                    ?: (this@isThreadSleepFunction as? KtResolvable)?.resolveSymbol() as? KaCallableSymbol
                 symbol?.callableId?.asSingleFqName() == FqName("java.lang.Thread.sleep")
             }
         }

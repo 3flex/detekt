@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaDeclarationSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaDestructuringDeclarationSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
@@ -33,6 +32,7 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
+import org.jetbrains.kotlin.resolution.KtResolvable
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 
 /**
@@ -176,7 +176,7 @@ class UnnecessaryAny(config: Config) :
 
             itRefCountInLeft == 1 -> {
                 with(session) {
-                    val itExpressionType = (leftExpression.mainReference?.resolveToSymbol() as? KaVariableSymbol)
+                    val itExpressionType = ((leftExpression as? KtResolvable)?.resolveSymbol() as? KaVariableSymbol)
                         ?.returnType
                         ?: return null
                     val valueExpressionType =

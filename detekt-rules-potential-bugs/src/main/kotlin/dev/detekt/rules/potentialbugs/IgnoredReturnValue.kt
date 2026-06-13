@@ -23,13 +23,13 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolOrigin
 import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.analysis.api.types.KaFunctionType
 import org.jetbrains.kotlin.analysis.api.types.KaType
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.load.java.JavaClassFinderImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtExpressionWithLabel
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelectorOrThis
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
+import org.jetbrains.kotlin.resolution.KtResolvable
 
 /**
  * This rule warns on instances where a function, annotated with either `@CheckReturnValue` or `@CheckResult`,
@@ -187,6 +188,7 @@ class IgnoredReturnValue(config: Config) :
         return true
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.isLambdaResult(lambda: KtLambdaExpression): Boolean {
         val statement = getQualifiedExpressionForSelectorOrThis().let {
@@ -197,7 +199,7 @@ class IgnoredReturnValue(config: Config) :
                 with(session) {
                     val symbol = lambda.functionLiteral.symbol
                     val label = (statement as? KtExpressionWithLabel)?.getTargetLabel()
-                    label?.mainReference?.resolveToSymbol() == symbol
+                    (label as? KtResolvable)?.resolveSymbol() == symbol
                 }
             }
 

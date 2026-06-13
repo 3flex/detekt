@@ -8,12 +8,13 @@ import dev.detekt.api.Rule
 import dev.detekt.psi.firstParameterOrNull
 import dev.detekt.psi.isCalling
 import dev.detekt.psi.receiverIsUsed
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
+import org.jetbrains.kotlin.resolution.KtResolvable
 
 /**
  * `let` expressions are used extensively in our code for null-checking and chaining functions,
@@ -120,6 +122,7 @@ private fun KtExpression?.getRootExpression(): KtExpression? {
     return receiverExpression
 }
 
+@OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
 private fun KtLambdaExpression.countLambdaParameterReference(): Int {
     val bodyExpression = bodyExpression ?: return 0
     return analyze(this) {
@@ -132,7 +135,7 @@ private fun KtLambdaExpression.countLambdaParameterReference(): Int {
             .filterNotNull()
             .sumOf { variableSymbol ->
                 bodyExpression.collectDescendantsOfType<KtSimpleNameExpression> {
-                    it.mainReference.resolveToSymbol() == variableSymbol
+                    (it as? KtResolvable)?.resolveSymbol() == variableSymbol
                 }.count()
             }
     }

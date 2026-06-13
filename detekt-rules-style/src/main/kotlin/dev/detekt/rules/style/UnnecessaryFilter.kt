@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtExperimentalApi
@@ -25,6 +24,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForReceiver
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelectorOrThis
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.unpackFunctionLiteral
+import org.jetbrains.kotlin.resolution.KtResolvable
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
@@ -89,7 +89,7 @@ class UnnecessaryFilter(config: Config) :
             val callableId = ((this@matchingCall as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)
                 ?.symbol
                 ?.callableId
-                ?: (mainReference?.resolveToSymbol() as? KaCallableSymbol)?.callableId
+                ?: ((this@matchingCall as? KtResolvable)?.resolveSymbol() as? KaCallableSymbol)?.callableId
             callableId?.asSingleFqName()?.takeIf { it in fqNames }
         }
     }

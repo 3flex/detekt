@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
@@ -35,6 +34,7 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
+import org.jetbrains.kotlin.resolution.KtResolvable
 import org.jetbrains.kotlin.resolution.KtResolvableCall
 import org.jetbrains.kotlin.types.expressions.OperatorConventions
 import org.jetbrains.kotlin.util.OperatorNameConventions
@@ -121,7 +121,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
                             .mapNotNull {
                                 analyze(it) {
                                     ((it as? KtResolvableCall)?.resolveCall() as? KaFunctionCall<*>)?.symbol
-                                        ?: it.mainReference.resolveToSymbol() as? KaFunctionSymbol
+                                        ?: (it as? KtResolvable)?.resolveSymbol() as? KaFunctionSymbol
                                 }
                             }
                             .let {
@@ -170,10 +170,11 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
         }
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtPropertyDelegate.symbols(): List<KaFunctionSymbol> {
         val delegate = (this.parent as? KtProperty)?.delegate ?: return emptyList()
         return analyze(delegate) {
-            delegate.mainReference?.resolveToSymbols()?.filterIsInstance<KaFunctionSymbol>().orEmpty()
+            (delegate as? KtResolvable)?.resolveSymbols()?.filterIsInstance<KaFunctionSymbol>().orEmpty()
         }
     }
 

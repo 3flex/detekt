@@ -11,12 +11,12 @@ import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaValueParameterSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtExpressionWithLabel
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.unpackFunctionLiteral
+import org.jetbrains.kotlin.resolution.KtResolvable
 
 /**
  * Redundant maps add complexity to the code and accomplish nothing. They should be removed or replaced with the proper
@@ -119,6 +120,7 @@ class RedundantHigherOrderMapUsage(config: Config) :
         return lambda
     }
 
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     @Suppress("ReturnCount")
     private fun KaSession.isRedundant(
         functionLiteral: KtFunctionLiteral,
@@ -131,7 +133,7 @@ class RedundantHigherOrderMapUsage(config: Config) :
         val labeledReturnExpressions = functionLiteral.collectDescendantsOfType<KtReturnExpression> {
             if (it == lastStatement) return@collectDescendantsOfType false
             val label = (it as? KtExpressionWithLabel)?.getTargetLabel() ?: return@collectDescendantsOfType false
-            label.mainReference.resolveToSymbol() == symbol
+            (label as? KtResolvable)?.resolveSymbol() == symbol
         }
         return labeledReturnExpressions.all { isReferenceTo(it, lambdaParameter) }
     }
