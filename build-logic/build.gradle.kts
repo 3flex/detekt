@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.asm.commons)
     implementation(libs.develocity.plugin)
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.vanniktech.mavenPublish.plugin)

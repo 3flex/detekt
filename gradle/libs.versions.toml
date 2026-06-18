@@ -1,5 +1,6 @@
 [versions]
 agp = "9.2.1"
+asm = "9.10.1"
 coroutines = "1.11.0"
 jacoco = "0.8.15"
 junit = "6.1.0"
@@ -40,6 +41,7 @@ junit-jupiterApi = { module = "org.junit.jupiter:junit-jupiter-api", version = "
 # This should only be updated when updating the minimum version supported by detekt's Gradle plugin.
 kotlin-gradlePluginApi = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version = "2.1.0" }
 
+asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
 assertj-core = { module = "org.assertj:assertj-core", version = "3.27.7" }
 # This represents the oldest assertj version supported by detekt-test-assertj.
 # This should only be updated when updating the minimum version supported by detekt-test-assertj.

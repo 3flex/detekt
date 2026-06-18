@@ -1,32 +1,63 @@
+import dev.detekt.buildlogic.RelocateJarTransform
+
 plugins {
     id("module")
 }
 
-val extraDepsToPackage = configurations.register("extraDepsToPackage")
-val ktlintToBundle = configurations.register("ktlintToBundle")
+// Custom attribute marking whether a jar's packages have been relocated via the ASM transform.
+val relocated = Attribute.of("dev.detekt.relocated", Boolean::class.javaObjectType)
+
+dependencies {
+    attributesSchema {
+        attribute(relocated)
+    }
+    // Plain (non-relocated) jars are the default input to the transform.
+    artifactTypes.named("jar") {
+        attributes.attribute(relocated, false)
+    }
+    registerTransform(RelocateJarTransform::class) {
+        from.attribute(relocated, false)
+        to.attribute(relocated, true)
+        parameters {
+            relocations.put("org.jetbrains.kotlin.com.intellij", "com.intellij")
+        }
+    }
+}
+
+// Declares the ktlint ruleset to relocate; the resolvable view requests the relocated variant,
+// which triggers the transform. Only the ktlint graph is ever transformed (not detekt-api etc.).
+val ktlintToRelocate = configurations.dependencyScope("ktlintToRelocate")
+val ktlintRelocated = configurations.resolvable("ktlintRelocated") {
+    extendsFrom(ktlintToRelocate.get())
+    attributes {
+        attribute(relocated, true)
+    }
+}
+
+// Extra non-ktlint deps bundled verbatim into the jar (slf4j-nop), no relocation needed.
+val extraDepsToPackage = configurations.dependencyScope("extraDepsToPackage")
+val extraDepsToPackageClasspath = configurations.resolvable("extraDepsToPackageClasspath") {
+    extendsFrom(extraDepsToPackage.get())
+}
+
+// Resolves the ktlint dependencies through the relocating transform; mapping to `.files` ensures
+// the configuration's `relocated` attribute (and thus the transform) is applied during resolution.
+val relocatedKtlintFiles = files(ktlintRelocated.map { it.files })
 
 dependencies {
     compileOnly(projects.detektApi)
     compileOnly(projects.detektPsiUtils)
-    // compileOnly so ktlint-repackage is not listed in the published POM (it's bundled into the JAR)
-    compileOnly(projects.detektRulesKtlintWrapper.ktlintRepackage) {
-        attributes {
-            attribute(Bundling.BUNDLING_ATTRIBUTE, named(Bundling.SHADOWED))
-        }
-    }
-    ktlintToBundle(projects.detektRulesKtlintWrapper.ktlintRepackage) {
-        attributes {
-            attribute(Bundling.BUNDLING_ATTRIBUTE, named(Bundling.SHADOWED))
-        }
+    // Relocated ktlint on the compile classpath; files(...) keeps it out of the published POM.
+    compileOnly(relocatedKtlintFiles)
+
+    ktlintToRelocate(libs.ktlint.rulesetStandard) {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
     }
 
     runtimeOnly(libs.slf4j.api)
 
-    testImplementation(projects.detektRulesKtlintWrapper.ktlintRepackage) {
-        attributes {
-            attribute(Bundling.BUNDLING_ATTRIBUTE, named(Bundling.SHADOWED))
-        }
-    }
+    testImplementation(relocatedKtlintFiles)
     testImplementation(libs.kotlin.compiler)
     testImplementation(projects.detektApi)
     testRuntimeOnly(projects.detektPsiUtils)
@@ -55,9 +86,8 @@ consumeGeneratedConfig(
 
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
-    dependsOn(ktlintToBundle, extraDepsToPackage)
     from(
-        ktlintToBundle.get().map { zipTree(it) },
-        extraDepsToPackage.get().map { zipTree(it) },
+        ktlintRelocated.get().map { zipTree(it) },
+        extraDepsToPackageClasspath.get().map { zipTree(it) },
     )
 }
