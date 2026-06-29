@@ -307,6 +307,84 @@ detekt {
 }
 ```
 
+### <a name="sharing-configuration">Sharing a detekt configuration across projects</a>
+
+If you maintain many projects, you can avoid copying the same configuration file into each one by sharing a
+single configuration and consuming it from every project. detekt doesn't need any dedicated support for this -
+Gradle's [`TextResourceFactory`](https://docs.gradle.org/current/dsl/org.gradle.api.resources.TextResourceFactory.html)
+already lets you point `config` at a configuration file that lives outside the project.
+
+#### From a published artifact
+
+Publish your shared `detekt.yml` inside an archive (for example a JAR) to a Maven repository, then consume it
+through a dedicated [dependency configuration](https://docs.gradle.org/current/userguide/dependency_configurations.html).
+Because the configuration file is resolved as a regular dependency, tools such as Renovate and Dependabot can keep
+it up to date automatically.
+
+##### Groovy DSL
+
+```groovy
+configurations {
+    detektConfig
+}
+
+dependencies {
+    detektConfig "com.example:detekt-config:1.2.3"
+}
+
+detekt {
+    config.from(resources.text.fromArchiveEntry(configurations.detektConfig, "detekt.yml"))
+}
+```
+
+##### Kotlin DSL
+
+```kotlin
+val detektConfig: Configuration by configurations.creating
+
+dependencies {
+    detektConfig("com.example:detekt-config:1.2.3")
+}
+
+detekt {
+    config.from(resources.text.fromArchiveEntry(detektConfig, "detekt.yml"))
+}
+```
+
+#### From a remote URL
+
+If you don't want to publish an artifact, you can fetch the configuration file directly over HTTP(S). Note that
+this approach is not compatible with dependency update tools like Renovate or Dependabot.
+
+##### Groovy DSL
+
+```groovy
+detekt {
+    config.from(resources.text.fromUri("https://example.com/detekt.yml"))
+}
+```
+
+##### Kotlin DSL
+
+```kotlin
+detekt {
+    config.from(resources.text.fromUri("https://example.com/detekt.yml"))
+}
+```
+
+In both cases you can keep a project-specific configuration file on top of the shared one. Configuration files
+are applied in order and later entries override earlier ones, so list the shared configuration first and any
+local overrides afterwards:
+
+```kotlin
+detekt {
+    config.from(
+        resources.text.fromArchiveEntry(detektConfig, "detekt.yml"),
+        "config/detekt/detekt.yml",
+    )
+}
+```
+
 ### <a name="gradle-properties">Options for detekt Gradle properties</a>
 
 ```groovy
