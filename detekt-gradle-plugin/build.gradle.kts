@@ -268,27 +268,30 @@ tasks {
 
     // JaCoCo does not instrument the Gradle JVMs that TestKit spawns to run the build under test, so
     // functional tests would otherwise contribute no coverage of the plugin. Expose the agent jar and
-    // a per-suite destination directory to the test JVM; DslGradleRunner reads these system properties
-    // and injects the agent into the spawned JVMs via -Dorg.gradle.jvmargs.
+    // a destination directory to the test JVM; DslGradleRunner reads these system properties and
+    // injects the agent into the spawned JVMs via -Dorg.gradle.jvmargs.
+    //
+    // Only the `functionalTest` suite is instrumented. `functionalTestMinSupportedGradle` runs against
+    // Gradle 7.6.3, which does not support a Java agent in a TestKit build that uses the configuration
+    // cache (the build under test enables isolated projects); its coverage is redundant with
+    // `functionalTest` anyway.
     val agentJarPath = jacocoAgentRuntime.map { it.singleFile.absolutePath }
-    listOf("functionalTest", "functionalTestMinSupportedGradle").forEach { suiteName ->
-        named<Test>(suiteName) {
-            val execDir = layout.buildDirectory.dir("jacoco/testkit/$suiteName")
-            inputs.files(jacocoAgentRuntime)
-            outputs.dir(execDir)
-            doFirst {
-                val dir = execDir.get().asFile
-                dir.mkdirs()
-                systemProperty("jacoco.agent.jar", agentJarPath.get())
-                systemProperty("jacoco.testkit.destdir", dir.absolutePath)
-            }
+    named<Test>("functionalTest") {
+        val execDir = layout.buildDirectory.dir("jacoco/testkit/functionalTest")
+        inputs.files(jacocoAgentRuntime)
+        outputs.dir(execDir)
+        doFirst {
+            val dir = execDir.get().asFile
+            dir.mkdirs()
+            systemProperty("jacoco.agent.jar", agentJarPath.get())
+            systemProperty("jacoco.testkit.destdir", dir.absolutePath)
         }
     }
 
     // Aggregation in `code-coverage-report` cannot reach this included build, so produce the plugin's
     // own merged report here, combining unit-test coverage with the TestKit exec files.
     register<JacocoReport>("jacocoTestKitReport") {
-        dependsOn("test", "functionalTest", "functionalTestMinSupportedGradle")
+        dependsOn("test", "functionalTest")
         executionData(
             fileTree(layout.buildDirectory) {
                 // *.exec: coverage from the test JVMs (also catches plugin code applied in-process via
