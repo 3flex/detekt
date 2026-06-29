@@ -178,8 +178,9 @@ constructor(
      * that concurrent writes to one `.exec` would cause under parallel test forks.
      */
     private fun jacocoAgentArg(): String? {
-        val agentJar = System.getProperty("jacoco.agent.jar") ?: return null
-        val destDir = System.getProperty("jacoco.testkit.destdir") ?: return null
+        val agentJar = System.getProperty("jacoco.agent.jar")
+        val destDir = System.getProperty("jacoco.testkit.destdir")
+        if (agentJar == null || destDir == null) return null
         val destFile = File(destDir, "testkit-$jacocoJvmId.exec").absolutePath
         return "-javaagent:$agentJar=destfile=$destFile,append=true,output=file"
     }
