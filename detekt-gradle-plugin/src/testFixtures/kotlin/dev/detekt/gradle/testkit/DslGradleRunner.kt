@@ -208,13 +208,11 @@ constructor(
         private const val SETTINGS_FILENAME = "settings.gradle"
         private const val DETEKT_TASK = "detekt"
 
-        /**
-         * Stable for the lifetime of a single test JVM (fork). The JaCoCo exec file injected into the
-         * TestKit-spawned JVMs is named after this so that all runners in one fork share it: that keeps
-         * `-Dorg.gradle.jvmargs` constant across tests (so TestKit reuses its Gradle daemon instead of
-         * spawning a fresh one per test), while parallel test forks still write to distinct files,
-         * avoiding the corruption that concurrent writes to one `.exec` would cause.
-         */
+        // Stable for the lifetime of a single test JVM (fork). The JaCoCo exec file injected into the
+        // TestKit-spawned JVMs is named after this so that all runners in one fork share it: that keeps
+        // `-Dorg.gradle.jvmargs` constant across tests (so TestKit reuses its Gradle daemon instead of
+        // spawning a fresh one per test), while parallel test forks still write to distinct files,
+        // avoiding the corruption that concurrent writes to one `.exec` would cause.
         private val jacocoJvmId: String = UUID.randomUUID().toString()
     }
 }
