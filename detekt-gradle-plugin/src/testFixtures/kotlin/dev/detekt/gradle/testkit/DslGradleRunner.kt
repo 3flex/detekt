@@ -138,7 +138,7 @@ constructor(
             add("--stacktrace")
             add("--info")
             add("--build-cache")
-            add("-Dorg.gradle.jvmargs=$jvmArgs")
+            add("-Dorg.gradle.jvmargs=${listOfNotNull(jvmArgs, jacocoAgentArg()).joinToString(" ")}")
             if (dryRun) {
                 add("-Pdetekt-dry-run=true")
             }
@@ -162,6 +162,24 @@ constructor(
             withArguments(args)
             gradleVersionOrNone?.let(::withGradleVersion)
         }
+    }
+
+    /**
+     * When the functional test task injects the JaCoCo agent (via the `jacoco.agent.jar` and
+     * `jacoco.testkit.destdir` system properties), return a `-javaagent` argument so the
+     * TestKit-spawned Gradle JVMs are instrumented. JaCoCo does not instrument these spawned JVMs
+     * out of the box, so without this functional tests contribute no coverage of the plugin.
+     *
+     * The exec file is named after [jacocoJvmId] (stable per test JVM), so every build in this fork
+     * appends to the same file. The report task merges the per-fork files. `append=true` accumulates
+     * coverage across a fork's sequentially-executed builds; distinct files per fork avoid the data
+     * corruption that concurrent writes to one `.exec` would cause under parallel test forks.
+     */
+    private fun jacocoAgentArg(): String? {
+        val agentJar = System.getProperty("jacoco.agent.jar") ?: return null
+        val destDir = System.getProperty("jacoco.testkit.destdir") ?: return null
+        val destFile = File(destDir, "testkit-$jacocoJvmId.exec").absolutePath
+        return "-javaagent:$agentJar=destfile=$destFile,append=true,output=file"
     }
 
     fun runTasksAndCheckResult(vararg tasks: String, doAssert: DslGradleRunner.(BuildResult) -> Unit) {
@@ -189,5 +207,14 @@ constructor(
     companion object {
         private const val SETTINGS_FILENAME = "settings.gradle"
         private const val DETEKT_TASK = "detekt"
+
+        /**
+         * Stable for the lifetime of a single test JVM (fork). The JaCoCo exec file injected into the
+         * TestKit-spawned JVMs is named after this so that all runners in one fork share it: that keeps
+         * `-Dorg.gradle.jvmargs` constant across tests (so TestKit reuses its Gradle daemon instead of
+         * spawning a fresh one per test), while parallel test forks still write to distinct files,
+         * avoiding the corruption that concurrent writes to one `.exec` would cause.
+         */
+        private val jacocoJvmId: String = UUID.randomUUID().toString()
     }
 }

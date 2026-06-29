@@ -127,6 +127,10 @@ kotlin {
 val testKitRuntimeOnly = configurations.register("testKitRuntimeOnly")
 val testKitGradleMinVersionRuntimeOnly = configurations.register("testKitGradleMinVersionRuntimeOnly")
 
+// Resolves the JaCoCo agent runtime jar so it can be injected into the TestKit-spawned Gradle JVMs.
+// See the `jacoco.agent.jar` system property wiring on the functional test tasks below.
+val jacocoAgentRuntime = configurations.register("jacocoAgentRuntime")
+
 dependencies {
     compileOnly(libs.android.gradleApi)
     compileOnly(libs.kotlin.gradlePluginApi)
@@ -161,6 +165,7 @@ dependencies {
             attribute(GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE, named("7.6.3"))
         }
     }
+    jacocoAgentRuntime("org.jacoco:org.jacoco.agent:${libs.versions.jacoco.get()}:runtime")
 
     // We use this published version of the detekt-rules-ktlint-wrapper to self analyse this project.
     detektPlugins("dev.detekt:detekt-rules-ktlint-wrapper:2.0.0-alpha.3")
@@ -258,6 +263,49 @@ tasks {
                     maxFailures = 20
                 }
             }
+        }
+    }
+
+    // JaCoCo does not instrument the Gradle JVMs that TestKit spawns to run the build under test, so
+    // functional tests would otherwise contribute no coverage of the plugin. Expose the agent jar and
+    // a per-suite destination directory to the test JVM; DslGradleRunner reads these system properties
+    // and injects the agent into the spawned JVMs via -Dorg.gradle.jvmargs.
+    val agentJarPath = jacocoAgentRuntime.map { it.singleFile.absolutePath }
+    listOf("functionalTest", "functionalTestMinSupportedGradle").forEach { suiteName ->
+        named<Test>(suiteName) {
+            val execDir = layout.buildDirectory.dir("jacoco/testkit/$suiteName")
+            inputs.files(jacocoAgentRuntime)
+            outputs.dir(execDir)
+            doFirst {
+                val dir = execDir.get().asFile
+                dir.mkdirs()
+                systemProperty("jacoco.agent.jar", agentJarPath.get())
+                systemProperty("jacoco.testkit.destdir", dir.absolutePath)
+            }
+        }
+    }
+
+    // Aggregation in `code-coverage-report` cannot reach this included build, so produce the plugin's
+    // own merged report here, combining unit-test coverage with the TestKit exec files.
+    register<JacocoReport>("jacocoTestKitReport") {
+        dependsOn("test", "functionalTest", "functionalTestMinSupportedGradle")
+        executionData(
+            fileTree(layout.buildDirectory) {
+                // *.exec: coverage from the test JVMs (also catches plugin code applied in-process via
+                // ProjectBuilder). testkit/**: coverage from the TestKit-spawned Gradle JVMs.
+                include("jacoco/*.exec", "jacoco/testkit/**/*.exec")
+            }
+        )
+        sourceDirectories.from(sourceSets["main"].allSource.srcDirs)
+        classDirectories.from(
+            files(sourceSets["main"].output.classesDirs).asFileTree.matching {
+                // Generated build metadata, also excluded from detekt self-analysis above.
+                exclude("dev/detekt/detekt_gradle_plugin/BuildConfig*")
+            }
+        )
+        reports {
+            xml.required = true
+            html.required = false
         }
     }
 
