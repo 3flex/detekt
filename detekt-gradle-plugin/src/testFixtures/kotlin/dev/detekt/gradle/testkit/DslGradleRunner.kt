@@ -138,7 +138,7 @@ constructor(
             add("--stacktrace")
             add("--info")
             add("--build-cache")
-            add("-Dorg.gradle.jvmargs=$jvmArgs")
+            add("-Dorg.gradle.jvmargs=${listOfNotNull(jvmArgs, jacocoAgentArg()).joinToString(" ")}")
             if (dryRun) {
                 add("-Pdetekt-dry-run=true")
             }
@@ -162,6 +162,27 @@ constructor(
             withArguments(args)
             gradleVersionOrNone?.let(::withGradleVersion)
         }
+    }
+
+    /**
+     * When the functional test task injects the JaCoCo agent (via the `jacoco.agent.jar` and
+     * `jacoco.testkit.destdir` system properties), return a `-javaagent` argument so the
+     * TestKit-spawned Gradle JVMs are instrumented. JaCoCo does not instrument these spawned JVMs
+     * out of the box, so without this functional tests contribute no coverage of the plugin.
+     *
+     * The exec file is named after [jacocoJvmId] (stable per test JVM), so every build in a fork
+     * appends to the same file. Keeping the name constant across a fork's tests keeps
+     * `-Dorg.gradle.jvmargs` constant too, so TestKit reuses its Gradle daemon rather than spawning a
+     * fresh one per test. The report task merges the per-fork files. `append=true` accumulates coverage
+     * across a fork's sequentially-executed builds; distinct files per fork avoid the data corruption
+     * that concurrent writes to one `.exec` would cause under parallel test forks.
+     */
+    private fun jacocoAgentArg(): String? {
+        val agentJar = System.getProperty("jacoco.agent.jar")
+        val destDir = System.getProperty("jacoco.testkit.destdir")
+        if (agentJar == null || destDir == null) return null
+        val destFile = File(destDir, "testkit-$jacocoJvmId.exec").absolutePath
+        return "-javaagent:$agentJar=destfile=$destFile,append=true,output=file"
     }
 
     fun runTasksAndCheckResult(vararg tasks: String, doAssert: DslGradleRunner.(BuildResult) -> Unit) {
@@ -189,5 +210,7 @@ constructor(
     companion object {
         private const val SETTINGS_FILENAME = "settings.gradle"
         private const val DETEKT_TASK = "detekt"
+
+        private val jacocoJvmId: String = UUID.randomUUID().toString()
     }
 }

@@ -83,6 +83,7 @@ setOf(
     "detektFunctionalTest",
     "detektFunctionalTestMinSupportedGradle",
     "detektTestFixtures",
+    "jacocoTestKitReport",
 ).forEach { taskName ->
     tasks.register(taskName) {
         dependsOn(gradle.includedBuild("detekt-gradle-plugin").task(":$taskName"))
