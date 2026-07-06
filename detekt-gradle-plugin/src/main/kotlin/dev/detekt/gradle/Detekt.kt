@@ -41,6 +41,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -141,12 +142,16 @@ abstract class Detekt @Inject constructor(
     @get:Option(option = "auto-correct", description = "Allow rules to auto correct code if they support it")
     abstract val autoCorrect: Property<Boolean>
 
+    @get:Internal
+    abstract val basePath: DirectoryProperty
+
     /**
-     * Respect only the file path for incremental build. Using @InputFile respects both file path and content.
+     * Respect only the file path for incremental build. Using @InputDirectory would respect both path and content.
      */
     @get:Input
     @get:Optional
-    abstract val basePath: Property<String>
+    internal val basePathString: Provider<String>
+        get() = basePath.locationOnly.map { it.asFile.absolutePath }
 
     @get:Nested
     /*
@@ -193,7 +198,7 @@ abstract class Detekt @Inject constructor(
                 ignoreFailures = ignoreFailures.get(),
                 minSeverity = failOnSeverity.get()
             ),
-            BasePathArgument(basePath.orNull),
+            BasePathArgument(basePathString.orNull),
             DisableDefaultRuleSetArgument(disableDefaultRuleSets.get()),
             FreeArgs(freeCompilerArgs.get()),
             OptInArguments(optIn.get()),

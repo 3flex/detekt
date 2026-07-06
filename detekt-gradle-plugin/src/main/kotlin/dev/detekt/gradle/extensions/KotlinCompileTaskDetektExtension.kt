@@ -20,7 +20,7 @@ open class KotlinCompileTaskDetektExtension(project: Project) {
 
     private val objects: ObjectFactory = project.objects
 
-    val isEnabled: Property<Boolean> = objects.property(Boolean::class.java)
+    val enabled: Property<Boolean> = objects.property(Boolean::class.java)
     val debug: Property<Boolean> = objects.property(Boolean::class.java)
     val buildUponDefaultConfig: Property<Boolean> = objects.property(Boolean::class.java)
     val allRules: Property<Boolean> = objects.property(Boolean::class.java)

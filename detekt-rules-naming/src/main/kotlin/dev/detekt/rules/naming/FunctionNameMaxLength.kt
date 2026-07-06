@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 /**
  * Reports when very long function names are used.
  */
-@Alias("FunctionMaxNameLength")
+@Alias("FunctionMaxLength")
 class FunctionNameMaxLength(config: Config) :
     Rule(config, "Function names should not be longer than the maximum set in detekt's configuration.") {
 

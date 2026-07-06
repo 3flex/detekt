@@ -33,6 +33,7 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -119,12 +120,16 @@ abstract class DetektCreateBaselineTask @Inject constructor(
     @get:Optional
     abstract val autoCorrect: Property<Boolean>
 
+    @get:Internal
+    abstract val basePath: DirectoryProperty
+
     /**
-     * Respect only the file path for incremental build. Using @InputFile respects both file path and content.
+     * Respect only the file path for incremental build. Using @InputDirectory would respect both path and content.
      */
     @get:Input
     @get:Optional
-    abstract val basePath: Property<String>
+    internal val basePathString: Provider<String>
+        get() = basePath.locationOnly.map { it.asFile.absolutePath }
 
     @get:Input
     @get:Optional
@@ -166,7 +171,7 @@ abstract class DetektCreateBaselineTask @Inject constructor(
             BuildUponDefaultConfigArgument(buildUponDefaultConfig.get()),
             AutoCorrectArgument(autoCorrect.get()),
             AllRulesArgument(allRules.get()),
-            BasePathArgument(basePath.orNull),
+            BasePathArgument(basePathString.orNull),
             DisableDefaultRuleSetArgument(disableDefaultRuleSets.get()),
             FreeArgs(freeCompilerArgs.get()),
             OptInArguments(optIn.get()),

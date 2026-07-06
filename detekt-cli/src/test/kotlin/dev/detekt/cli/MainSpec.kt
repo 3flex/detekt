@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package dev.detekt.cli
 
 import dev.detekt.cli.runners.ConfigExporter

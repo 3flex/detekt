@@ -6,6 +6,6 @@ import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 open class DetektCompilerPluginReport @Inject constructor(val name: String, objects: ObjectFactory) {
-    val enabled: Property<Boolean> = objects.property(Boolean::class.java)
-    val destination: RegularFileProperty = objects.fileProperty()
+    val required: Property<Boolean> = objects.property(Boolean::class.java)
+    val outputLocation: RegularFileProperty = objects.fileProperty()
 }

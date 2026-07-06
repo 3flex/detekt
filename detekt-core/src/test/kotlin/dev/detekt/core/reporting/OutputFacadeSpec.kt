@@ -71,6 +71,33 @@ class OutputFacadeSpec {
     }
 
     @Test
+    fun `an unknown report id fails instead of being silently ignored`(@TempDir tempDir: Path) {
+        val printStream = StringPrintStream()
+        val defaultResult = TestDetektion(
+            createIssue(
+                createRuleInstance(ruleSetId = "Key"),
+                createIssueEntity(createIssueLocation("TestFile.kt"))
+            ),
+        )
+
+        val spec = createNullLoggingSpec {
+            reports {
+                report { "md" to tempDir.resolve("detekt.md") }
+            }
+            logging {
+                outputChannel = printStream
+            }
+        }
+
+        assertThatCode {
+            spec.withSettings { OutputFacade(this).run(defaultResult, OutputFacade.ReportPaths.Show) }
+        }
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessageContaining("No report with id 'md' was found.")
+            .hasMessageContaining("'markdown'")
+    }
+
+    @Test
     fun `two reports can't have the same path`(@TempDir tempDir: Path) {
         val printStream = StringPrintStream()
         val defaultResult = TestDetektion(

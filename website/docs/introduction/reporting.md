@@ -142,5 +142,5 @@ jobs:
 Note: you'll have to set `Detekt.basePath` on each Detekt Gradle task,
 so that GitHub knows where the repository is to place annotations correctly.
 ```gradle
-basePath = rootProject.projectDir.absolutePath
+basePath = rootProject.projectDir
 ```

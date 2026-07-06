@@ -320,11 +320,11 @@ naming:
     forbiddenName: []
   FunctionNameMaxLength:
     active: false
-    aliases: ['FunctionMaxNameLength']
+    aliases: ['FunctionMaxLength']
     maximumFunctionNameLength: 30
   FunctionNameMinLength:
     active: false
-    aliases: ['FunctionMinNameLength']
+    aliases: ['FunctionMinLength']
     minimumFunctionNameLength: 3
   FunctionNaming:
     active: true

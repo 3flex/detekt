@@ -43,14 +43,12 @@ fun main(args: Array<String>) {
     exitProcess(result.exitCode())
 }
 
+/**
+ * The reflective entry point used by detekt's Gradle plugin (`DefaultCliInvoker`) to invoke the CLI.
+ * The signature must stay stable so that any 2.x Gradle plugin can invoke any 2.x CLI on the classpath.
+ * It is not intended to be called by users; use `DetektCli.load()` from detekt-tooling instead.
+ */
 @NotApiButProbablyUsedByUsers
-@Deprecated(
-    "Don't build a runner yourself.",
-    ReplaceWith(
-        "DetektCli.load().run(args, outputPrinter, errorPrinter)",
-        "io.github.detekt.tooling.api.DetektCli"
-    )
-)
 fun buildRunner(args: Array<String>, outputPrinter: PrintStream, errorPrinter: PrintStream): Executable {
     check(KotlinCompilerVersion.VERSION == whichKotlin()) {
         """

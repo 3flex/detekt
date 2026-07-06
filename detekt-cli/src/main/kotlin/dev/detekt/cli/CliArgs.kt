@@ -111,7 +111,7 @@ class CliArgs {
         converter = ReportPathConverter::class,
         description = "Generates a report for given 'report-id' and stores it on given 'path'. " +
             "Entry should consist of: [report-id:path]. " +
-            "Available 'report-id' values: 'checkstyle', 'html', 'md', 'sarif'. " +
+            "Available 'report-id' values: 'checkstyle', 'html', 'markdown', 'sarif'. " +
             "These can also be used in combination with each other " +
             "e.g. '-r html:reports/detekt.html -r checkstyle:reports/detekt.xml'"
     )

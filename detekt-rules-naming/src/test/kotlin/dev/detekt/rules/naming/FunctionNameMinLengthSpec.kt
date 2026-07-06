@@ -6,7 +6,7 @@ import dev.detekt.test.lint
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class FunctionMinNameLengthSpec {
+class FunctionNameMinLengthSpec {
 
     @Test
     fun `should report a function name that is too short`() {

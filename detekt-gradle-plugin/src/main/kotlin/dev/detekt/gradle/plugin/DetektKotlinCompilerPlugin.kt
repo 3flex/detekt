@@ -28,7 +28,7 @@ class DetektKotlinCompilerPlugin : KotlinCompilerPluginSupportPlugin {
 
         target.tasks.withType(KotlinJvmCompile::class.java).configureEach { task ->
             task.extensions.create(DETEKT_EXTENSION, KotlinCompileTaskDetektExtension::class.java, target).apply {
-                isEnabled.convention(extension.enableCompilerPlugin)
+                enabled.convention(extension.enableCompilerPlugin)
                 baseline.convention(extension.baseline)
                 debug.convention(extension.debug)
                 buildUponDefaultConfig.convention(extension.buildUponDefaultConfig)
@@ -56,7 +56,7 @@ class DetektKotlinCompilerPlugin : KotlinCompilerPluginSupportPlugin {
         val options = project.objects.listProperty(SubpluginOption::class.java).apply {
             add(SubpluginOption("debug", taskExtension.get().debug.toString()))
             add(SubpluginOption("configDigest", taskExtension.get().config.toDigest()))
-            add(SubpluginOption("isEnabled", taskExtension.get().isEnabled.getOrElse(false).toString()))
+            add(SubpluginOption("isEnabled", taskExtension.get().enabled.getOrElse(false).toString()))
             add(SubpluginOption("useDefaultConfig", taskExtension.get().buildUponDefaultConfig.get().toString()))
             add(SubpluginOption("allRules", taskExtension.get().allRules.get().toString()))
             add(SubpluginOption("disableDefaultRuleSets", taskExtension.get().disableDefaultRuleSets.get().toString()))
@@ -65,16 +65,16 @@ class DetektKotlinCompilerPlugin : KotlinCompilerPluginSupportPlugin {
             add(SubpluginOption("excludes", taskExtension.get().excludes.get().encodeToBase64()))
 
             taskExtension.get().reports.all { report ->
-                report.enabled.convention(true)
-                report.destination.convention(
+                report.required.convention(true)
+                report.outputLocation.convention(
                     projectExtension.reportsDir.file("${kotlinCompilation.name}.${report.name}")
                 )
 
-                if (report.enabled.get()) {
+                if (report.required.get()) {
                     add(
                         SubpluginOption(
                             "report",
-                            "${report.name}:${report.destination.asFile.get().absolutePath}"
+                            "${report.name}:${report.outputLocation.asFile.get().absolutePath}"
                         )
                     )
                 }

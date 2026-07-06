@@ -6,12 +6,11 @@ import dev.detekt.gradle.extensions.DetektReportType.MARKDOWN
 import dev.detekt.gradle.extensions.DetektReportType.SARIF
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import javax.inject.Inject
 
 @Suppress("TooManyFunctions")
-open class DetektReports @Inject constructor(@get:Internal val objects: ObjectFactory) {
+open class DetektReports @Inject constructor(private val objects: ObjectFactory) {
 
     @get:Nested
     open val checkstyle: DetektReport = objects.newInstance(DetektReport::class.java, CHECKSTYLE)

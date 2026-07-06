@@ -543,7 +543,7 @@ class DetektTaskDslSpec {
                         outputLocation.set(file("build/reports/mydetekt.sarif"))
                     }
                 }
-                basePath = projectDir.toString()
+                basePath = projectDir
             }
         """.trimIndent()
 

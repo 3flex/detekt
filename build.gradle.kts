@@ -70,7 +70,7 @@ allprojects {
             sarif.required = true
             markdown.required = true
         }
-        basePath = rootDir.absolutePath
+        basePath = rootDir
     }
     detektReportMergeSarif {
         input.from(tasks.withType<Detekt>().map { it.reports.sarif.outputLocation })

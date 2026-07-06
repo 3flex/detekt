@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 /**
  * Reports when very short function names are used.
  */
-@Alias("FunctionMinNameLength")
+@Alias("FunctionMinLength")
 class FunctionNameMinLength(config: Config) :
     Rule(config, "Function names should not be shorter than the minimum set in detekt's configuration.") {
 

@@ -40,6 +40,11 @@ class OutputFacade(private val settings: ProcessingSettings) {
 
     private fun handleOutputReports(result: Detektion, reportPaths: ReportPaths) {
         val extensions = loadExtensions<OutputReport>(settings)
+        val unknownReportIds = reports.keys - extensions.map { it.id }.toSet()
+        check(unknownReportIds.isEmpty()) {
+            "No report with id ${unknownReportIds.joinToString { "'$it'" }} was found. " +
+                "Available report ids: ${extensions.map { it.id }.sorted().joinToString { "'$it'" }}."
+        }
         for (report in extensions) {
             val filePath = reports[report.id]?.path
             if (filePath != null) {

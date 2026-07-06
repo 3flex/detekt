@@ -123,7 +123,7 @@ Several rules were renamed for consistency:
 | `MayBeConst`                      | `MayBeConstant`                       |
 | `FunctionMinLength`               | `FunctionNameMinLength`               |
 | `FunctionMaxLength`               | `FunctionNameMaxLength`               |
-| `SpacingBetweenPackageAndImports` | `SpacingAfterPackageDeclaration`      |
+| `SpacingBetweenPackageAndImports` | `SpacingAfterPackageAndImports`       |
 | `UntilInsteadOfRangeTo`           | `RangeUntilInsteadOfRangeTo`          |
 | `RedundantVisibilityModifierRule` | `RedundantVisibilityModifier`         |
 
@@ -184,7 +184,9 @@ Several configuration concepts were removed or replaced:
 - The deprecated `Severity` enum (`CodeSmell`, `Style`, `Defect`, …) is removed. Severity is now a
   three-value enum (`Info`, `Warning`, `Error`) configurable per rule via the standard
   `excludes` / `severity` keys.
-- Threshold-style configs were renamed everywhere to `allowed...`:
+- Most threshold-style configs were renamed to `allowed...` (note that some rules keep other
+  naming, e.g. `ReturnCount.max`, `ThrowsCount.max`, `UnderscoresInNumericLiterals.acceptableLength`,
+  `FunctionNameMaxLength.maximumFunctionNameLength` and `VariableMaxLength.maximumVariableNameLength`):
 
 | Rule                          | Old key                                    | New key              |
 |-------------------------------|--------------------------------------------|----------------------|
@@ -193,7 +195,7 @@ Several configuration concepts were removed or replaced:
 | `LongParameterList`           | `functionThreshold` / `constructorThreshold` | `allowedFunctionParameters` / `allowedConstructorParameters` |
 | `CyclomaticComplexMethod`     | `threshold`                                | `allowedComplexity`  |
 | `CognitiveComplexMethod`      | `threshold`                                | `allowedComplexity`  |
-| `ComplexCondition`            | `threshold`                                | `allowedComplexity`  |
+| `ComplexCondition`            | `threshold`                                | `allowedConditions`  |
 | `ComplexInterface`            | `threshold`                                | `allowedDefinitions` |
 | `NestedBlockDepth`            | `threshold`                                | `allowedDepth`       |
 | `NestedScopeFunctions`        | `threshold`                                | `allowedDepth`       |
@@ -253,7 +255,6 @@ for you.
   reports and logs will be `\` rather than the mixed behaviour of 1.x.
 - `--report` validation is stricter and emits clearer error messages for unknown formats.
 - `--classpath` is validated when the CLI starts so misconfigured classpaths fail fast.
-- A new `--filter` flag lets you exclude paths from analysis without modifying the config file.
 
 ### Compiler plugin coordinates
 
@@ -261,8 +262,8 @@ The compiler plugin moved too. If you applied it via Gradle's compiler plugin DS
 
 ```diff
  plugins {
--    id("io.gitlab.arturbosch.detekt") version "1.23.8"
-+    id("dev.detekt.compiler-plugin") version "2.0.0"
+-    id("io.github.detekt.gradle.compiler-plugin") version "1.23.8"
++    id("dev.detekt.gradle.compiler-plugin") version "2.0.0"
  }
 ```
 
