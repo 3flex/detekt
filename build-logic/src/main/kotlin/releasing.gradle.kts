@@ -46,7 +46,7 @@ dependencies {
 }
 
 fun updateVersion(increment: (Semver) -> Semver) {
-    val versionsFile = file("$rootDir/build-logic/src/main/kotlin/Versions.kt")
+    val versionsFile = file("$rootDir/build-logic/src/main/kotlin/base-settings.settings.gradle.kts")
     val newContent = versionsFile.readLines()
         .joinToString("\n") {
             if (it.contains("const val DETEKT: String")) {
@@ -78,7 +78,7 @@ tasks {
     register<UpdateVersionInFileTask>("applyDocVersion") {
         fileToUpdate = file("$rootDir/website/src/remark/detektVersionReplace.js")
         linePartToFind = "const detektVersion = "
-        lineTransformation = "const detektVersion = \"${Versions.DETEKT}\";"
+        lineTransformation = "const detektVersion = \"$version\";"
     }
 }
 

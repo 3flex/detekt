@@ -22,9 +22,6 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "6.0.10"
 }
 
-group = "dev.detekt"
-version = Versions.currentOrSnapshot()
-
 buildConfig {
     buildConfigField("DETEKT_VERSION", project.version.toString())
     buildConfigField("DETEKT_COMPILER_PLUGIN_VERSION", project.version.toString())

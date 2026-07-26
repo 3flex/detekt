@@ -26,7 +26,7 @@ detekt {
 }
 
 buildConfig {
-    buildConfigField("DETEKT_VERSION", Versions.DETEKT)
+    buildConfigField("DETEKT_VERSION", version.toString())
     buildConfigField("KOTLIN_IMPLEMENTATION_VERSION", libs.versions.kotlin.get())
 }
 

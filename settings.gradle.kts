@@ -1,3 +1,6 @@
+import dev.detekt.gradle.Detekt
+import dev.detekt.gradle.extensions.DetektExtension
+
 rootProject.name = "detekt"
 
 pluginManagement {
@@ -48,12 +51,40 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
 plugins {
+    id("base-settings")
     id("com.gradle.develocity") version "4.5.0"
     id("com.gradle.common-custom-user-data-gradle-plugin") version "2.8.0"
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("com.autonomousapps.build-health") version "3.19.1"
     // Kotlin plugin must be added to classpath to support build-health analysis
     id("org.jetbrains.kotlin.jvm") version "2.4.10" apply false
+    id("dev.detekt") apply false
+}
+
+gradle.lifecycle.beforeProject {
+    apply(plugin = "dev.detekt")
+
+    configure<DetektExtension> {
+        buildUponDefaultConfig = true
+        baseline = file("$rootDir/config/detekt/baseline.xml")
+    }
+
+    dependencies {
+        "detekt"(project(":detekt-cli"))
+        "detektPlugins"(project(":detekt-rules-ktlint-wrapper"))
+        "detektPlugins"(project(":detekt-rules-libraries"))
+        "detektPlugins"(project(":detekt-rules-ruleauthors"))
+    }
+
+    tasks.withType<Detekt>().configureEach {
+        reports {
+            checkstyle.required = true
+            html.required = true
+            sarif.required = true
+            markdown.required = true
+        }
+        basePath = rootDir.absolutePath
+    }
 }
 
 val isCiBuild = providers.environmentVariable("CI").isPresent

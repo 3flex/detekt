@@ -1,4 +1,9 @@
-object Versions {
+gradle.lifecycle.beforeProject {
+    group = "dev.detekt"
+    version = Versions.currentOrSnapshot()
+}
+
+private object Versions {
 
     const val DETEKT: String = "2.0.0-alpha.6"
     const val SNAPSHOT_NAME: String = "main"

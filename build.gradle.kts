@@ -1,10 +1,9 @@
-import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.report.ReportMergeTask
 
 plugins {
     id("releasing")
     id("dev.detekt")
-    id("org.jetbrains.dokka") version "2.2.0"
+    id("org.jetbrains.dokka")
 }
 
 dependencies {
@@ -46,35 +45,9 @@ val detektReportMergeSarif = tasks.register<ReportMergeTask>("detektReportMergeS
 }
 
 allprojects {
-    group = "dev.detekt"
-    version = Versions.currentOrSnapshot()
-
-    apply(plugin = "dev.detekt")
-
-    detekt {
-        buildUponDefaultConfig = true
-        baseline = file("$rootDir/config/detekt/baseline.xml")
-    }
-
-    dependencies {
-        detekt(project(":detekt-cli"))
-        detektPlugins(project(":detekt-rules-ktlint-wrapper"))
-        detektPlugins(project(":detekt-rules-libraries"))
-        detektPlugins(project(":detekt-rules-ruleauthors"))
-    }
-
-    tasks.withType<Detekt>().configureEach {
-        reports {
-            checkstyle.required = true
-            html.required = true
-            sarif.required = true
-            markdown.required = true
-        }
-        basePath = rootDir.absolutePath
-    }
-    detektReportMergeSarif {
-        input.from(tasks.withType<Detekt>().map { it.reports.sarif.outputLocation })
-    }
+//    detektReportMergeSarif {
+//        input.from(tasks.withType<Detekt>().map { it.reports.sarif.outputLocation })
+//    }
 }
 
 setOf(
