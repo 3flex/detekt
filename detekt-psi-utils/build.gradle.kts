@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api(libs.kotlin.compiler)
     compileOnly(projects.detektKotlinAnalysisApi)
+    compileOnly(projects.detektKotlinAnalysisApiStandalone)
 
     testImplementation(libs.assertj.core)
     testImplementation(projects.detektTestJunit)
