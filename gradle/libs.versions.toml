@@ -73,6 +73,9 @@ kotlin-analysisApiStandalone = { module = "org.jetbrains.kotlin:analysis-api-sta
 kotlin-lowLevelApiFir = { module = "org.jetbrains.kotlin:low-level-api-fir-for-ide", version.ref = "kotlin" }
 kotlin-symbolLightClasses = { module = "org.jetbrains.kotlin:symbol-light-classes-for-ide", version.ref = "kotlin" }
 kotlin-analysisApiImplBase = { module = "org.jetbrains.kotlin:analysis-api-impl-base-for-ide", version.ref = "kotlin" }
+# Since Kotlin 2.4.20 the class file decompiler is no longer part of the kotlin-compiler artifact. This artifact
+# largely overlaps kotlin-compiler, so only the decompiler classes are repackaged from it.
+kotlin-compilerCommonForIde = { module = "org.jetbrains.kotlin:kotlin-compiler-common-for-ide", version.ref = "kotlin" }
 # Should be possible to remove when https://youtrack.jetbrains.com/issue/KT-81457 fixed
 kotlinx-coroutinesCore-intellij = { module = "org.jetbrains.intellij.deps.kotlinx:kotlinx-coroutines-core", version = "1.10.2-intellij-2" }
 # Can likely be removed in future - https://youtrack.jetbrains.com/issue/KT-73751/Analysis-API-Caffeine-dependency

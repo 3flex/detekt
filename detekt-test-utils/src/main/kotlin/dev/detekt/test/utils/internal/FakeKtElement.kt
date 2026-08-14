@@ -2,7 +2,6 @@ package dev.detekt.test.utils.internal
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.Language
-import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
@@ -17,6 +16,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtNonPublicApi
 import org.jetbrains.kotlin.psi.KtVisitor
 import javax.swing.Icon
 
@@ -156,10 +156,6 @@ class FakeKtElement(private val psiFile: PsiFile = FakePsiFile("")) : KtElement 
         error("Fake not implemented yet")
     }
 
-    override fun getPresentation(): ItemPresentation? {
-        error("Fake not implemented yet")
-    }
-
     override fun getPrevSibling(): PsiElement {
         error("Fake not implemented yet")
     }
@@ -229,6 +225,11 @@ class FakeKtElement(private val psiFile: PsiFile = FakePsiFile("")) : KtElement 
     }
 
     override fun <T : Any?> putUserData(p0: Key<T>, p1: T?) {
+        // no-op
+    }
+
+    @OptIn(KtNonPublicApi::class)
+    override fun rawDelete() {
         // no-op
     }
 
