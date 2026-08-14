@@ -2,7 +2,6 @@ package dev.detekt.test.utils.internal
 
 import com.intellij.lang.FileASTNode
 import com.intellij.lang.Language
-import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -34,8 +33,6 @@ class FakePsiFile(private val text: String = "", private val name: String = "") 
     override fun canNavigateToSource(): Boolean = false
 
     override fun getName(): String = name
-
-    override fun getPresentation(): ItemPresentation? = null
 
     override fun getIcon(p0: Int): Icon {
         error("Fake not implemented yet")

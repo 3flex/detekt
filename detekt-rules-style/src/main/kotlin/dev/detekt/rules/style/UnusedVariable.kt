@@ -27,8 +27,6 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgumentList
 import org.jetbrains.kotlin.psi.KtVariableDeclaration
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
-import org.jetbrains.kotlin.resolve.source.getPsi
-import org.jetbrains.kotlin.resolve.source.toSourceElement
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 /**
@@ -142,8 +140,6 @@ private class UnusedVariableVisitor(private val allowedNames: Regex) : DetektVis
         }
 
     private fun registerNewDeclaration(declaration: KtNamedDeclaration) {
-        declaration.toSourceElement().getPsi()?.also {
-            variables[it] = declaration
-        }
+        variables[declaration] = declaration
     }
 }

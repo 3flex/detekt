@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.psi.KtOperationReferenceExpression
 import org.jetbrains.kotlin.psi.KtPostfixExpression
 import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.psiUtil.isDotSelector
-import org.jetbrains.kotlin.resolve.calls.util.asCallableReferenceExpression
 import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 
 /**
@@ -127,7 +126,9 @@ class ForbiddenMethodCall(config: Config) :
     private fun check(expression: KtExpression) {
         analyze(expression) {
             val call = expression.resolveToCall()
-                ?: expression.asCallableReferenceExpression()?.resolveToCall()
+                ?: (expression.parent as? KtCallableReferenceExpression)
+                    ?.takeIf { it.callableReference == expression }
+                    ?.resolveToCall()
                 ?: return
 
             val successfulCall = call.successfulCallOrNull<KaCall>() ?: return

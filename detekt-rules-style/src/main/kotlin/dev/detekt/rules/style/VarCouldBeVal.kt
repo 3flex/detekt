@@ -10,6 +10,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
+import com.intellij.psi.util.PsiTreeUtil
 import dev.detekt.psi.isLateinit
 import dev.detekt.psi.isOverride
 import org.jetbrains.kotlin.analysis.api.KaSession
@@ -37,8 +38,14 @@ import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.isObjectLiteral
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
+import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.KtDeclarationWithBody
+import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtPsiUtil
+import org.jetbrains.kotlin.psi.KtScript
+import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.lastBlockStatementOrThis
-import org.jetbrains.kotlin.util.containingNonLocalDeclaration
 
 /**
  * Reports var declarations (both local variables and private class properties) that could be val,
@@ -248,3 +255,16 @@ class VarCouldBeVal(config: Config) :
         private val unaryAssignmentOperators = setOf(KtTokens.MINUSMINUS, KtTokens.PLUSPLUS)
     }
 }
+
+// Replacement for the K1-only org.jetbrains.kotlin.util.containingNonLocalDeclaration
+private fun KtElement.containingNonLocalDeclaration(): KtDeclaration? {
+    var container = containingDeclarationForPseudocode()
+    while (container != null && KtPsiUtil.isLocal(container)) {
+        container = container.containingDeclarationForPseudocode()
+    }
+    return container
+}
+
+private fun KtElement.containingDeclarationForPseudocode(): KtDeclaration? =
+    PsiTreeUtil.getParentOfType(this, KtDeclarationWithBody::class.java, KtClassOrObject::class.java, KtScript::class.java)
+        ?: getNonStrictParentOfType<KtProperty>()
