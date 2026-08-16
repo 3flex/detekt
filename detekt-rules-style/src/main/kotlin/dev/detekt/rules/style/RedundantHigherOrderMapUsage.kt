@@ -6,12 +6,12 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaValueParameterSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
@@ -118,6 +118,7 @@ class RedundantHigherOrderMapUsage(config: Config) :
         return lambda
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     private fun KaSession.isRedundant(
         functionLiteral: KtFunctionLiteral,
@@ -130,17 +131,18 @@ class RedundantHigherOrderMapUsage(config: Config) :
         val labeledReturnExpressions = functionLiteral.collectDescendantsOfType<KtReturnExpression> {
             if (it == lastStatement) return@collectDescendantsOfType false
             val label = (it as? KtExpressionWithLabel)?.getTargetLabel() ?: return@collectDescendantsOfType false
-            label.mainReference.resolveToSymbol() == symbol
+            label.resolveSymbol() == symbol
         }
         return labeledReturnExpressions.all { isReferenceTo(it, lambdaParameter) }
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KaSession.isReferenceTo(expression: KtExpression, symbol: KaValueParameterSymbol): Boolean {
         val nameReference = when (expression) {
             is KtReturnExpression -> expression.returnedExpression
             else -> expression
         } as? KtNameReferenceExpression ?: return false
-        return nameReference.mainReference.resolveToSymbol() == symbol
+        return nameReference.resolveSymbol() == symbol
     }
 
     companion object {

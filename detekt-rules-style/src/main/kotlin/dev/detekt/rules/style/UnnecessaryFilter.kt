@@ -6,17 +6,18 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForReceiver
@@ -78,16 +79,18 @@ class UnnecessaryFilter(config: Config) :
         return argument?.getArgumentExpression()?.unpackFunctionLiteral()
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KtExpression.matchingCall(fqNames: Set<FqName>): FqName? {
         val calleeText = getCalleeExpressionIfAny()?.text ?: return null
         if (fqNames.none { it.shortName().asString() == calleeText }) return null
         return analyze(this) {
             val callableId = resolveToCall()?.singleFunctionCallOrNull()?.symbol?.callableId
-                ?: (mainReference?.resolveToSymbol() as? KaCallableSymbol)?.callableId
+                ?: ((this@matchingCall as? KtReferenceExpression)?.resolveSymbol() as? KaCallableSymbol)?.callableId
             callableId?.asSingleFqName()?.takeIf { it in fqNames }
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     private fun KtExpression.nextCall(): KtExpression? {
         getQualifiedExpressionForReceiver()?.selectorExpression?.let { return it }
@@ -99,7 +102,7 @@ class UnnecessaryFilter(config: Config) :
                 val propertyName = propertySymbol.name.asString()
                 val singleReferrer = property.siblings(forward = true, withItself = false).flatMap { sibling ->
                     sibling.collectDescendantsOfType<KtNameReferenceExpression> {
-                        it.text == propertyName && it.mainReference.resolveToSymbol() == propertySymbol
+                        it.text == propertyName && it.resolveSymbol() == propertySymbol
                     }
                 }.singleOrNull()
                 val qualified = singleReferrer?.getQualifiedExpressionForReceiver()

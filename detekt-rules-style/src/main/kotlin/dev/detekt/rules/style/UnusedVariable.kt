@@ -11,10 +11,10 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtExpression
@@ -135,10 +135,11 @@ private class UnusedVariableVisitor(private val allowedNames: Regex) : DetektVis
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.resolveToLocalVariableSymbol(): KaVariableSymbol? =
         with(session) {
-            mainReference?.resolveToSymbol() as? KaVariableSymbol
+            (this@resolveToLocalVariableSymbol as? KtReferenceExpression)?.resolveSymbol() as? KaVariableSymbol
         }
 
     private fun registerNewDeclaration(declaration: KtNamedDeclaration) {

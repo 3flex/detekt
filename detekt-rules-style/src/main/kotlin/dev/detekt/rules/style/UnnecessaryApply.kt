@@ -7,6 +7,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.receiverIsUsed
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
@@ -15,7 +16,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.singleCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
@@ -74,6 +74,7 @@ class UnnecessaryApply(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     context(session: KaSession)
     private fun KtCallExpression.hasOnlyOneMemberAccessStatement(): Boolean {
@@ -96,7 +97,7 @@ class UnnecessaryApply(config: Config) :
             val lambdaSymbol = lambda.functionLiteral.symbol
             return singleStatement.collectDescendantsOfType<KtNameReferenceExpression> {
                 val symbol = if (it.parent is KtThisExpression) {
-                    it.mainReference.resolveToSymbol()
+                    it.resolveSymbol()
                 } else {
                     it.implicitReceiver()
                 }

@@ -8,8 +8,8 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -40,6 +40,7 @@ class UnusedUnaryOperator(config: Config) :
     ),
     RequiresAnalysisApi {
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     override fun visitPrefixExpression(expression: KtPrefixExpression) {
         super.visitPrefixExpression(expression)
@@ -58,7 +59,7 @@ class UnusedUnaryOperator(config: Config) :
         analyze(expression) {
             val parentOrSelf = expression.parentBinaryExpressionOrThis()
             if (parentOrSelf.isUsedAsExpression) return
-            if (expression.operationReference.mainReference.resolveToSymbol() != null) return
+            if (expression.operationReference.resolveSymbol() != null) return
             val message = "This '${parentOrSelf.text}' is not used"
             report(Finding(Entity.from(expression), message))
         }

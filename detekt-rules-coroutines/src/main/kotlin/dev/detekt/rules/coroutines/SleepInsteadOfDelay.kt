@@ -7,13 +7,13 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypes
@@ -71,6 +72,7 @@ class SleepInsteadOfDelay(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.isThreadSleepFunction(): Boolean {
         fun KtCallableReferenceExpression.isSleepCallableRef(): Boolean =
@@ -85,7 +87,7 @@ class SleepInsteadOfDelay(config: Config) :
         } else {
             with(session) {
                 val symbol = resolveToCall()?.singleFunctionCallOrNull()?.symbol
-                    ?: mainReference?.resolveToSymbol() as? KaCallableSymbol
+                    ?: (this@isThreadSleepFunction as? KtReferenceExpression)?.resolveSymbol() as? KaCallableSymbol
                 symbol?.callableId?.asSingleFqName() == FqName("java.lang.Thread.sleep")
             }
         }

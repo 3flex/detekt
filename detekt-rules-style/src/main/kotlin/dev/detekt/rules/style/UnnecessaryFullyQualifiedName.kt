@@ -10,6 +10,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.fullyQualifiedNameGlobToRegex
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.KaScopeKind
@@ -23,7 +24,6 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaConstructorSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClassLiteralExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -95,6 +95,7 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     override fun visitUserType(type: KtUserType) {
         super.visitUserType(type)
@@ -116,7 +117,7 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         if (!typeText.contains(".")) return
 
         analyze(type) {
-            val resolvedSymbol = type.referenceExpression?.mainReference?.resolveToSymbol() ?: return
+            val resolvedSymbol = type.referenceExpression?.resolveSymbol() ?: return
             val candidate = resolvedSymbol.ignoredFqNameCandidate()
             if (candidate != null && ignoredFullyQualifiedNames.any { it.matches(candidate) }) return
             val packageFqName = resolvedSymbol.packageFqName() ?: return
@@ -212,9 +213,10 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KaSession.isReceiverLocalVariableOrProperty(receiver: KtExpression): Boolean {
         val leftmost = leftmostReference(receiver) ?: return false
-        return leftmost.mainReference.resolveToSymbol() is KaVariableSymbol
+        return leftmost.resolveSymbol() is KaVariableSymbol
     }
 
     private fun leftmostReference(expression: KtExpression): KtNameReferenceExpression? =

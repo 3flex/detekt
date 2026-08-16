@@ -7,6 +7,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.psi.firstParameterOrNull
 import dev.detekt.psi.isCalling
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
@@ -17,7 +18,6 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaDeclarationSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaDestructuringDeclarationSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
@@ -143,6 +144,7 @@ class UnnecessaryAny(config: Config) :
             }
         }
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("ReturnCount")
     context(session: KaSession)
     private fun isUsageOfValueAndItEligible(
@@ -173,9 +175,10 @@ class UnnecessaryAny(config: Config) :
 
             itRefCountInLeft == 1 -> {
                 with(session) {
-                    val itExpressionType = (leftExpression.mainReference?.resolveToSymbol() as? KaVariableSymbol)
-                        ?.returnType
-                        ?: return null
+                    val itExpressionType =
+                        ((leftExpression as? KtReferenceExpression)?.resolveSymbol() as? KaVariableSymbol)
+                            ?.returnType
+                            ?: return null
                     val valueExpressionType = rightExpression
                         .resolveToCall()
                         ?.singleCallOrNull<KaCallableMemberCall<*, *>>()
@@ -196,11 +199,12 @@ class UnnecessaryAny(config: Config) :
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     context(session: KaSession)
     private fun KtExpression.getItUsageCount(symbol: KaDeclarationSymbol) =
         with(session) {
             collectDescendantsOfType<KtNameReferenceExpression>().count {
-                it.mainReference.resolveToSymbol() == symbol
+                it.resolveSymbol() == symbol
             }
         }
 

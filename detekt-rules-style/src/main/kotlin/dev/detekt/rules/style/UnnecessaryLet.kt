@@ -8,8 +8,8 @@ import dev.detekt.api.Rule
 import dev.detekt.psi.firstParameterOrNull
 import dev.detekt.psi.isCalling
 import dev.detekt.psi.receiverIsUsed
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
@@ -121,6 +122,7 @@ private fun KtExpression?.getRootExpression(): KtExpression? {
     return receiverExpression
 }
 
+@OptIn(KaExperimentalApi::class)
 private fun KtLambdaExpression.countLambdaParameterReference(): Int {
     val bodyExpression = bodyExpression ?: return 0
     val receiver = this.getStrictParentOfType<KtQualifiedExpression>()?.receiverExpression
@@ -128,11 +130,11 @@ private fun KtLambdaExpression.countLambdaParameterReference(): Int {
         val parameters = buildList {
             val destructuringDeclaration = valueParameters.singleOrNull()?.destructuringDeclaration
             addAll(destructuringDeclaration?.symbol?.entries ?: listOfNotNull(firstParameterOrNull()))
-            receiver?.mainReference?.resolveToSymbol()?.let { add(it) }
+            (receiver as? KtReferenceExpression)?.resolveSymbol()?.let { add(it) }
         }
         parameters.sumOf { variableSymbol ->
             bodyExpression.collectDescendantsOfType<KtSimpleNameExpression> {
-                it.mainReference.resolveToSymbol() == variableSymbol
+                it.resolveSymbol() == variableSymbol
             }.count()
         }
     }

@@ -11,12 +11,12 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.isOperator
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
@@ -71,6 +71,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
     private val invokeOperatorReferences = mutableMapOf<KaCallableSymbol, MutableList<KtReferenceExpression>>()
     private val propertyDelegates = mutableListOf<KtPropertyDelegate>()
 
+    @OptIn(KaExperimentalApi::class)
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     fun getUnusedReports(): List<Finding> {
         val propertyDelegateSymbols by lazy(LazyThreadSafetyMode.NONE) {
@@ -117,7 +118,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
                             .mapNotNull {
                                 analyze(it) {
                                     val symbol = it.resolveToCall()?.singleFunctionCallOrNull()?.symbol
-                                        ?: it.mainReference.resolveToSymbol() as? KaFunctionSymbol
+                                        ?: it.resolveSymbol() as? KaFunctionSymbol
                                     symbol?.psi
                                 }
                             }
@@ -163,10 +164,11 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
         }
     }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KtPropertyDelegate.symbols(): List<KaFunctionSymbol> {
         val delegate = (this.parent as? KtProperty)?.delegate ?: return emptyList()
         return analyze(delegate) {
-            delegate.mainReference?.resolveToSymbols()?.filterIsInstance<KaFunctionSymbol>().orEmpty()
+            delegate.resolveSymbols().filterIsInstance<KaFunctionSymbol>()
         }
     }
 

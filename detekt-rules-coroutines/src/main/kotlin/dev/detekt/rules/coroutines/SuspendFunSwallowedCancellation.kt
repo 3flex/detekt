@@ -7,6 +7,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.rules.coroutines.utils.CoroutineCallableIds
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaCompoundVariableAccessCall
@@ -14,7 +15,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.successfulFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -241,12 +241,13 @@ class SuspendFunSwallowedCancellation(config: Config) :
             else -> true
         }
 
+    @OptIn(KaExperimentalApi::class)
     private fun KtExpression.hasSuspendCalls(): Boolean =
         when (this) {
             is KtForExpression -> {
                 analyze(this) {
-                    mainReference?.resolveToSymbols()?.filterIsInstance<KaNamedFunctionSymbol>()
-                        .orEmpty()
+                    this@hasSuspendCalls.resolveSymbols()
+                        .filterIsInstance<KaNamedFunctionSymbol>()
                         .any { it.isSuspend }
                 }
             }
@@ -302,6 +303,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
      * Checking for a [KtThrowExpression] which throws the same element as we received from the [KtCatchClause]. This
      * returns false if another exception with the same shadowed name as [cancellationException] is thrown.
      */
+    @OptIn(KaExperimentalApi::class)
     private fun KtCatchClause.exceptionWasRethrown(cancellationException: KtParameter): Boolean {
         val thrownElements = catchBody
             ?.getChildrenOfType<KtThrowExpression>()
@@ -311,7 +313,7 @@ class SuspendFunSwallowedCancellation(config: Config) :
             .filterIsInstance<KtNameReferenceExpression>()
             .map { expr ->
                 analyze(expr) {
-                    expr.mainReference.resolveToSymbol()?.psi
+                    expr.resolveSymbol()?.psi
                 }
             }
             .toList()

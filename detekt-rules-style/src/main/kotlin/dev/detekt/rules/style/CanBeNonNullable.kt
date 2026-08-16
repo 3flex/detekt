@@ -13,6 +13,7 @@ import dev.detekt.psi.isNullCheck
 import dev.detekt.psi.isNullable
 import dev.detekt.psi.isOpen
 import dev.detekt.psi.isOverride
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.resolution.singleFunctionCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.singleVariableAccessCall
@@ -20,7 +21,6 @@ import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
 import org.jetbrains.kotlin.analysis.api.types.KaTypeParameterType
-import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
@@ -554,14 +554,14 @@ class CanBeNonNullable(config: Config) :
             return isSetToNonNullable && cannotSetViaNonPrivateMeans
         }
 
+        @OptIn(KaExperimentalApi::class)
         private fun KtPropertyDelegate?.returnsNullable(): Boolean {
             val delegate = this ?: return true
             return analyze(delegate) {
                 val functionSymbol = delegate
-                    .mainReference
-                    ?.resolveToSymbols()
-                    ?.filterIsInstance<KaFunctionSymbol>()
-                    ?.firstOrNull {
+                    .resolveSymbols()
+                    .filterIsInstance<KaFunctionSymbol>()
+                    .firstOrNull {
                         it.callableId?.callableName == OperatorNameConventions.GET_VALUE
                     }
                 functionSymbol?.run {
