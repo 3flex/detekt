@@ -13,6 +13,7 @@ val aaDependencies = configurations.resolvable("aaDependencies") {
 dependencies {
     // Exclude transitive dependencies due to https://youtrack.jetbrains.com/issue/KT-61639
     aaDependency(libs.kotlin.analysisApiStandalone) { isTransitive = false }
+    aaDependency("org.jetbrains.kotlin:kotlin-compiler-common-for-ide:2.4.20-RC") { isTransitive = false }
 }
 
 val defaultJarClassifier = "default-jar"
