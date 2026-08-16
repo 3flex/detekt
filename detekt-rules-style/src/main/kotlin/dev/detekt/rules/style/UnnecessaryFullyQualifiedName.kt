@@ -28,13 +28,14 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClassLiteralExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtPackageDirective
+import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTypeParameterListOwner
+import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.getPossiblyQualifiedCallExpression
@@ -96,7 +97,6 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         }
     }
 
-    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     @Suppress("ReturnCount")
     override fun visitUserType(type: KtUserType) {
         super.visitUserType(type)
@@ -118,7 +118,16 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         if (!typeText.contains(".")) return
 
         analyze(type) {
-            val resolvedSymbol = type.referenceExpression?.resolveSymbol() ?: return
+            val typeReference = type.getParentOfType<KtTypeReference>(strict = true) ?: return
+            // for a vararg parameter the declared type is wrapped in an array type, so unwrap it
+            val declaredType = typeReference.type.let { referenceType ->
+                if ((typeReference.parent as? KtParameter)?.isVarArg == true) {
+                    referenceType.arrayElementType ?: referenceType
+                } else {
+                    referenceType
+                }
+            }
+            val resolvedSymbol = (declaredType.abbreviation ?: declaredType).symbol ?: return
             val candidate = resolvedSymbol.ignoredFqNameCandidate()
             if (candidate != null && ignoredFullyQualifiedNames.any { it.matches(candidate) }) return
             val packageFqName = resolvedSymbol.packageFqName() ?: return

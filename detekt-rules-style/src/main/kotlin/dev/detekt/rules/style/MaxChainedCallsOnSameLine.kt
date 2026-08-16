@@ -10,12 +10,14 @@ import dev.detekt.api.config
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
-import org.jetbrains.kotlin.analysis.api.symbols.KaPackageSymbol
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtPackageDirective
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
@@ -85,8 +87,24 @@ class MaxChainedCallsOnSameLine(config: Config) :
         if (selectorOrThis !is KtReferenceExpression) return false
         return analyze(selectorOrThis) {
             val symbol = selectorOrThis.resolveSymbol()
-            symbol is KaPackageSymbol || symbol is KaClassSymbol
+            symbol is KaClassSymbol ||
+                (symbol == null && this@isReferenceToPackageOrClass.toFqNameOrNull()?.let { findPackage(it) } != null)
         }
+    }
+
+    private fun KtExpression.toFqNameOrNull(): FqName? = when (this) {
+        is KtNameReferenceExpression -> FqName.topLevel(Name.identifier(getReferencedName()))
+        is KtDotQualifiedExpression -> {
+            val receiverFqName = receiverExpression.toFqNameOrNull()
+            val selectorName = (selectorExpression as? KtNameReferenceExpression)?.getReferencedName()
+            if (receiverFqName != null && selectorName != null) {
+                receiverFqName.child(Name.identifier(selectorName))
+            } else {
+                null
+            }
+        }
+
+        else -> null
     }
 
     private fun KtQualifiedExpression.callOnNewLine(): Boolean {

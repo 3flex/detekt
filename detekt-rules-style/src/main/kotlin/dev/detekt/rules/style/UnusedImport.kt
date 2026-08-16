@@ -11,12 +11,14 @@ import dev.detekt.api.Rule
 import dev.detekt.api.config
 import dev.detekt.psi.isPartOf
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
+import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassKind
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassLikeSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
+import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
@@ -26,7 +28,10 @@ import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
 import org.jetbrains.kotlin.psi.KtPackageDirective
 import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.KtTypeReference
+import org.jetbrains.kotlin.psi.KtUserType
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.isDotReceiver
 
 /**
@@ -196,8 +201,21 @@ class UnusedImport(config: Config) :
         @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         private fun KtReferenceExpression.fqNamesOrEmpty(): Set<FqName> =
             analyze(this) {
-                resolveSymbol()?.fqNamesForImport.orEmpty()
+                val symbol = resolveSymbol() ?: resolveTypeSymbol(this@fqNamesOrEmpty)
+                symbol?.fqNamesForImport.orEmpty()
             }
+
+        /**
+         * Resolves a reference that is the referenced name of a full user type (e.g. `Path` in `typealias Foo = Path`)
+         * through the enclosing type reference, as such references are not resolvable as expressions.
+         */
+        private fun KaSession.resolveTypeSymbol(reference: KtReferenceExpression): KaSymbol? {
+            val userType = reference.parent as? KtUserType ?: return null
+            if (userType.referenceExpression != reference) return null
+            if ((userType.parent as? KtUserType)?.qualifier == userType) return null
+            val kaType = userType.getParentOfType<KtTypeReference>(strict = true)?.type ?: return null
+            return (kaType.abbreviation ?: kaType).symbol
+        }
     }
 
     companion object {
