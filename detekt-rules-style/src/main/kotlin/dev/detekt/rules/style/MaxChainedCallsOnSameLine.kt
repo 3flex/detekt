@@ -92,20 +92,22 @@ class MaxChainedCallsOnSameLine(config: Config) :
         }
     }
 
-    private fun KtExpression.toFqNameOrNull(): FqName? = when (this) {
-        is KtNameReferenceExpression -> FqName.topLevel(Name.identifier(getReferencedName()))
-        is KtDotQualifiedExpression -> {
-            val receiverFqName = receiverExpression.toFqNameOrNull()
-            val selectorName = (selectorExpression as? KtNameReferenceExpression)?.getReferencedName()
-            if (receiverFqName != null && selectorName != null) {
-                receiverFqName.child(Name.identifier(selectorName))
-            } else {
-                null
-            }
-        }
+    private fun KtExpression.toFqNameOrNull(): FqName? =
+        when (this) {
+            is KtNameReferenceExpression -> FqName.topLevel(Name.identifier(getReferencedName()))
 
-        else -> null
-    }
+            is KtDotQualifiedExpression -> {
+                val receiverFqName = receiverExpression.toFqNameOrNull()
+                val selectorName = (selectorExpression as? KtNameReferenceExpression)?.getReferencedName()
+                if (receiverFqName != null && selectorName != null) {
+                    receiverFqName.child(Name.identifier(selectorName))
+                } else {
+                    null
+                }
+            }
+
+            else -> null
+        }
 
     private fun KtQualifiedExpression.callOnNewLine(): Boolean {
         val receiver = receiverExpression

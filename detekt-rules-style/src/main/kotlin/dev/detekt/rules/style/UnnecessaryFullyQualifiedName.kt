@@ -118,16 +118,7 @@ class UnnecessaryFullyQualifiedName(config: Config) :
         if (!typeText.contains(".")) return
 
         analyze(type) {
-            val typeReference = type.getParentOfType<KtTypeReference>(strict = true) ?: return
-            // for a vararg parameter the declared type is wrapped in an array type, so unwrap it
-            val declaredType = typeReference.type.let { referenceType ->
-                if ((typeReference.parent as? KtParameter)?.isVarArg == true) {
-                    referenceType.arrayElementType ?: referenceType
-                } else {
-                    referenceType
-                }
-            }
-            val resolvedSymbol = (declaredType.abbreviation ?: declaredType).symbol ?: return
+            val resolvedSymbol = declaredTypeSymbol(type) ?: return
             val candidate = resolvedSymbol.ignoredFqNameCandidate()
             if (candidate != null && ignoredFullyQualifiedNames.any { it.matches(candidate) }) return
             val packageFqName = resolvedSymbol.packageFqName() ?: return
@@ -221,6 +212,18 @@ class UnnecessaryFullyQualifiedName(config: Config) :
             }
             report(finding)
         }
+    }
+
+    private fun KaSession.declaredTypeSymbol(type: KtUserType): KaClassLikeSymbol? {
+        val typeReference = type.getParentOfType<KtTypeReference>(strict = true) ?: return null
+        val referenceType = typeReference.type
+        // for a vararg parameter the declared type is wrapped in an array type, so unwrap it
+        val declaredType = if ((typeReference.parent as? KtParameter)?.isVarArg == true) {
+            referenceType.arrayElementType ?: referenceType
+        } else {
+            referenceType
+        }
+        return (declaredType.abbreviation ?: declaredType).symbol
     }
 
     @OptIn(KaExperimentalApi::class)
