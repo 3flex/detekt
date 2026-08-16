@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtIfExpression
@@ -554,7 +555,7 @@ class CanBeNonNullable(config: Config) :
             return isSetToNonNullable && cannotSetViaNonPrivateMeans
         }
 
-        @OptIn(KaExperimentalApi::class)
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         private fun KtPropertyDelegate?.returnsNullable(): Boolean {
             val delegate = this ?: return true
             return analyze(delegate) {

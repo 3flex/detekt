@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
@@ -122,7 +123,7 @@ private fun KtExpression?.getRootExpression(): KtExpression? {
     return receiverExpression
 }
 
-@OptIn(KaExperimentalApi::class)
+@OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
 private fun KtLambdaExpression.countLambdaParameterReference(): Int {
     val bodyExpression = bodyExpression ?: return 0
     val receiver = this.getStrictParentOfType<KtQualifiedExpression>()?.receiverExpression

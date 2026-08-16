@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -79,7 +80,7 @@ class UnnecessaryFilter(config: Config) :
         return argument?.getArgumentExpression()?.unpackFunctionLiteral()
     }
 
-    @OptIn(KaExperimentalApi::class)
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtExpression.matchingCall(fqNames: Set<FqName>): FqName? {
         val calleeText = getCalleeExpressionIfAny()?.text ?: return null
         if (fqNames.none { it.shortName().asString() == calleeText }) return null

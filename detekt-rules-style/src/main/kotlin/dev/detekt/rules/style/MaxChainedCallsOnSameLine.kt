@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaPackageSymbol
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtPackageDirective
@@ -78,7 +79,7 @@ class MaxChainedCallsOnSameLine(config: Config) :
             else -> 0
         }
 
-    @OptIn(KaExperimentalApi::class)
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtExpression.isReferenceToPackageOrClass(): Boolean {
         val selectorOrThis = (this as? KtQualifiedExpression)?.selectorExpression ?: this
         if (selectorOrThis !is KtReferenceExpression) return false

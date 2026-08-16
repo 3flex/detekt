@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
@@ -192,7 +193,7 @@ class UnusedImport(config: Config) :
             return setOfNotNull(callableFqName, companionCallableFqName)
         }
 
-        @OptIn(KaExperimentalApi::class)
+        @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
         private fun KtReferenceExpression.fqNamesOrEmpty(): Set<FqName> =
             analyze(this) {
                 resolveSymbol()?.fqNamesForImport.orEmpty()

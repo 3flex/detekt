@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -71,7 +72,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
     private val invokeOperatorReferences = mutableMapOf<KaCallableSymbol, MutableList<KtReferenceExpression>>()
     private val propertyDelegates = mutableListOf<KtPropertyDelegate>()
 
-    @OptIn(KaExperimentalApi::class)
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     fun getUnusedReports(): List<Finding> {
         val propertyDelegateSymbols by lazy(LazyThreadSafetyMode.NONE) {
@@ -164,7 +165,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
         }
     }
 
-    @OptIn(KaExperimentalApi::class)
+    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
     private fun KtPropertyDelegate.symbols(): List<KaFunctionSymbol> {
         val delegate = (this.parent as? KtProperty)?.delegate ?: return emptyList()
         return analyze(delegate) {
