@@ -14,5 +14,5 @@ dependencies {
     testImplementation(projects.detektTestUtils)
     testImplementation(testFixtures(projects.detektApi))
     testImplementation(libs.assertj.core)
-    testImplementation(libs.kotlin.compiler)
+    testImplementation(libs.ksp.symbolProcessingAa)
 }
