@@ -66,6 +66,9 @@ internal class EnvironmentFacade(projectSpec: ProjectSpec, compilerSpec: Compile
         get() = sourceModule.psiRoots.filterIsInstance<KtFile>()
 
     init {
+        if (loggingSpec.debug) {
+            loggingSpec.outputChannel.appendLine("Compiler configuration: $configuration")
+        }
         buildStandaloneAnalysisAPISession(disposable) {
             // Required for autocorrect support
             registerProjectService(TreeAspect::class.java)
