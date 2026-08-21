@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.repositories
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.junit.jupiter.api.Test
 
 class DetektJvmSpec {
@@ -31,6 +32,9 @@ class DetektJvmSpec {
                 it.languageVersion.set("1.6")
                 it.apiVersion.set("1.5")
             }
+            tasks.named("compileTestKotlin", KotlinCompile::class.java) {
+                it.compilerOptions.progressiveMode.set(true)
+            }
         },
     ).also(DslGradleRunner::setupProject)
 
@@ -49,6 +53,7 @@ class DetektJvmSpec {
         assertThat(argumentString).contains("--analysis-mode full")
         assertThat(argumentString).doesNotContain("--api-version")
         assertThat(argumentString).doesNotContain("--language-version")
+        assertThat(argumentString).doesNotContain("-progressive")
         assertThat(argumentString).contains("--fail-on-severity error")
     }
 
@@ -68,6 +73,7 @@ class DetektJvmSpec {
         assertThat(argumentString).contains("--jvm-target 1.8")
         assertThat(argumentString).contains("--api-version 1.5")
         assertThat(argumentString).contains("--language-version 1.6")
+        assertThat(argumentString).contains("-progressive")
         assertThat(argumentString).contains("--fail-on-severity error")
     }
 }

@@ -78,6 +78,7 @@ class DetektPlainSpec {
             assertThat(argumentString).doesNotContain("--report md:")
             assertThat(argumentString).doesNotContain("--classpath")
             assertThat(argumentString).contains("--analysis-mode light")
+            assertThat(argumentString).doesNotContain("-progressive")
             assertThat(argumentString).contains("--fail-on-severity error")
         }
     }

@@ -25,6 +25,7 @@ import dev.detekt.gradle.invoke.MultiPlatformEnabledArgument
 import dev.detekt.gradle.invoke.NoJdkArgument
 import dev.detekt.gradle.invoke.OptInArguments
 import dev.detekt.gradle.invoke.ParallelArgument
+import dev.detekt.gradle.invoke.ProgressiveModeArgument
 import dev.detekt.gradle.plugin.isWorkerApiEnabled
 import org.gradle.api.Incubating
 import org.gradle.api.file.ConfigurableFileCollection
@@ -113,6 +114,9 @@ abstract class DetektCreateBaselineTask @Inject constructor(
     abstract val noJdk: Property<Boolean>
 
     @get:Input
+    abstract val progressiveMode: Property<Boolean>
+
+    @get:Input
     abstract val multiPlatformEnabled: Property<Boolean>
 
     @get:Input
@@ -172,6 +176,7 @@ abstract class DetektCreateBaselineTask @Inject constructor(
             OptInArguments(optIn.get()),
             FriendPathArgs(friendPaths),
             NoJdkArgument(noJdk.get()),
+            ProgressiveModeArgument(progressiveMode.get()),
             ExplicitApiArgument(explicitApi.orNull),
             MultiPlatformEnabledArgument(multiPlatformEnabled.get()),
         ).flatMap(CliArgument::toArgument)

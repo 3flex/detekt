@@ -24,6 +24,7 @@ public abstract class dev/detekt/gradle/Detekt : org/gradle/api/tasks/SourceTask
 	public abstract fun getOptIn ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getParallel ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPluginClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getProgressiveMode ()Lorg/gradle/api/provider/Property;
 	public fun getReports ()Ldev/detekt/gradle/extensions/DetektReports;
 	public fun getSource ()Lorg/gradle/api/file/FileTree;
 	public final fun reports (Lorg/gradle/api/Action;)V
@@ -54,6 +55,7 @@ public abstract class dev/detekt/gradle/DetektCreateBaselineTask : org/gradle/ap
 	public abstract fun getOptIn ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getParallel ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPluginClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getProgressiveMode ()Lorg/gradle/api/provider/Property;
 	public fun getSource ()Lorg/gradle/api/file/FileTree;
 }
 

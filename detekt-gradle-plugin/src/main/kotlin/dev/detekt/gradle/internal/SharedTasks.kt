@@ -38,6 +38,7 @@ internal fun Project.setDetektTaskDefaults(extension: DetektExtension) {
         it.basePath.convention(extension.basePath.map { basePath -> basePath.asFile.absolutePath })
         it.allRules.convention(extension.allRules)
         it.noJdk.convention(false)
+        it.progressiveMode.convention(false)
         it.multiPlatformEnabled.convention(false)
     }
 }
@@ -69,6 +70,7 @@ internal fun Project.setCreateBaselineTaskDefaults(extension: DetektExtension) {
         it.basePath.convention(extension.basePath.map { basePath -> basePath.asFile.absolutePath })
         it.allRules.convention(extension.allRules)
         it.noJdk.convention(false)
+        it.progressiveMode.convention(false)
         it.multiPlatformEnabled.convention(false)
     }
 }

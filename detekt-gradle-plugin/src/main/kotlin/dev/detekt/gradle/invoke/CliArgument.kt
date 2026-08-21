@@ -29,6 +29,7 @@ private const val JDK_HOME_PARAMETER = "--jdk-home"
 private const val BASE_PATH_PARAMETER = "--base-path"
 private const val OPT_IN_PARAMETER = "-opt-in"
 private const val NO_JDK_PARAMETER = "-no-jdk"
+private const val PROGRESSIVE_PARAMETER = "-progressive"
 private const val MULTIPLATFORM_ENABLED_PARAMETER = "-Xmulti-platform"
 private const val EXPLICIT_API_MODE = "-Xexplicit-api"
 
@@ -172,6 +173,9 @@ internal data class OptInArguments(val list: List<String>) : CliArgument {
 }
 
 internal data class NoJdkArgument(override val value: Boolean) : BoolCliArgument(value, NO_JDK_PARAMETER)
+
+internal data class ProgressiveModeArgument(override val value: Boolean) :
+    BoolCliArgument(value, PROGRESSIVE_PARAMETER)
 
 internal data class ExplicitApiArgument(val mode: String?) : CliArgument {
     override fun toArgument() = mode?.let { listOf("$EXPLICIT_API_MODE=$it") }.orEmpty()
