@@ -56,6 +56,23 @@ tasks.withType<Test>().configureEach {
     }
 }
 
+configurations.consumable("generatedStuff") {
+    attributes {
+        attribute(
+            Usage.USAGE_ATTRIBUTE,
+            attributes.named(Usage::class.java, "detekt-report-aggregation")
+        )
+        attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            attributes.named(Category::class.java, Category.VERIFICATION)
+        )
+        attribute(
+            VerificationType.VERIFICATION_TYPE_ATTRIBUTE,
+            attributes.named(VerificationType::class.java, "detekt-report")
+        )
+    }
+}
+
 val jvmTargetVersion = versionCatalog.findVersion("jvm-target").get().requiredVersion
 val jvmMajorVersion = jvmTargetVersion.toIntOrNull() ?: 8
 

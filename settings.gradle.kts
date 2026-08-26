@@ -62,28 +62,36 @@ plugins {
 }
 
 gradle.lifecycle.beforeProject {
-    apply(plugin = "dev.detekt")
+    plugins.withId("module") {
+        apply(plugin = "dev.detekt")
 
-    configure<DetektExtension> {
-        buildUponDefaultConfig = true
-        baseline = file("$rootDir/config/detekt/baseline.xml")
-    }
-
-    dependencies {
-        "detekt"(project(":detekt-cli"))
-        "detektPlugins"(project(":detekt-rules-ktlint-wrapper"))
-        "detektPlugins"(project(":detekt-rules-libraries"))
-        "detektPlugins"(project(":detekt-rules-ruleauthors"))
-    }
-
-    tasks.withType<Detekt>().configureEach {
-        reports {
-            checkstyle.required = true
-            html.required = true
-            sarif.required = true
-            markdown.required = true
+        configure<DetektExtension> {
+            buildUponDefaultConfig = true
+            baseline = file("$rootDir/config/detekt/baseline.xml")
         }
-        basePath = rootDir.absolutePath
+
+        dependencies {
+            "detekt"(project(":detekt-cli"))
+            "detektPlugins"(project(":detekt-rules-ktlint-wrapper"))
+            "detektPlugins"(project(":detekt-rules-libraries"))
+            "detektPlugins"(project(":detekt-rules-ruleauthors"))
+        }
+
+        tasks.withType<Detekt>().configureEach {
+            reports {
+                checkstyle.required = true
+                html.required = true
+                sarif.required = true
+                markdown.required = true
+            }
+            basePath = rootDir.absolutePath
+        }
+
+        artifacts.add("generatedStuff", tasks.named<Detekt>("detektMain").flatMap { it.reports.sarif.outputLocation })
+        artifacts.add("generatedStuff", tasks.named<Detekt>("detektTest").flatMap { it.reports.sarif.outputLocation })
+        plugins.withId("java-test-fixtures") {
+            artifacts.add("generatedStuff", tasks.named<Detekt>("detektTestFixtures").flatMap { it.reports.sarif.outputLocation })
+        }
     }
 }
 

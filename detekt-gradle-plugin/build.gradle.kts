@@ -161,6 +161,11 @@ dependencies {
     detektPlugins("dev.detekt:detekt-rules-ktlint-wrapper:2.0.0-alpha.6")
 }
 
+artifacts.add("generatedStuff", tasks.named<Detekt>("detektMain").flatMap { it.reports.sarif.outputLocation })
+artifacts.add("generatedStuff", tasks.named<Detekt>("detektTest").flatMap { it.reports.sarif.outputLocation })
+artifacts.add("generatedStuff", tasks.named<Detekt>("detektFunctionalTest").flatMap { it.reports.sarif.outputLocation })
+artifacts.add("generatedStuff", tasks.named<Detekt>("detektFunctionalTestMinSupportedGradle").flatMap { it.reports.sarif.outputLocation })
+
 gradlePlugin {
     website = "https://detekt.dev"
     vcsUrl = "https://github.com/detekt/detekt"
