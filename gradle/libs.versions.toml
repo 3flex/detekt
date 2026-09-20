@@ -47,10 +47,8 @@ assertj-coreMinimum = { module = "org.assertj:assertj-core", version = "3.27.4" 
 classgraph = { module = "io.github.classgraph:classgraph", version = "5.0.1" }
 jcommander = { module = "org.jcommander:jcommander", version = "1.85" }
 # Version must align to dependency used by Kotlin on compile classpath due to our use of Gradle's consistent resolution
-jetbrains-annotations = { module = "org.jetbrains:annotations", version = "23.0.0" }
-kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version = "13.0" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlin-scriptingJvm = { module = "org.jetbrains.kotlin:kotlin-scripting-jvm", version.ref = "kotlin" }
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.12.0" }
 kotlinx-coroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version = "0.12.0" }
@@ -63,7 +61,18 @@ slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 snakeyaml-engine = { module = "org.snakeyaml:snakeyaml-engine", version = "2.10" }
 
-# Kotlin Analysis API artifacts
+# Official Kotlin Analysis API artifacts
+## Can use on compile classpath (see https://youtrack.jetbrains.com/issue/KT-61404/Analysis-API-implement-proper-library-publishing-structure)
+kotlin-analysisApiSurface = { module = "org.jetbrains.kotlin:kotlin-analysis-api-surface", version.ref = "kotlin" }
+kotlin-analysisApiStandaloneSurface = { module = "org.jetbrains.kotlin:kotlin-analysis-api-standalone-surface", version.ref = "kotlin" }
+kotlin-analysisApiIntellijApiSurfaceComponents = { module = "org.jetbrains.kotlin:kotlin-analysis-api-intellij-api-surface-components", version.ref = "kotlin" }
+## Should only be on runtime classpath (see https://youtrack.jetbrains.com/issue/KT-61404/Analysis-API-implement-proper-library-publishing-structure and https://youtrack.jetbrains.com/issue/KT-85528/Move-diagnostic-classes-out-of-analysis-api-fir)
+kotlin-analysisApiImplementation = { module = "org.jetbrains.kotlin:kotlin-analysis-api-implementation", version.ref = "kotlin" }
+kotlin-analysisApiStandaloneImplementation = { module = "org.jetbrains.kotlin:kotlin-analysis-api-standalone-implementation", version.ref = "kotlin" }
+kotlin-analysisApiFirDiagnostics = { module = "org.jetbrains.kotlin:kotlin-analysis-api-fir-diagnostics", version.ref = "kotlin" }
+kotlin-analysisApiIntellijImplementationComponents = { module = "org.jetbrains.kotlin:kotlin-analysis-api-intellij-implementation-components", version.ref = "kotlin" }
+
+# Unofficial Kotlin Analysis API artifacts
 kotlin-analysisApiPlatformInterface = { module = "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide", version.ref = "kotlin" }
 kotlin-analysisApiK2 = { module = "org.jetbrains.kotlin:analysis-api-k2-for-ide", version.ref = "kotlin" }
 kotlin-analysisApi = { module = "org.jetbrains.kotlin:analysis-api-for-ide", version.ref = "kotlin" }
