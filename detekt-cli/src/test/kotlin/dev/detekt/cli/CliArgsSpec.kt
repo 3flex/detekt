@@ -381,14 +381,14 @@ internal class CliArgsSpec {
         fun `unsupported --api-version returns error message`() {
             assertThatIllegalArgumentException()
                 .isThrownBy { parseArguments(arrayOf("--api-version", "1.9")) }
-                .withMessageStartingWith("\"1.9\" passed to --api-version, expected one of [2.0, 2.1, 2.2, 2.3, 2.4, ")
+                .withMessageStartingWith("\"1.9\" passed to --api-version, expected one of [2.2, 2.3, 2.4, 2.5, 2.6, ")
         }
 
         @Test
         fun `invalid --api-version returns error message`() {
             assertThatIllegalArgumentException()
                 .isThrownBy { parseArguments(arrayOf("--api-version", "x")) }
-                .withMessageStartingWith("\"x\" passed to --api-version, expected one of [2.0, 2.1, 2.2, 2.3, 2.4, ")
+                .withMessageStartingWith("\"x\" passed to --api-version, expected one of [2.2, 2.3, 2.4, 2.5, 2.6, ")
         }
 
         @Test
@@ -402,7 +402,7 @@ internal class CliArgsSpec {
             assertThatIllegalArgumentException()
                 .isThrownBy { parseArguments(arrayOf("--language-version", "1.9")) }
                 .withMessageStartingWith(
-                    "\"1.9\" passed to --language-version, expected one of [2.0, 2.1, 2.2, 2.3, 2.4, "
+                    "\"1.9\" passed to --language-version, expected one of [2.2, 2.3, 2.4, 2.5, 2.6, "
                 )
         }
 
@@ -411,7 +411,7 @@ internal class CliArgsSpec {
             assertThatIllegalArgumentException()
                 .isThrownBy { parseArguments(arrayOf("--language-version", "x")) }
                 .withMessageStartingWith(
-                    "\"x\" passed to --language-version, expected one of [2.0, 2.1, 2.2, 2.3, 2.4, "
+                    "\"x\" passed to --language-version, expected one of [2.2, 2.3, 2.4, 2.5, 2.6, "
                 )
         }
 
@@ -625,11 +625,11 @@ private val expectedHelp = """
     |      Target version of the generated JVM bytecode that was generated during 
     |      compilation and is now being used for type resolution
     |      Default: 1.8
-    |      Possible Values: [1.6, 1.8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+    |      Possible Values: [1.6, 1.8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
     |    --language-version
     |      Compatibility mode for Kotlin language version X.Y, reports errors for 
     |      all language features that came out later
-    |      Possible Values: [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
+    |      Possible Values: [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7]
     |    --parallel
     |      Enables parallel compilation and analysis of source files. Do some 
     |      benchmarks first before enabling this flag. Heuristics show performance 
