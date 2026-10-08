@@ -49,7 +49,6 @@ jcommander = { module = "org.jcommander:jcommander", version = "1.85" }
 # Version must align to dependency used by Kotlin on compile classpath due to our use of Gradle's consistent resolution
 jetbrains-annotations = { module = "org.jetbrains:annotations", version = "13.0" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.12.0" }
 kotlinx-coroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html-jvm", version = "0.12.0" }
 ktlint-rulesetStandard = { module = "io.github.ktlint.core:ktlint-ruleset-standard", version.ref = "ktlint"  }
@@ -61,7 +60,6 @@ slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 snakeyaml-engine = { module = "org.snakeyaml:snakeyaml-engine", version = "2.10" }
 
-# Official Kotlin Analysis API artifacts
 ## Can use on compile classpath (see https://youtrack.jetbrains.com/issue/KT-61404/Analysis-API-implement-proper-library-publishing-structure)
 kotlin-analysisApiSurface = { module = "org.jetbrains.kotlin:kotlin-analysis-api-surface", version.ref = "kotlin" }
 kotlin-analysisApiStandaloneSurface = { module = "org.jetbrains.kotlin:kotlin-analysis-api-standalone-surface", version.ref = "kotlin" }
@@ -71,19 +69,6 @@ kotlin-analysisApiImplementation = { module = "org.jetbrains.kotlin:kotlin-analy
 kotlin-analysisApiStandaloneImplementation = { module = "org.jetbrains.kotlin:kotlin-analysis-api-standalone-implementation", version.ref = "kotlin" }
 kotlin-analysisApiFirDiagnostics = { module = "org.jetbrains.kotlin:kotlin-analysis-api-fir-diagnostics", version.ref = "kotlin" }
 kotlin-analysisApiIntellijImplementationComponents = { module = "org.jetbrains.kotlin:kotlin-analysis-api-intellij-implementation-components", version.ref = "kotlin" }
-
-# Unofficial Kotlin Analysis API artifacts
-kotlin-analysisApiPlatformInterface = { module = "org.jetbrains.kotlin:analysis-api-platform-interface-for-ide", version.ref = "kotlin" }
-kotlin-analysisApiK2 = { module = "org.jetbrains.kotlin:analysis-api-k2-for-ide", version.ref = "kotlin" }
-kotlin-analysisApi = { module = "org.jetbrains.kotlin:analysis-api-for-ide", version.ref = "kotlin" }
-kotlin-analysisApiStandalone = { module = "org.jetbrains.kotlin:analysis-api-standalone-for-ide", version.ref = "kotlin" }
-kotlin-lowLevelApiFir = { module = "org.jetbrains.kotlin:low-level-api-fir-for-ide", version.ref = "kotlin" }
-kotlin-symbolLightClasses = { module = "org.jetbrains.kotlin:symbol-light-classes-for-ide", version.ref = "kotlin" }
-kotlin-analysisApiImplBase = { module = "org.jetbrains.kotlin:analysis-api-impl-base-for-ide", version.ref = "kotlin" }
-# Should be possible to remove when https://youtrack.jetbrains.com/issue/KT-81457 fixed
-kotlinx-coroutinesCore-intellij = { module = "org.jetbrains.intellij.deps.kotlinx:kotlinx-coroutines-core", version = "1.11.0-intellij-1" }
-# Can likely be removed in future - https://youtrack.jetbrains.com/issue/KT-73751/Analysis-API-Caffeine-dependency
-caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version = "2.9.3" }
 
 # Add dummy lib references so Renovate auto updates the version. Only the version number is referenced in build scripts so Renovate will ignore these otherwise.
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
