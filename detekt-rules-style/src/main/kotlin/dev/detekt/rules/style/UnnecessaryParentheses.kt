@@ -64,6 +64,7 @@ class UnnecessaryParentheses(config: Config) :
 
         if (expression.parent is KtDelegatedSuperTypeEntry) return
 
+        @Suppress("DEPRECATION")
         if (!KtPsiUtil.areParenthesesUseless(expression)) return
 
         if (allowForUnclearPrecedence && inner.isBinaryOperationPrecedenceUnclearWithParent()) return
