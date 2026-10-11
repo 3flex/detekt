@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.analysis.api.symbols.symbol
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -96,7 +95,7 @@ class RedundantSuspendModifier(config: Config) :
         return when (this) {
             is KtForExpression -> {
                 analyze(this) {
-                    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+                    @OptIn(KaExperimentalApi::class)
                     this.resolveSuccessfulSymbols()
                         .filterIsInstance<KaNamedFunctionSymbol>()
                         .any { it.isSuspend }

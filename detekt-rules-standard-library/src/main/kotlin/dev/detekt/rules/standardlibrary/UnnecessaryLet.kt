@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
@@ -138,7 +137,7 @@ private fun KtLambdaExpression.countLambdaParameterReference(): Int {
         }
         parameters.sumOf { variableSymbol ->
             bodyExpression.collectDescendantsOfType<KtSimpleNameExpression> {
-                @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+                @OptIn(KaExperimentalApi::class)
                 it.resolveSuccessfulSymbol() == variableSymbol
             }.count()
         }

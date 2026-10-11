@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.analysis.api.session.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -141,7 +140,7 @@ private class UnusedVariableVisitor(private val allowedNames: Regex) : DetektVis
 
     context(_: KaSession)
     private fun KtExpression.resolveToLocalVariableSymbol(): KaVariableSymbol? =
-        @OptIn(KtExperimentalApi::class, KaExperimentalApi::class)
+        @OptIn(KaExperimentalApi::class)
         (this as? KtResolvable)?.resolveSuccessfulSymbol() as? KaVariableSymbol
 
     private fun registerNewDeclaration(declaration: KtNamedDeclaration) {

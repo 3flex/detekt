@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtExpressionWithLabel
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
@@ -210,7 +209,7 @@ class IgnoredReturnValue(config: Config) :
             is KtReturnExpression -> {
                 val symbol = lambda.functionLiteral.symbol
                 val label = (statement as? KtExpressionWithLabel)?.getTargetLabel()
-                @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+                @OptIn(KaExperimentalApi::class)
                 label?.resolveSuccessfulSymbol() == symbol
             }
 

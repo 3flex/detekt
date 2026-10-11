@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.psiUtil.leaves
@@ -63,7 +62,7 @@ class UnusedUnaryOperator(config: Config) :
         analyze(expression) {
             val parentOrSelf = expression.parentBinaryExpressionOrThis()
             if (parentOrSelf.isUsedAsExpression) return
-            @OptIn(KtExperimentalApi::class, KaExperimentalApi::class)
+            @OptIn(KaExperimentalApi::class)
             val operatorSymbol =
                 expression.operationReference.resolveSuccessfulSymbol() as? KaNamedFunctionSymbol ?: return
             val classId = operatorSymbol.callableId?.classId ?: return

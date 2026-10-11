@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -165,7 +164,7 @@ class UnnecessaryAny(config: Config) :
 
         val itRefCountInLeft = leftExpression.getItUsageCount(parameter)
         val itRefCountInRight = rightExpression.getItUsageCount(parameter)
-        @OptIn(KtExperimentalApi::class, KaExperimentalApi::class)
+        @OptIn(KaExperimentalApi::class)
         return when {
             itRefCountInLeft > 0 && itRefCountInRight > 0 -> {
                 // both side `it` has been used

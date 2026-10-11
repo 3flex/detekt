@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.analysis.api.session.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.symbol
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -88,7 +87,7 @@ class UnnecessaryFilter(config: Config) :
         val calleeText = getCalleeExpressionIfAny()?.text ?: return null
         if (fqNames.none { it.shortName().asString() == calleeText }) return null
         return analyze(this) {
-            @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+            @OptIn(KaExperimentalApi::class)
             val callableId = ((this as? KtResolvableCall)?.resolveSuccessfulCall() as? KaFunctionCall<*>)
                 ?.symbol
                 ?.callableId

@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -124,7 +123,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
                         val referencePsis = (references + referencesViaOperator)
                             .mapNotNull {
                                 analyze(it) {
-                                    @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+                                    @OptIn(KaExperimentalApi::class)
                                     val symbol = (
                                         (it as? KtResolvableCall)?.resolveSuccessfulCall() as? KaFunctionCall<*>
                                         )
@@ -178,7 +177,7 @@ private class UnusedFunctionVisitor(private val allowedNames: Regex) : DetektVis
     private fun KtPropertyDelegate.symbols(): List<KaFunctionSymbol> {
         val delegate = (this.parent as? KtProperty)?.delegate ?: return emptyList()
         return analyze(delegate) {
-            @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+            @OptIn(KaExperimentalApi::class)
             delegate.resolveSuccessfulSymbols().filterIsInstance<KaFunctionSymbol>()
         }
     }

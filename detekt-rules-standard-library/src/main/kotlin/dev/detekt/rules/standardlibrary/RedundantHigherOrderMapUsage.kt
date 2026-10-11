@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtExperimentalApi
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtExpressionWithLabel
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
@@ -133,7 +132,7 @@ class RedundantHigherOrderMapUsage(config: Config) :
         val labeledReturnExpressions = functionLiteral.collectDescendantsOfType<KtReturnExpression> {
             if (it == lastStatement) return@collectDescendantsOfType false
             val label = (it as? KtExpressionWithLabel)?.getTargetLabel() ?: return@collectDescendantsOfType false
-            @OptIn(KaExperimentalApi::class, KtExperimentalApi::class)
+            @OptIn(KaExperimentalApi::class)
             label.resolveSuccessfulSymbol() == symbol
         }
         return labeledReturnExpressions.all { isReferenceTo(it, lambdaParameter) }
