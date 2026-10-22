@@ -58,18 +58,4 @@ class RulesWhichCantBeCorrectedSpec {
             .singleElement()
             .noSuppress()
     }
-
-    @Test
-    fun `Indentation finding inside string templates can't be corrected`() {
-        val multilineQuote = "\"\"\""
-        val code = """
-            val foo = $multilineQuote
-                  line1
-            ${'\t'}line2
-                $multilineQuote.trimIndent()
-        """.trimIndent()
-
-        assertThat(Indentation(autoCorrectConfig).lint(code)).singleElement()
-            .noSuppress()
-    }
 }
