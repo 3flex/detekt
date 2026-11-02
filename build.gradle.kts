@@ -54,6 +54,7 @@ allprojects {
     detekt {
         buildUponDefaultConfig = true
         baseline = file("$rootDir/config/detekt/baseline.xml")
+        debug = true
     }
 
     dependencies {
