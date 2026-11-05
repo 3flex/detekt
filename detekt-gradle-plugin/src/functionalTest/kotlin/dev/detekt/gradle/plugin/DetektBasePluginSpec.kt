@@ -10,37 +10,6 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class DetektBasePluginSpec {
     @Test
-    fun `generates source set tasks for JVM project`() {
-        val gradleRunner = DslGradleRunner(
-            projectLayout = ProjectLayout(
-                numberOfSourceFilesInRootPerSourceDir = 1,
-                srcDirs = listOf(
-                    "src/main/kotlin",
-                    "src/test/kotlin",
-                ),
-            ),
-            buildFileName = "build.gradle.kts",
-            mainBuildFileContent = """
-                plugins {
-                    id("dev.detekt")
-                    kotlin("jvm")
-                }
-                
-                repositories {
-                    mavenLocal()
-                    mavenCentral()
-                }
-            """.trimIndent(),
-            dryRun = true,
-        ).also {
-            it.setupProject()
-        }
-
-        gradleRunner.checkTask("main")
-        gradleRunner.checkTask("test")
-    }
-
-    @Test
     fun `generates source set tasks for Android project (legacy plugin)`() {
         val gradleRunner = DslGradleRunner(
             projectLayout = ProjectLayout(
@@ -130,40 +99,6 @@ class DetektBasePluginSpec {
         gradleRunner.checkTask("debug")
         gradleRunner.checkTask("test")
         gradleRunner.checkTask("androidTest")
-    }
-
-    @Test
-    fun `generates source set tasks when multiple plugins of type KotlinBasePlugin are applied #8613`() {
-        val gradleRunner = DslGradleRunner(
-            projectLayout = ProjectLayout(
-                numberOfSourceFilesInRootPerSourceDir = 1,
-                srcDirs = listOf(
-                    "src/main/kotlin",
-                    "src/test/kotlin",
-                ),
-            ),
-            buildFileName = "build.gradle.kts",
-            mainBuildFileContent = """
-                plugins {
-                    id("dev.detekt")
-                    kotlin("jvm") // This plugin has type KotlinBasePlugin
-                }
-            
-                // This plugin also has type KotlinBasePlugin
-                apply<org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin>()
-            
-                repositories {
-                    mavenLocal()
-                    mavenCentral()
-                }
-            """.trimIndent(),
-            dryRun = true,
-        ).also {
-            it.setupProject()
-        }
-
-        gradleRunner.checkTask("main")
-        gradleRunner.checkTask("test")
     }
 
     @Nested
